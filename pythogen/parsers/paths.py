@@ -5,9 +5,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from typing import Any
 
-from parsers.operations import OperationParser
-
 from pythogen import models
+from pythogen.parsers.operations import OperationParser
 
 
 if TYPE_CHECKING:
