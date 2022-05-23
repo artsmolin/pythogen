@@ -4,13 +4,14 @@ import logging
 
 import models
 import yaml
-from parsers.operations import OperationParser
-from parsers.parameters import ParameterParser
-from parsers.paths import PathParser
-from parsers.references import RefResolver
-from parsers.request_body import RequestBodyParser
-from parsers.response import ResponseParser
-from parsers.schemas import SchemaParser
+
+from pythogen.parsers.operations import OperationParser
+from pythogen.parsers.parameters import ParameterParser
+from pythogen.parsers.paths import PathParser
+from pythogen.parsers.references import RefResolver
+from pythogen.parsers.request_body import RequestBodyParser
+from pythogen.parsers.response import ResponseParser
+from pythogen.parsers.schemas import SchemaParser
 
 
 logger = logging.getLogger(__name__)

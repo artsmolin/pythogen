@@ -5,10 +5,11 @@
 
 from typing import Optional
 
-import packager
-import renderer
 import typer
-from parsers.document import parse_openapi_file
+
+from pythogen import packager
+from pythogen import renderer
+from pythogen.parsers.document import parse_openapi_file
 
 
 def main(

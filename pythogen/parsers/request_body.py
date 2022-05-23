@@ -1,10 +1,10 @@
 import logging
 from typing import Any
 
-import models
-from parsers import constants
-from parsers.references import RefResolver
-from parsers.schemas import SchemaParser
+from pythogen import models
+from pythogen.parsers import constants
+from pythogen.parsers.references import RefResolver
+from pythogen.parsers.schemas import SchemaParser
 
 
 logger = logging.getLogger(__name__)

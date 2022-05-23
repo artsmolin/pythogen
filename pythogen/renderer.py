@@ -9,10 +9,11 @@ from dataclasses import dataclass
 from typing import TypeVar
 
 import inflection
-import models
-import settings
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+
+from pythogen import models
+from pythogen import settings
 
 
 PathStr = TypeVar('PathStr', bound=str)

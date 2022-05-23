@@ -2,12 +2,12 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
-import models
-from parsers.parameters import ParameterParser
-from parsers.references import RefResolver
-from parsers.request_body import RequestBodyParser
-from parsers.response import ResponseParser
-from parsers.schemas import SchemaParser
+from pythogen import models
+from pythogen.parsers.parameters import ParameterParser
+from pythogen.parsers.references import RefResolver
+from pythogen.parsers.request_body import RequestBodyParser
+from pythogen.parsers.response import ResponseParser
+from pythogen.parsers.schemas import SchemaParser
 
 
 logger = logging.getLogger(__name__)

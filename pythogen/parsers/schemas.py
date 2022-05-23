@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Optional
 
-import models
-from parsers.references import RefResolver
+from pythogen import models
+from pythogen.parsers.references import RefResolver
 
 
 @dataclass

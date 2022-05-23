@@ -7,9 +7,10 @@
 import dataclasses
 from pathlib import Path
 
-import settings
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+
+from pythogen import settings
 
 
 @dataclasses.dataclass

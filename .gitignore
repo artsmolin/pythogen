@@ -19,3 +19,4 @@ flower.db
 local_settings.py
 tmp/
 .env
+__pycache__
