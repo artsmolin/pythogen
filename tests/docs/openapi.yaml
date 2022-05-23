@@ -1,0 +1,485 @@
+openapi: 3.0.2
+info:
+  title: test server
+  version: 0.1.0
+paths:
+  /objects/{object_id}:
+    get:
+      tags:
+        - test
+      summary: Get Object
+      operationId: get_object
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+        - required: false
+          schema:
+            title: Return Error
+            type: string
+          name: return_error
+          in: query
+        - required: true
+          schema: { title: From, type: string, description: __safety_key__(from_) }
+          name: from
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetObjectResp'
+        '500':
+          description: Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+    delete:
+      tags:
+        - test
+      summary: Delete Object
+      operationId: delete_object
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteObjectResp'
+    put:
+      tags:
+        - test
+      summary: Put Object
+      operationId: put_object
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutObjectData'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutObjectResp'
+
+    patch:
+      tags:
+        - test
+      summary: Patch Object
+      operationId: patch_object
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchObjectData'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchObjectResp'
+
+  /post-without-body:
+    post:
+      tags:
+        - test
+      summary: Post Object Without Body
+      operationId: post_object_without_body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostObjectResp'
+  /objects:
+    get:
+      tags:
+        - test
+      summary: Get List objects
+      operationId: get_list_objects
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetObjectResp'
+    post:
+      tags:
+        - test
+      summary: Post Object
+      operationId: post_object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostObjectData'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostObjectResp'
+
+  /text:
+    get:
+      tags:
+        - test
+      summary: Get Text
+      operationId: get_text
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+  /empty:
+    get:
+      tags:
+        - test
+      summary: Get Empty
+      operationId: get_empty
+      responses:
+        '200':
+          description: Successful Response
+  /binary:
+    get:
+      tags:
+        - test
+      summary: Get Binary
+      operationId: get_binary
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/binary:
+              schema:
+                type: string
+                format: binary
+  /allof:
+    get:
+      tags:
+        - test
+      summary: Get Allof
+      operationId: get_allof
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllOfResp'
+  /objects-form-data:
+    post:
+      tags:
+        - test
+      summary: Post Form Object
+      operationId: post_form_object
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostObjectData'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostObjectResp'
+  /multipart-form-data:
+    post:
+      tags:
+      - test
+      summary: Post Multipart Form Data
+      operationId: post_multipart_form_data
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PostFile"
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostObjectResp'
+  /slow/objects/{object_id}:
+    get:
+      tags:
+        - test
+      summary: Get Object Slow
+      operationId: get_object_slow
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+        - required: false
+          schema:
+            title: Return Error
+            type: string
+          name: return_error
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetObjectResp'
+        '500':
+          description: Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+    put:
+      tags:
+        - test
+      summary: Put Object Slow
+      operationId: put_object_slow
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutObjectData'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutObjectResp'
+
+components:
+  schemas:
+    AllOfResp:
+      title: All Of Resp
+      type: object
+      properties:
+        all_of:
+          title: All Of
+          allOf:
+            - $ref: '#/components/schemas/Data'
+    Data:
+      title: Data
+      type: object
+      properties:
+        id:
+          title: id
+          type: string
+        data:
+          title: Data
+          type: integer
+      additionalProperties: false
+    GetObjectResp:
+      title: GetObjectResp
+      type: object
+      properties:
+        string_data:
+          title: String Data
+          type: string
+          description: "String Data. [__discriminator__(BaseObjectResp.string_data)]"
+        integer_data:
+          title: Integer Data
+          type: integer
+        array_data:
+          title: Array Data
+          type: array
+          items:
+            type: string
+        boolean_data:
+          title: Boolean Data
+          type: boolean
+      additionalProperties: false
+    PostObjectData:
+      title: PostObjectData
+      required:
+        - string_data
+        - integer_data
+        - array_data
+        - boolean_data
+        - event-data
+      type: object
+      properties:
+        string_data:
+          title: String Data
+          type: string
+        integer_data:
+          title: Integer Data
+          type: integer
+        array_data:
+          title: Array Data
+          type: array
+          items:
+            type: string
+        boolean_data:
+          title: Boolean Data
+          type: boolean
+        event-data:
+          title: Event-Data
+          type: object
+          description: __safety_key__(event_data)
+        date:
+          type: string
+          format: date
+        datetime:
+          type: string
+          format: date-time
+        url:
+          type: string
+          format: uri
+      additionalProperties: false
+    PatchObjectData:
+      title: PatchObjectData
+      required:
+        - id
+        - data
+      type: object
+      properties:
+        id:
+          title: ID
+          type: string
+        data:
+          title: Data
+          type: integer
+      additionalProperties: false
+    PutObjectData:
+      title: PutObjectData
+      required:
+        - id
+        - data
+      type: object
+      properties:
+        id:
+          title: ID
+          type: string
+        data:
+          title: Data
+          type: integer
+      additionalProperties: false
+    PostFile:
+      title: PostFile
+      required:
+        - text
+      type: object
+      properties:
+        text:
+          type: string
+    PostObjectResp:
+      title: PostObjectResp
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          default: OK
+      additionalProperties: false
+    PatchObjectResp:
+      title: PatchObjectResp
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          default: OK
+      additionalProperties: false
+    PutObjectResp:
+      title: PutObjectResp
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          default: OK
+      additionalProperties: false
+    DeleteObjectResp:
+      title: DeleteObjectResp
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          default: OK
+      additionalProperties: false
+    UnknownError:
+      title: UnknownError
+      type: object
+      properties:
+        code:
+          title: Code
+          type: string
+          default: unknown_error
+      additionalProperties: false
+
+    TestSafetyKey:
+      title: model for testing safety key
+      type: object
+      properties:
+        for:
+          title: For
+          type: string
+          description: reserved word, expecting "for_"
+        class:
+          title: Class
+          type: string
+          description: reserved word, expecting "class_"
+        33with.dot-and-hyphens&*:
+          title: With dot, hyphens and garbage
+          type: integer
+          description: invalid identifier, expecting "with_dot_and_hyphens"
+        34with.dot-and-hyphens&*:
+          title: With dot, hyphens and garbage
+          type: integer
+          description: __safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"

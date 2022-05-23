@@ -1,0 +1,28 @@
+exclude: (^tests)
+repos:
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+        args: [ --line-length=120, --skip-string-normalization ]
+        stages: [ commit ]
+
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        args: [ --in-place, --ignore-init-module-imports, --remove-all-unused-imports, --remove-unused-variables ]
+        stages: [ commit ]
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.9.3
+    hooks:
+      - id: isort
+        args: [ --profile=black, --force-grid-wrap=2, --lines-after-imports=2, --force-single-line, --line-length=120, --project=app]
+        stages: [ commit ]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer

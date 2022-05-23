@@ -1,0 +1,5 @@
+        {%- if sync %}
+        response = self.client.{{ method }}(url, {%- if req_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if req_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
+        {%- else %}
+        response = await self.client.{{ method }}(url, {%- if req_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if req_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
+        {%- endif %}

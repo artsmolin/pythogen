@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "{{ name }}"
+version = "{{ version }}"
+description = "{{ name }}"
+authors = []
+
+[[tool.poetry.source]]
+name = "gitlab-pypi"
+url = "https://gitlab-pypi:kdnfksdnfnsdnfjksdnfjn@gitlab.com/api/v4/groups/11111/-/packages/pypi/simple"
+default = true
+
+[tool.poetry.dependencies]
+alfa = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

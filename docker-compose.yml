@@ -1,0 +1,27 @@
+version: "3.7"
+
+
+services:
+  mock_server:
+    build: ./tests/server
+    command: python server.py
+    ports:
+    - 8080:8080
+    networks:
+      clientator:
+        aliases:
+          - mock_server
+
+  tests:
+    build: ./tests
+    environment:
+      TEST_SERVER_URL: http://test_server:8080
+    command: python main.py
+    networks:
+      clientator:
+        aliases:
+          - tests
+
+networks:
+  clientator:
+    driver: bridge

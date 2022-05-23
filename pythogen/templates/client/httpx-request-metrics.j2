@@ -1,0 +1,19 @@
+
+        try:
+            {%- if sync %}
+            response = self.client.{{ method }}(url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
+            {%- else %}
+            response = await self.client.{{ method }}(url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
+            {%- endif %}
+        except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(exc)
+            raise exc
+        {#
+            https://www.python-httpx.org/api/#response
+            .elapsed - The amount of time elapsed between sending the request
+            and calling close() on the corresponding response received for that request.
+            total_seconds() to correctly get the total elapsed seconds.
+        #}
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(response)
