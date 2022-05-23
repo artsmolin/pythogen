@@ -4,7 +4,7 @@ install-pre-commit:
 format: install-pre-commit
 	pre-commit run --all-files
 
-clients:
+clients-for-tests:
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client.py
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
 

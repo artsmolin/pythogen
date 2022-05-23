@@ -37,5 +37,5 @@ Generate clients
     make requirements
     ```
 - Make changes
-- Execute `make clients`
+- Execute `make clients-for-tests`
 - Run tests `make tests-in-docker`
