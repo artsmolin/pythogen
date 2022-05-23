@@ -27,5 +27,6 @@ jobs:
           virtualenvs-in-project: false
       - name: Publish to pypi
         run: |
+          poetry version "$(poetry version).dev${BUILD_ID}"
           poetry build
           poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
