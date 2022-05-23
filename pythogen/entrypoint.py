@@ -36,5 +36,9 @@ def main(
     )
 
 
-if __name__ == '__main__':
+def run() -> None:
     typer.run(main)
+
+
+if __name__ == '__main__':
+    run()
