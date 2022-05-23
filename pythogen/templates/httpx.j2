@@ -156,26 +156,8 @@ class BaseMetricsIntegration:
         client_response_time_histogram: Optional[Histogram] = None,
         client_non_http_errors_counter: Optional[Counter] = None,
     ):
-        self._client_response_time_histogram = client_response_time_histogram or Histogram(
-            'http_client_duration',
-            'http_client_duration requests to external services duration in seconds',
-            labelnames=(
-                'client_name',
-                'http_method',
-                'http_target',
-                'http_status_code',
-            ),
-        )
-        self._client_non_http_errors_counter = client_non_http_errors_counter or Counter(
-            'http_client_other_errors_total',
-            'http_client_other_errors_total total count of non http errors occurred',
-            labelnames=(
-                'client_name',
-                'http_method',
-                'http_target',
-                'exception',
-            ),
-        )
+        self._client_response_time_histogram = client_response_time_histogram
+        self._client_non_http_errors_counter = client_non_http_errors_counter
 
     def on_request_error(self) -> None:
          raise NotImplemented()
