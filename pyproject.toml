@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pythogen"
-version = "0.0.6"
+version = "0.0.7"
 description = ""
 authors = []
 
@@ -13,7 +13,7 @@ rich = "12.2.0"
 inflection = "0.5.1"
 
 [tool.poetry.scripts]
-poetry = 'pythogen.entrypoint'
+poetry = 'pythogen.entrypoint.run'
 
 [build-system]
 requires = ["poetry>=1.1.0"]
