@@ -10,25 +10,22 @@ Generator of python HTTP-clients from OpenApi specification based on `httpx` and
 - Tracing
 - Metrics
 
-## Usage
-Activate environment
+## Installation
 ```shell
-rm -rf venv || true
-python3.9 -m venv venv
-source venv/bin/activate
-make requirements
+pip install pythogen
 ```
-Generate clients
-- Async
-    ```shell
-    python pythogen/entrypoint.py path/to/input/openapi.yaml path/to/output/client.py
-    ```
-- Sync
-    ```shell
-    python pythogen/entrypoint.py path/to/input/openapi.yaml path/to/output/client.py --sync
-    ```
 
-## For developers
+## Usage
+Generate asynchronous client
+```shell
+pythogen path/to/input/openapi.yaml path/to/output/client.py
+```
+Generate synchronous client
+```shell
+pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
+```
+
+## Development
 - Activate environment
     ```shell
     rm -rf venv || true
