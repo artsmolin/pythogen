@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import logging
 
-import models
 import yaml
 
+from pythogen import models
 from pythogen.parsers.operations import OperationParser
 from pythogen.parsers.parameters import ParameterParser
 from pythogen.parsers.paths import PathParser
