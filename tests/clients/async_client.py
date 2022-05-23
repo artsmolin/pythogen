@@ -12,6 +12,8 @@
 
 from __future__ import annotations
 
+import abc
+
 from datetime import datetime
 from datetime import date
 
@@ -60,21 +62,21 @@ class TracerConfig(BaseModel):
     jaeger_enabled: bool
 
 
-class BaseTracerIntegration:
+class BaseTracerIntegration(abc.ABC):
     def __init__(self, tracer: Optional[Tracer] = None):
         self.tracer = tracer
 
-    def get_tracing_http_headers(self) -> dict[str, str]:
-        raise NotImplemented()
+    @abc.abstractmethod
+    def get_tracing_http_headers(self) -> dict[str, str]: ...
 
-    def get_current_trace_id(self) -> Optional[str]:
-        raise NotImplemented()
+    @abc.abstractmethod
+    def get_current_trace_id(self) -> Optional[str]: ...
 
-    def get_tracer(self) -> Tracer:
-        raise NotImplemented()
+    @abc.abstractmethod
+    def get_tracer(self) -> Tracer: ...
 
-    def get_current_span(self) -> Optional[Span]:
-        raise NotImplemented()
+    @abc.abstractmethod
+    def get_current_span(self) -> Optional[Span]: ...
 
 
 class DefaultTracerIntegration(BaseTracerIntegration):
@@ -138,7 +140,7 @@ except AttributeError:
     DEFAULT_AUTH = None
 
 
-class BaseMetricsIntegration:
+class BaseMetricsIntegration(abc.ABC):
     def __init__(
         self,
         client_response_time_histogram: Optional[Histogram] = None,
@@ -147,11 +149,11 @@ class BaseMetricsIntegration:
         self._client_response_time_histogram = client_response_time_histogram
         self._client_non_http_errors_counter = client_non_http_errors_counter
 
-    def on_request_error(self) -> None:
-         raise NotImplemented()
+    @abc.abstractmethod
+    def on_request_error(self) -> None: ...
 
-    def on_request_success(self) -> None:
-         raise NotImplemented()
+    @abc.abstractmethod
+    def on_request_success(self) -> None: ...
 
 
 class DefaultMetricsIntegration(BaseMetricsIntegration):
