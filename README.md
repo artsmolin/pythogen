@@ -1,4 +1,10 @@
-# 🧬 Pythogen: HTTP-clients generator for Python
+<div>
+  <p align="center">
+    <img src="docs/images/logo.png" height="100">
+  </p>
+  <h1 align="center"><strong>Pythogen</strong></h1>
+</div>
+
 Generator of python HTTP-clients from OpenApi specification based on `httpx` and `pydantic`.
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
