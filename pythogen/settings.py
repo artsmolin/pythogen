@@ -1,3 +1,7 @@
-TEMPLATES_DIR_PATH = "pythogen/templates"
+from pathlib import Path
+
+
 CLIENT_TEMPLATE_NAME = "httpx.j2"
-CLIENT_TEMPLATE_PATH = f"{TEMPLATES_DIR_PATH}/{CLIENT_TEMPLATE_NAME}"
+
+CURRENT_DIR_PATH = Path(__file__).parent.absolute()
+TEMPLATES_DIR_PATH = CURRENT_DIR_PATH / Path("pythogen/templates")

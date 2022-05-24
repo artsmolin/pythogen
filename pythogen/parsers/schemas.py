@@ -278,9 +278,7 @@ class SchemaParser:
             items = []
             for any_ref_item in any_of:
                 ref = any_ref_item.get('$ref', None)
-                resolved_ref = self._ref_resolver.resolve(
-                    ref,
-                )
-                ref_schema = self._parse_schema(resolved_ref.ref_id, resolved_ref.ref_data)
+                resolved_ref = self._ref_resolver.resolve(ref)
+                ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 items.append(ref_schema)
             return items
