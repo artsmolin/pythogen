@@ -15,7 +15,7 @@ services:
   tests:
     build: ./tests
     environment:
-      TEST_SERVER_URL: http://test_server:8080
+      TEST_SERVER_URL: http://mock_server:8080
     command: python main.py
     networks:
       clientator:
