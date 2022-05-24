@@ -13,7 +13,10 @@ requirements:
 	poetry install --remove-untracked
 	make install-pre-commit
 
-tests-in-docker:
+test:
+	pytest
+
+test-clients:
 	docker-compose up -d --build mock_server ;\
 	docker-compose up --build tests ;\
 	test_status_code=$$? ;\

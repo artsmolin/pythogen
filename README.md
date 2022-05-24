@@ -40,5 +40,5 @@ pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
     make requirements
     ```
 - Make changes
-- Execute `make clients-for-tests`
-- Run tests `make tests-in-docker`
+- Run `make test`
+- Execute `make clients-for-tests && make test-clients`

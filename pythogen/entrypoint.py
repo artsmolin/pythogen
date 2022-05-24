@@ -12,6 +12,10 @@ from pythogen import renderer
 from pythogen.parsers.document import parse_openapi_file
 
 
+app = typer.Typer()
+
+
+@app.command()
 def main(
     input: str = typer.Argument(..., help="input OpenAPI file path"),
     output: str = typer.Argument(..., help="client output file path"),
@@ -22,7 +26,6 @@ def main(
     """
     Generate HTTP clients for python from OpenAPI
     """
-
     if package:
         resp = packager.init_package(client_class_name=name, package_version=package)
         output = resp.output_path
@@ -42,4 +45,4 @@ def run() -> None:
 
 
 if __name__ == '__main__':
-    run()
+    app()
