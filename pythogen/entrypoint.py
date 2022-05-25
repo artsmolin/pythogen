@@ -3,6 +3,7 @@
 """
 
 
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -21,14 +22,20 @@ def main(
     output: str = typer.Argument(..., help="client output file path"),
     name: str = typer.Option("Client", help="client class name"),
     sync: bool = typer.Option(False, help="sync client"),
-    package: Optional[str] = typer.Option(None, help="package version"),
+    package_version: Optional[str] = typer.Option(None, help="package version"),
+    package_authors: Optional[str] = typer.Option(None, help="package authors"),
 ):
     """
     Generate HTTP clients for python from OpenAPI
     """
-    if package:
-        resp = packager.init_package(client_class_name=name, package_version=package)
-        output = resp.output_path
+    if package_version:
+        resp = packager.init_package(
+            output_path=Path(output).parent,
+            client_class_name=name,
+            package_version=package_version,
+            package_authors=package_authors,
+        )
+        output = resp.client_output_path
 
     document = parse_openapi_file(input)
 

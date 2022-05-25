@@ -30,6 +30,10 @@ Generate synchronous client
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
 ```
+Generate client as python-package
+```shell
+pythogen path/to/input/openapi.yaml path/to/output/client.py --package-version=0.0.1 --package-authors="Rick, Morty"
+```
 
 ## Development
 - Activate environment
