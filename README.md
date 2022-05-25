@@ -26,18 +26,22 @@ pip install pythogen
 ```
 
 ## Usage
-Generate asynchronous client
-```shell
-pythogen path/to/input/openapi.yaml path/to/output/client.py
-```
-Generate synchronous client
-```shell
-pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
-```
-Generate client as python-package
+### Generate ordinary clients
+- Asynchronous client
+  ```shell
+  pythogen path/to/input/openapi.yaml path/to/output/client.py
+  ```
+- Synchronous client
+  ```shell
+  pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
+  ```
+### Generate client as python-package
 ```shell
 pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0.1 --package-authors="Rick, Morty"
 ```
+- `--package-version` — required;
+- `--package-authors` — optional;
+- `path/to/package/output` — path to the directory where package will be saved.
 
 ## Development
 - Activate environment
