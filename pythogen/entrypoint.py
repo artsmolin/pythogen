@@ -3,7 +3,6 @@
 """
 
 
-from pathlib import Path
 from typing import Optional
 
 import typer
@@ -30,7 +29,7 @@ def main(
     """
     if package_version:
         resp = packager.init_package(
-            output_path=Path(output).parent,
+            output_path=output,
             client_class_name=name,
             package_version=package_version,
             package_authors=package_authors,
