@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pythogen"
-version = "0.0.17"
+version = "0.0.18"
 description = ""
 repository = "https://github.com/artsmolin/pythogen"
 authors = []
