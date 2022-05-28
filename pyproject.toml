@@ -1,9 +1,15 @@
 [tool.poetry]
 name = "pythogen"
 version = "0.0.18"
-description = ""
+description = "Generator of python HTTP-clients from OpenApi specification."
+homepage = "https://github.com/artsmolin/pythogen"
 repository = "https://github.com/artsmolin/pythogen"
-authors = []
+authors = ["Artur Smolin <artursmolin@outlook.com>", "Vladimir Vyazovetskov <erhosen@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+include = [
+    "LICENSE",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
