@@ -14,7 +14,7 @@ ASYNC_CLIENT_PATH = "tests/pythogen/tmp/async_client.py"
 @contextmanager
 def collect_garbage():
     yield
-    Path(ASYNC_CLIENT_PATH).unlink()
+    Path(ASYNC_CLIENT_PATH).unlink(missing_ok=True)
 
 
 def test_entrypoint() -> None:
