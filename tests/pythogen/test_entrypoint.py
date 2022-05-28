@@ -8,17 +8,19 @@ runner = CliRunner()
 
 
 OPENAPI_PATH = "tests/docs/openapi.yaml"
-ASYNC_CLIENT_PATH = "tests/pythogen/tmp/async_client.py"
+TMP_DIR_PATH = "tests/pythogen/tmp"
+ASYNC_CLIENT_PATH = f"{TMP_DIR_PATH}/async_client.py"
 
 
 @contextmanager
-def collect_garbage():
+def temp_files():
+    Path(TMP_DIR_PATH).mkdir(parents=True, exist_ok=True) 
     yield
     Path(ASYNC_CLIENT_PATH).unlink(missing_ok=True)
 
 
 def test_entrypoint() -> None:
-    with collect_garbage():
+    with temp_files():
         result = runner.invoke(entrypoint.app, [OPENAPI_PATH, ASYNC_CLIENT_PATH])
     
     assert result.exit_code == 0
