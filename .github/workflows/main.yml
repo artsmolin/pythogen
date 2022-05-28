@@ -1,0 +1,39 @@
+name: Tests
+on: push
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Linting
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files
+  test:
+    name: test
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        pip install poetry
+        poetry install
+    - name: Run pytest
+      run: |
+        poetry run pytest --cov=pythogen --cov-report=xml tests/
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1.3.1
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        file: ./coverage.xml
