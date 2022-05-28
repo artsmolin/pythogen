@@ -13,6 +13,8 @@ Generator of python HTTP-clients from OpenApi specification based on `httpx` and
 [![pypi](https://img.shields.io/pypi/v/pythogen.svg)](https://pypi.org/project/pythogen/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+---
+
 <p align="center">
   <img src="docs/images/example.png">
 </p>
