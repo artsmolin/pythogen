@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
 
 
 @dataclass
@@ -13,7 +14,7 @@ class RefResolver:
     Отвечает за получение данных из указанного $ref пути.
     """
 
-    def __init__(self, openapi_data: dict[str, Any]) -> None:
+    def __init__(self, openapi_data: Dict[str, Any]) -> None:
         self._openapi_data = openapi_data
 
     def resolve(self, ref: str) -> ResolvedRef:

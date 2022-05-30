@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.parameters import ParameterParser
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ParsedOperation:
     operation: models.OperationObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class OperationParser:
@@ -34,10 +35,10 @@ class OperationParser:
         self._request_body_parser = request_body_parser
         self._parameters_parser = parameters_parser
 
-    def parse_item(self, method: models.HttpMethod, operation_data: dict[str, Any]) -> ParsedOperation:
+    def parse_item(self, method: models.HttpMethod, operation_data: Dict[str, Any]) -> ParsedOperation:
         """Спарсить спецификацию метода ручки (POST-, GET-, PUT-запроса и т.п.)"""
-        responses: dict[str, models.ResponseObject] = {}
-        inline_schemas: dict[str, models.SchemaObject] = {}
+        responses: Dict[str, models.ResponseObject] = {}
+        inline_schemas: Dict[str, models.SchemaObject] = {}
 
         for status_code, response_data in operation_data.get('responses').items():
             if status_code == 'default':

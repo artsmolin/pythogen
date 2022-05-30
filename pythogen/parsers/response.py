@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.references import RefResolver
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ParsedResponse:
     response: models.ResponseObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class ResponseParser:
@@ -21,10 +22,10 @@ class ResponseParser:
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
 
-    def parse_item(self, response_id: str, response_data: dict[str, Any]) -> ParsedResponse:
+    def parse_item(self, response_id: str, response_data: Dict[str, Any]) -> ParsedResponse:
         """Спарсить спецификацию ответа ручки"""
         schema = None
-        inline_schemas: dict[str, models.SchemaObject] = {}
+        inline_schemas: Dict[str, models.SchemaObject] = {}
 
         if content := response_data.get('content'):
             media_types = list(content.keys())

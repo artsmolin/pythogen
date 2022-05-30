@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import Dict
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -19,14 +20,14 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ParsedPaths:
-    paths: dict[str, models.PathItemObject]
-    inline_schemas: dict[str, models.SchemaObject]
+    paths: Dict[str, models.PathItemObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 @dataclass
 class ParsedPath:
     path: models.PathItemObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class PathParser:
@@ -59,7 +60,7 @@ class PathParser:
         ref_resolver: RefResolver,
         schema_parser: SchemaParser,
         operation_parser: OperationParser,
-        openapi_data: dict[str, Any],
+        openapi_data: Dict[str, Any],
     ) -> None:
         self._openapi_data = openapi_data
         self._ref_resolver = ref_resolver
@@ -81,7 +82,7 @@ class PathParser:
             inline_schemas=inline_schemas,
         )
 
-    def parse_item(self, path_data: dict[str, Any]) -> ParsedPath:
+    def parse_item(self, path_data: Dict[str, Any]) -> ParsedPath:
         """Спарсить спецификацию ручки"""
         operations = {}
         inline_schemas = {}

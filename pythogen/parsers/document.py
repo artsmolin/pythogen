@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Dict
 
 import yaml
 
@@ -71,7 +72,7 @@ def parse_openapi_file(file_path: str) -> models.Document:
 
     parsed_paths = path_parser.parse_collection()
     parsed_schemas = schema_parser.parse_collection()
-    schemas: dict[str, models.SchemaObject] = {
+    schemas: Dict[str, models.SchemaObject] = {
         **parsed_schemas.schemas,
         **parsed_schemas.inline_schemas,
         **parsed_paths.inline_schemas,

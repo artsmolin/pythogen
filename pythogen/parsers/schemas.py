@@ -1,6 +1,8 @@
 import re
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Optional
 
 from pythogen import models
@@ -10,19 +12,19 @@ from pythogen.parsers.references import RefResolver
 @dataclass
 class ParsedSchema:
     schema: models.SchemaObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 @dataclass
 class ParsedSchemaColection:
-    schemas: dict[str, models.SchemaObject]
-    inline_schemas: dict[str, models.SchemaObject]
+    schemas: Dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 @dataclass
 class ParsedProperties:
-    properties: list[models.SchemaProperty]
-    inline_schemas: dict[str, models.SchemaObject]
+    properties: List[models.SchemaProperty]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class SchemaParser:
@@ -54,8 +56,8 @@ class SchemaParser:
     def __init__(
         self,
         ref_resolver: RefResolver,
-        openapi_data: dict[str, Any],
-        discriminator_base_class_schemas: list[models.DiscriminatorBaseClassSchema],
+        openapi_data: Dict[str, Any],
+        discriminator_base_class_schemas: List[models.DiscriminatorBaseClassSchema],
     ) -> None:
         self._openapi_data = openapi_data
         self._ref_resolver = ref_resolver
@@ -78,7 +80,7 @@ class SchemaParser:
             inline_schemas=inline_schemas,
         )
 
-    def parse_item(self, schema_id: str, schema_data: dict[str, Any]) -> ParsedSchema:
+    def parse_item(self, schema_id: str, schema_data: Dict[str, Any]) -> ParsedSchema:
         schema_type = self._parse_type(schema_data)
         parsed_properties = self._parse_properties(schema_type, schema_data)
 
@@ -101,7 +103,7 @@ class SchemaParser:
             inline_schemas=parsed_properties.inline_schemas,
         )
 
-    def _parse_type(self, data: dict[str, Any]) -> models.Type:
+    def _parse_type(self, data: Dict[str, Any]) -> models.Type:
         if data == {}:
             # Парсинг пустой схемы
             # application/json:
@@ -120,7 +122,7 @@ class SchemaParser:
                 raise Exception(f'Unable to parse schema "{id}", uknown type "{raw_data_type}"')
         return data_type
 
-    def _parse_format(self, data: dict[str, Any]) -> Optional[models.Format]:
+    def _parse_format(self, data: Dict[str, Any]) -> Optional[models.Format]:
         data_format = data.get('format')
         if data_format:
             try:
@@ -128,7 +130,7 @@ class SchemaParser:
             except Exception:
                 raise Exception(f'Unable to parse schema "{id}", uknown format "{data_format}"')
 
-    def _get_description(self, data: dict[str, Any]) -> Optional[str]:
+    def _get_description(self, data: Dict[str, Any]) -> Optional[str]:
         description = data.get("description", "")
         if description:
             description = description.replace("\n", "\\n")
@@ -138,7 +140,7 @@ class SchemaParser:
 
     def _get_discriminator_base_class_schema(
         self,
-        data: dict[str, Any],
+        data: Dict[str, Any],
     ) -> Optional[models.DiscriminatorBaseClassSchema]:
         description = data.get("description", "")
         if "__discriminator__" not in description:
@@ -150,7 +152,7 @@ class SchemaParser:
             attr=attr,
         )
 
-    def _parse_properties(self, schema_type: models.Type, data: dict[str, Any]) -> ParsedProperties:
+    def _parse_properties(self, schema_type: models.Type, data: Dict[str, Any]) -> ParsedProperties:
         data_format = data.get('format')
         if data_format:
             try:
@@ -255,7 +257,7 @@ class SchemaParser:
             inline_schemas=inline_schemas,
         )
 
-    def _parse_items(self, data: dict[str, Any]):
+    def _parse_items(self, data: Dict[str, Any]):
         items = None
 
         if items_schema_data := data.get('items'):
