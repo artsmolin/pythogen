@@ -20,6 +20,7 @@ from datetime import date
 from httpx import Timeout
 from typing import Literal
 from typing import List
+from typing import Tuple
 from typing import Any
 from typing import Dict
 from typing import Optional
@@ -182,9 +183,9 @@ FileTypes = Union[
     # file (or text)
     FileContent,
     # (filename, file (or text))
-    tuple[Optional[str], FileContent],
+    Tuple[Optional[str], FileContent],
     # (filename, file (or text), content_type)
-    tuple[Optional[str], FileContent, Optional[str]],
+    Tuple[Optional[str], FileContent, Optional[str]],
 ]
 
 class EmptyBody(BaseModel):
@@ -198,7 +199,7 @@ class BaseObjectResp(BaseModel):
     @validator("string_data", pre=True)
     def check(cls, v: str) -> str:
         type_hints = get_type_hints(cls)
-        string_data_values: tuple[str] = type_hints["string_data"].__dict__['__args__']
+        string_data_values: Tuple[str] = type_hints["string_data"].__dict__['__args__']
 
         if v not in string_data_values:
             raise ValueError(f'invalid string_data for {cls}')
@@ -878,7 +879,7 @@ class Client:
         self,
         body: Optional[Union[PostFile, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
-        files: Optional[Union[Mapping[str, FileTypes], Sequence[tuple[str, FileTypes]]]] = None,
+        files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/multipart-form-data')
 

@@ -8,6 +8,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict
 from typing import List
+from typing import Tuple
 from typing import TypeVar
 
 import inflection
@@ -103,7 +104,7 @@ def prepare_operations(document: models.Document) -> PreparedOperations:
     return prepared_operations
 
 
-def iterresponsemap(responses: models.ResponsesObject) -> List[tuple[str, str]]:
+def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
     mapping = []
 
     for code, response in responses.patterned.items():
