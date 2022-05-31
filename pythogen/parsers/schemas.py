@@ -68,8 +68,8 @@ class SchemaParser:
         schemas = {}
         inline_schemas = {}
         for schema_id, schema_data in schemas_data.items():
-            if ref := schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if schema_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
                 parsed_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
                 parsed_schema = self.parse_item(schema_id, schema_data)
@@ -162,10 +162,12 @@ class SchemaParser:
 
         properties = []
         inline_schemas = {}
-        if properties_map := data.get('properties'):
+
+        properties_map = data.get('properties')
+        if properties_map:
             for key, property_schema_data in properties_map.items():
-                if ref := property_schema_data.get('$ref', None):
-                    resolved_ref = self._ref_resolver.resolve(ref)
+                if property_schema_data.get('$ref', None):
+                    resolved_ref = self._ref_resolver.resolve(property_schema_data['$ref'])
                     property_schema_data = resolved_ref.ref_data
                     property_schema_id = resolved_ref.ref_id
                     parsed_schema = self.parse_item(property_schema_id, property_schema_data)
@@ -258,11 +260,10 @@ class SchemaParser:
         )
 
     def _parse_items(self, data: Dict[str, Any]):
-        items = None
-
-        if items_schema_data := data.get('items'):
-            if ref := items_schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+        items_schema_data = data.get('items')
+        if items_schema_data:
+            if items_schema_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
                 parsed_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 return parsed_schema.schema
 
@@ -276,9 +277,9 @@ class SchemaParser:
                 parsed_schema = self.parse_item(items_schema_id, items_schema_data)
                 return parsed_schema.schema
 
-        if any_of := data.get('anyOf'):
+        if data.get('anyOf'):
             items = []
-            for any_ref_item in any_of:
+            for any_ref_item in data['anyOf']:
                 ref = any_ref_item.get('$ref', None)
                 resolved_ref = self._ref_resolver.resolve(ref)
                 ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)

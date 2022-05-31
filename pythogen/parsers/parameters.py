@@ -17,8 +17,8 @@ class ParameterParser:
         parameters = self._openapi_data["components"].get('parameters', {})
         result = {}
         for parameter_id, parameter_data in parameters.items():
-            if ref := parameter_data.get('$ref', None):
-                parameter = self.parse_item_from_ref(parameter_id, ref)
+            if parameter_data.get('$ref', None):
+                parameter = self.parse_item_from_ref(parameter_id, parameter_data['$ref'])
             else:
                 parameter = self.parse_item(parameter_id, parameter_data)
             result[parameter_id] = parameter
@@ -30,8 +30,8 @@ class ParameterParser:
 
     def parse_item(self, id_: str, data: Dict[str, Any]) -> models.ParameterObject:
         schema_data = data['schema']
-        if ref := schema_data.get('$ref', None):
-            resolved_ref = self._ref_resolver.resolve(ref)
+        if schema_data.get('$ref', None):
+            resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
             parsed_schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
         else:
             parsed_schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)

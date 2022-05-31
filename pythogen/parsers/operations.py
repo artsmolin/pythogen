@@ -45,8 +45,8 @@ class OperationParser:
                 logger.error('Unable to parse responses, "default" not implemented yet')
                 continue
 
-            if ref := response_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if response_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(response_data['$ref'])
                 response_data = resolved_ref.ref_data
                 response_id = resolved_ref.ref_id
             else:
@@ -64,8 +64,8 @@ class OperationParser:
 
         parameters = []
         for parameter_data in operation_data.get('parameters', []):
-            if ref := parameter_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if parameter_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(parameter_data['$ref'])
                 parameter = self._parameters_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 parameters.append(parameter)
             else:
