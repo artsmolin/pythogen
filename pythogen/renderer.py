@@ -169,7 +169,7 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
         models.Format.date_time: 'datetime',
     }
 
-    representation = 'dict'
+    representation = 'Dict'
 
     if schema.type in primitive_type_mapping:
         if schema.enum:

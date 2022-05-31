@@ -19,7 +19,9 @@ from datetime import date
 
 from httpx import Timeout
 from typing import Literal
+from typing import List
 from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Union
 from typing import Callable
@@ -67,7 +69,7 @@ class BaseTracerIntegration(abc.ABC):
         self.tracer = tracer
 
     @abc.abstractmethod
-    def get_tracing_http_headers(self) -> dict[str, str]: ...
+    def get_tracing_http_headers(self) -> Dict[str, str]: ...
 
     @abc.abstractmethod
     def get_current_trace_id(self) -> Optional[str]: ...
@@ -80,13 +82,13 @@ class BaseTracerIntegration(abc.ABC):
 
 
 class DefaultTracerIntegration(BaseTracerIntegration):
-    def get_tracing_http_headers(self) -> dict[str, str]:
+    def get_tracing_http_headers(self) -> Dict[str, str]:
         tracer = self.get_tracer()
         span = self.get_current_span()
         if not span:
             return {}
         span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
-        headers: dict[str, str] = {}
+        headers: Dict[str, str] = {}
         tracer.inject(span, Format.HTTP_HEADERS, headers)
         return headers
 
@@ -292,7 +294,7 @@ class {{ name }}:
         {%- else %}
         client: Optional[httpx.AsyncClient] = None,
         {%- endif %}
-        headers: dict[str, str] = None,
+        headers: Dict[str, str] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
@@ -342,7 +344,7 @@ class {{ name }}:
     def _get_url(self, path: str) -> str:
         return f'{self.base_url}{path}'
 
-    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
         return {'extra': {'props': {'data': kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
@@ -365,7 +367,7 @@ class {{ name }}:
             ),
         )
 
-    def add_tracing_data_to_headers(self, headers_: dict[str, str]) -> None:
+    def add_tracing_data_to_headers(self, headers_: Dict[str, str]) -> None:
         tracing_headers = self.tracer_integration.get_tracing_http_headers()
         headers_.update(tracing_headers)
         trace_id = self.tracer_integration.get_current_trace_id() or ''

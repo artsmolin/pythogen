@@ -26,7 +26,7 @@
         {%- endif %}
         {%- endfor %}
         {%- if operation.request_body %}
-        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, dict[str, Any]]] = None,
+        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, Dict[str, Any]]] = None,
         {%- endif %}
         {#- optional query params -#}
         {%- for parameter in operation.query_params -%}
