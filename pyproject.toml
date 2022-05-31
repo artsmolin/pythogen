@@ -24,6 +24,9 @@ pytest-cov = "^3.0.0"
 [tool.poetry.scripts]
 pythogen = 'pythogen.entrypoint:run'
 
+[tool.poetry.dev-dependencies]
+importlib-metadata = "^4.11.4"
+
 [build-system]
 requires = ["poetry>=1.1.0"]
 build-backend = "poetry.masonry.api"
