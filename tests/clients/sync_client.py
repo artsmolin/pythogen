@@ -18,8 +18,14 @@ from datetime import datetime
 from datetime import date
 
 from httpx import Timeout
-from typing import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+from typing import List
+from typing import Tuple
 from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Union
 from typing import Callable
@@ -67,7 +73,7 @@ class BaseTracerIntegration(abc.ABC):
         self.tracer = tracer
 
     @abc.abstractmethod
-    def get_tracing_http_headers(self) -> dict[str, str]: ...
+    def get_tracing_http_headers(self) -> Dict[str, str]: ...
 
     @abc.abstractmethod
     def get_current_trace_id(self) -> Optional[str]: ...
@@ -80,13 +86,13 @@ class BaseTracerIntegration(abc.ABC):
 
 
 class DefaultTracerIntegration(BaseTracerIntegration):
-    def get_tracing_http_headers(self) -> dict[str, str]:
+    def get_tracing_http_headers(self) -> Dict[str, str]:
         tracer = self.get_tracer()
         span = self.get_current_span()
         if not span:
             return {}
         span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
-        headers: dict[str, str] = {}
+        headers: Dict[str, str] = {}
         tracer.inject(span, Format.HTTP_HEADERS, headers)
         return headers
 
@@ -180,9 +186,9 @@ FileTypes = Union[
     # file (or text)
     FileContent,
     # (filename, file (or text))
-    tuple[Optional[str], FileContent],
+    Tuple[Optional[str], FileContent],
     # (filename, file (or text), content_type)
-    tuple[Optional[str], FileContent, Optional[str]],
+    Tuple[Optional[str], FileContent, Optional[str]],
 ]
 
 class EmptyBody(BaseModel):
@@ -196,7 +202,7 @@ class BaseObjectResp(BaseModel):
     @validator("string_data", pre=True)
     def check(cls, v: str) -> str:
         type_hints = get_type_hints(cls)
-        string_data_values: tuple[str] = type_hints["string_data"].__dict__['__args__']
+        string_data_values: Tuple[str] = type_hints["string_data"].__dict__['__args__']
 
         if v not in string_data_values:
             raise ValueError(f'invalid string_data for {cls}')
@@ -386,9 +392,9 @@ class PostObjectData(BaseModel):
     # required ---
     string_data: str
     integer_data: int
-    array_data: list[str]
+    array_data: List[str]
     boolean_data: bool
-    event_data: dict = Field(description="__safety_key__(event_data)", alias="event-data")
+    event_data: Dict = Field(description="__safety_key__(event_data)", alias="event-data")
 
     # optional ---
     date: Optional[date] = None
@@ -423,7 +429,7 @@ class GetObjectResp(BaseModel):
     # optional ---
     string_data: Optional[str] = Field(description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
     integer_data: Optional[int] = None
-    array_data: Optional[list[str]] = None
+    array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
 
 
@@ -461,7 +467,7 @@ class Client:
         base_url: str,
         timeout: int = 5,
         client: Optional[httpx.Client] = None,
-        headers: dict[str, str] = None,
+        headers: Dict[str, str] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
@@ -527,7 +533,7 @@ class Client:
     def get_list_objects(
         self,
         auth: Optional[BasicAuth] = None,
-    ) -> Optional[list[GetObjectResp]]:
+    ) -> Optional[List[GetObjectResp]]:
         url = self._get_url(f'/objects')
 
         params = {
@@ -787,7 +793,7 @@ class Client:
     @tracing
     def post_object(
         self,
-        body: Optional[Union[PostObjectData, dict[str, Any]]] = None,
+        body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/objects')
@@ -830,7 +836,7 @@ class Client:
     @tracing
     def post_form_object(
         self,
-        body: Optional[Union[PostObjectData, dict[str, Any]]] = None,
+        body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/objects-form-data')
@@ -874,9 +880,9 @@ class Client:
     @tracing
     def post_multipart_form_data(
         self,
-        body: Optional[Union[PostFile, dict[str, Any]]] = None,
+        body: Optional[Union[PostFile, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
-        files: Optional[Union[Mapping[str, FileTypes], Sequence[tuple[str, FileTypes]]]] = None,
+        files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/multipart-form-data')
 
@@ -923,7 +929,7 @@ class Client:
     def patch_object(
         self,
         object_id: str,
-        body: Optional[Union[PatchObjectData, dict[str, Any]]] = None,
+        body: Optional[Union[PatchObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[PatchObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
@@ -967,7 +973,7 @@ class Client:
     def put_object(
         self,
         object_id: str,
-        body: Optional[Union[PutObjectData, dict[str, Any]]] = None,
+        body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[PutObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
@@ -1011,7 +1017,7 @@ class Client:
     def put_object_slow(
         self,
         object_id: str,
-        body: Optional[Union[PutObjectData, dict[str, Any]]] = None,
+        body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[PutObjectResp]:
         url = self._get_url(f'/slow/objects/{object_id}')
@@ -1094,15 +1100,15 @@ class Client:
     def _get_url(self, path: str) -> str:
         return f'{self.base_url}{path}'
 
-    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
         return {'extra': {'props': {'data': kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
         msg = f"request error"
         msg += f" | client={client_name}"
         msg += f" | method={method}"
-        msg += f" | {url=}"
-        msg += f" | {params=}"
+        msg += f" | url={url}"
+        msg += f" | params={params}"
         msg += f" | content={content}"
         msg += f" | headers={headers}"
 
@@ -1117,7 +1123,7 @@ class Client:
             ),
         )
 
-    def add_tracing_data_to_headers(self, headers_: dict[str, str]) -> None:
+    def add_tracing_data_to_headers(self, headers_: Dict[str, str]) -> None:
         tracing_headers = self.tracer_integration.get_tracing_http_headers()
         headers_.update(tracing_headers)
         trace_id = self.tracer_integration.get_current_trace_id() or ''

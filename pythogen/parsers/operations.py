@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.parameters import ParameterParser
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ParsedOperation:
     operation: models.OperationObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class OperationParser:
@@ -34,18 +35,18 @@ class OperationParser:
         self._request_body_parser = request_body_parser
         self._parameters_parser = parameters_parser
 
-    def parse_item(self, method: models.HttpMethod, operation_data: dict[str, Any]) -> ParsedOperation:
+    def parse_item(self, method: models.HttpMethod, operation_data: Dict[str, Any]) -> ParsedOperation:
         """Спарсить спецификацию метода ручки (POST-, GET-, PUT-запроса и т.п.)"""
-        responses: dict[str, models.ResponseObject] = {}
-        inline_schemas: dict[str, models.SchemaObject] = {}
+        responses: Dict[str, models.ResponseObject] = {}
+        inline_schemas: Dict[str, models.SchemaObject] = {}
 
         for status_code, response_data in operation_data.get('responses').items():
             if status_code == 'default':
                 logger.error('Unable to parse responses, "default" not implemented yet')
                 continue
 
-            if ref := response_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if response_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(response_data['$ref'])
                 response_data = resolved_ref.ref_data
                 response_id = resolved_ref.ref_id
             else:
@@ -63,8 +64,8 @@ class OperationParser:
 
         parameters = []
         for parameter_data in operation_data.get('parameters', []):
-            if ref := parameter_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if parameter_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(parameter_data['$ref'])
                 parameter = self._parameters_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 parameters.append(parameter)
             else:

@@ -18,22 +18,46 @@ jobs:
   test:
     name: test
     needs: lint
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [ "3.7", "3.8", "3.9", "3.10" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v1
+    - name: Set up python ${{ matrix.python-version }}
+      id: setup-python
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        pip install --upgrade pip
         pip install poetry
         poetry install
     - name: Run pytest
       run: |
-        poetry run pytest --cov=pythogen --cov-report=xml tests/
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1.3.1
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
-        file: ./coverage.xml
+        poetry run pytest .
+
+  coverage:
+    name: coverage
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
+      - name: Run pytest
+        run: |
+          poetry run pytest --cov=pythogen --cov-report=xml tests/
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1.3.1
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: ./coverage.xml

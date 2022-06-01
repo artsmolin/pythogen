@@ -18,8 +18,14 @@ from datetime import datetime
 from datetime import date
 
 from httpx import Timeout
-from typing import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+from typing import List
+from typing import Tuple
 from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Union
 from typing import Callable
@@ -67,7 +73,7 @@ class BaseTracerIntegration(abc.ABC):
         self.tracer = tracer
 
     @abc.abstractmethod
-    def get_tracing_http_headers(self) -> dict[str, str]: ...
+    def get_tracing_http_headers(self) -> Dict[str, str]: ...
 
     @abc.abstractmethod
     def get_current_trace_id(self) -> Optional[str]: ...
@@ -80,13 +86,13 @@ class BaseTracerIntegration(abc.ABC):
 
 
 class DefaultTracerIntegration(BaseTracerIntegration):
-    def get_tracing_http_headers(self) -> dict[str, str]:
+    def get_tracing_http_headers(self) -> Dict[str, str]:
         tracer = self.get_tracer()
         span = self.get_current_span()
         if not span:
             return {}
         span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
-        headers: dict[str, str] = {}
+        headers: Dict[str, str] = {}
         tracer.inject(span, Format.HTTP_HEADERS, headers)
         return headers
 
@@ -192,9 +198,9 @@ FileTypes = Union[
     # file (or text)
     FileContent,
     # (filename, file (or text))
-    tuple[Optional[str], FileContent],
+    Tuple[Optional[str], FileContent],
     # (filename, file (or text), content_type)
-    tuple[Optional[str], FileContent, Optional[str]],
+    Tuple[Optional[str], FileContent, Optional[str]],
 ]
 
 class EmptyBody(BaseModel):
@@ -208,7 +214,7 @@ class {{ schema.name }}(BaseModel):
     @validator("{{ schema.attr }}", pre=True)
     def check(cls, v: str) -> str:
         type_hints = get_type_hints(cls)
-        {{ schema.attr }}_values: tuple[str] = type_hints["{{ schema.attr }}"].__dict__['__args__']
+        {{ schema.attr }}_values: Tuple[str] = type_hints["{{ schema.attr }}"].__dict__['__args__']
 
         if v not in {{ schema.attr }}_values:
             raise ValueError(f'invalid {{ schema.attr }} for {cls}')
@@ -292,7 +298,7 @@ class {{ name }}:
         {%- else %}
         client: Optional[httpx.AsyncClient] = None,
         {%- endif %}
-        headers: dict[str, str] = None,
+        headers: Dict[str, str] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
@@ -342,15 +348,15 @@ class {{ name }}:
     def _get_url(self, path: str) -> str:
         return f'{self.base_url}{path}'
 
-    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
         return {'extra': {'props': {'data': kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
         msg = f"request error"
         msg += f" | client={client_name}"
         msg += f" | method={method}"
-        msg += f" | {url=}"
-        msg += f" | {params=}"
+        msg += f" | url={url}"
+        msg += f" | params={params}"
         msg += f" | content={content}"
         msg += f" | headers={headers}"
 
@@ -365,7 +371,7 @@ class {{ name }}:
             ),
         )
 
-    def add_tracing_data_to_headers(self, headers_: dict[str, str]) -> None:
+    def add_tracing_data_to_headers(self, headers_: Dict[str, str]) -> None:
         tracing_headers = self.tracer_integration.get_tracing_http_headers()
         headers_.update(tracing_headers)
         trace_id = self.tracer_integration.get_current_trace_id() or ''

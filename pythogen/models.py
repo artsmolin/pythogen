@@ -8,6 +8,8 @@ import keyword
 import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict
+from typing import List
 from typing import Optional
 
 
@@ -130,26 +132,26 @@ class SchemaObject:
 
     id: str
     title: Optional[str]
-    required: Optional[list[str]]
-    enum: list[str]
+    required: Optional[List[str]]
+    enum: List[str]
     type: Type
     format: Optional[str]
     items: Optional['SchemaObject']
-    properties: list[SchemaProperty]
+    properties: List[SchemaProperty]
     description: Optional[str] = None
 
     # Технические поля
     discriminator_base_class_schema: Optional[DiscriminatorBaseClassSchema] = None
 
     @property
-    def required_properties(self) -> list[SchemaProperty]:
+    def required_properties(self) -> List[SchemaProperty]:
         if self.required is None:
             return []
 
         return [p for p in self.properties if p.orig_key in self.required]
 
     @property
-    def optional_properties(self) -> list[SchemaProperty]:
+    def optional_properties(self) -> List[SchemaProperty]:
         if self.required is None:
             return self.properties
 
@@ -202,18 +204,18 @@ class OperationObject:
     operation_id: Optional[str]
     request_body: Optional[RequestBodyObject]
     responses: ResponsesObject
-    parameters: list[ParameterObject]
+    parameters: List[ParameterObject]
 
     @property
-    def path_params(self) -> list[ParameterObject]:
+    def path_params(self) -> List[ParameterObject]:
         return [parameter for parameter in self.parameters if parameter.location == ParameterLocation.path]
 
     @property
-    def query_params(self) -> list[ParameterObject]:
+    def query_params(self) -> List[ParameterObject]:
         return [parameter for parameter in self.parameters if parameter.location == ParameterLocation.query]
 
     @property
-    def headers(self) -> list[ParameterObject]:
+    def headers(self) -> List[ParameterObject]:
         return [parameter for parameter in self.parameters if parameter.location == ParameterLocation.header]
 
     @property
@@ -230,7 +232,7 @@ class PathItemObject:
 
     summary: Optional[str]
     description: Optional[str]
-    operations: dict[HttpMethod, OperationObject]
+    operations: Dict[HttpMethod, OperationObject]
 
 
 @dataclass
@@ -242,20 +244,20 @@ class ResponseObject:
 
 @dataclass
 class ResponsesObject:
-    patterned: dict[str, ResponseObject]
+    patterned: Dict[str, ResponseObject]
 
 
 @dataclass
 class Document:
     info: InfoObject
-    paths: dict[str, PathItemObject]
-    parameters: dict[str, ParameterObject]
-    schemas: dict[str, SchemaObject]
+    paths: Dict[str, PathItemObject]
+    parameters: Dict[str, ParameterObject]
+    schemas: Dict[str, SchemaObject]
 
-    discriminator_base_class_schemas: list[DiscriminatorBaseClassSchema]
+    discriminator_base_class_schemas: List[DiscriminatorBaseClassSchema]
 
     @property
-    def sorted_schemas(self) -> list[SchemaObject]:
+    def sorted_schemas(self) -> List[SchemaObject]:
         sorted = []
         keys = list(self.schemas.keys())
         while keys:

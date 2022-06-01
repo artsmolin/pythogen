@@ -6,6 +6,9 @@ that was parsed from an OpenAPI file.
 
 import logging
 from dataclasses import dataclass
+from typing import Dict
+from typing import List
+from typing import Tuple
 from typing import TypeVar
 
 import inflection
@@ -65,12 +68,12 @@ def render_client(*, output_path: str, document: models.Document, name, sync) ->
 
 @dataclass
 class PreparedOperations:
-    get: dict[PathStr, models.OperationObject]
-    post: dict[PathStr, models.OperationObject]
-    post_no_body: dict[PathStr, models.OperationObject]
-    put: dict[PathStr, models.OperationObject]
-    patch: dict[PathStr, models.OperationObject]
-    delete_no_body: dict[PathStr, models.OperationObject]
+    get: Dict[PathStr, models.OperationObject]
+    post: Dict[PathStr, models.OperationObject]
+    post_no_body: Dict[PathStr, models.OperationObject]
+    put: Dict[PathStr, models.OperationObject]
+    patch: Dict[PathStr, models.OperationObject]
+    delete_no_body: Dict[PathStr, models.OperationObject]
 
 
 def prepare_operations(document: models.Document) -> PreparedOperations:
@@ -101,7 +104,7 @@ def prepare_operations(document: models.Document) -> PreparedOperations:
     return prepared_operations
 
 
-def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
+def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
     mapping = []
 
     for code, response in responses.patterned.items():
@@ -167,7 +170,7 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
         models.Format.date_time: 'datetime',
     }
 
-    representation = 'dict'
+    representation = 'Dict'
 
     if schema.type in primitive_type_mapping:
         if schema.enum:
@@ -183,10 +186,10 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
     elif schema.type == models.Type.array:
         if schema.items.type is models.Type.any_of:
             items = [classname(item.schema.id) for item in schema.items.items]  # type: ignore
-            representation = f'list[Union{items}]'
+            representation = f'List[Union{items}]'
         else:
             items = j2_typerepr(schema.items)
-            representation = f'list[{items}]'
+            representation = f'List[{items}]'
 
     elif schema.type == models.Type.any_of:
         representation = classname(schema.id)

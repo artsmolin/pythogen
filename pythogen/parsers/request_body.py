@@ -1,5 +1,6 @@
 import logging
 from typing import Any
+from typing import Dict
 
 from pythogen import models
 from pythogen.parsers import constants
@@ -15,10 +16,10 @@ class RequestBodyParser:
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
 
-    def parse_item(self, request_body_data: dict[str, Any]) -> models.RequestBodyObject:
+    def parse_item(self, request_body_data: Dict[str, Any]) -> models.RequestBodyObject:
         """Спарсить спецификацию тела ручки"""
-        if ref := request_body_data.get('$ref', None):
-            resolved_ref = self._ref_resolver.resolve(ref)
+        if request_body_data.get('$ref', None):
+            resolved_ref = self._ref_resolver.resolve(request_body_data['$ref'])
             data = resolved_ref.ref_data
             id_ = resolved_ref.ref_id
         else:
@@ -26,15 +27,16 @@ class RequestBodyParser:
             id_ = f'<inline+{models.RequestBodyObject.__name__}>'
 
         files_required = False
-        if content := data.get('content'):
+        content = data.get('content')
+        if content:
             media_types = list(content.keys())
             if len(media_types) > 1:
                 logger.error(f'Unable to parse request body "{id_}", multiple media types not implemented yet')
             media_type = media_types[0]
             media_type_data = content[media_type]
             schema_data = media_type_data['schema']
-            if ref := schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if schema_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
                 parsed_schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
                 parsed_schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)

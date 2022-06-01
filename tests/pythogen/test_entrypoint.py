@@ -16,7 +16,10 @@ ASYNC_CLIENT_PATH = f"{TMP_DIR_PATH}/async_client.py"
 def temp_files():
     Path(TMP_DIR_PATH).mkdir(parents=True, exist_ok=True) 
     yield
-    Path(ASYNC_CLIENT_PATH).unlink(missing_ok=True)
+    try:
+        Path(ASYNC_CLIENT_PATH).unlink()
+    except FileNotFoundError:
+        pass
 
 
 def test_entrypoint() -> None:

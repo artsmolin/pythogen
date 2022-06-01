@@ -1,6 +1,8 @@
 import re
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Optional
 
 from pythogen import models
@@ -10,19 +12,19 @@ from pythogen.parsers.references import RefResolver
 @dataclass
 class ParsedSchema:
     schema: models.SchemaObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 @dataclass
 class ParsedSchemaColection:
-    schemas: dict[str, models.SchemaObject]
-    inline_schemas: dict[str, models.SchemaObject]
+    schemas: Dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 @dataclass
 class ParsedProperties:
-    properties: list[models.SchemaProperty]
-    inline_schemas: dict[str, models.SchemaObject]
+    properties: List[models.SchemaProperty]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class SchemaParser:
@@ -54,8 +56,8 @@ class SchemaParser:
     def __init__(
         self,
         ref_resolver: RefResolver,
-        openapi_data: dict[str, Any],
-        discriminator_base_class_schemas: list[models.DiscriminatorBaseClassSchema],
+        openapi_data: Dict[str, Any],
+        discriminator_base_class_schemas: List[models.DiscriminatorBaseClassSchema],
     ) -> None:
         self._openapi_data = openapi_data
         self._ref_resolver = ref_resolver
@@ -66,8 +68,8 @@ class SchemaParser:
         schemas = {}
         inline_schemas = {}
         for schema_id, schema_data in schemas_data.items():
-            if ref := schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if schema_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
                 parsed_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
                 parsed_schema = self.parse_item(schema_id, schema_data)
@@ -78,7 +80,7 @@ class SchemaParser:
             inline_schemas=inline_schemas,
         )
 
-    def parse_item(self, schema_id: str, schema_data: dict[str, Any]) -> ParsedSchema:
+    def parse_item(self, schema_id: str, schema_data: Dict[str, Any]) -> ParsedSchema:
         schema_type = self._parse_type(schema_data)
         parsed_properties = self._parse_properties(schema_type, schema_data)
 
@@ -101,7 +103,7 @@ class SchemaParser:
             inline_schemas=parsed_properties.inline_schemas,
         )
 
-    def _parse_type(self, data: dict[str, Any]) -> models.Type:
+    def _parse_type(self, data: Dict[str, Any]) -> models.Type:
         if data == {}:
             # Парсинг пустой схемы
             # application/json:
@@ -120,7 +122,7 @@ class SchemaParser:
                 raise Exception(f'Unable to parse schema "{id}", uknown type "{raw_data_type}"')
         return data_type
 
-    def _parse_format(self, data: dict[str, Any]) -> Optional[models.Format]:
+    def _parse_format(self, data: Dict[str, Any]) -> Optional[models.Format]:
         data_format = data.get('format')
         if data_format:
             try:
@@ -128,7 +130,7 @@ class SchemaParser:
             except Exception:
                 raise Exception(f'Unable to parse schema "{id}", uknown format "{data_format}"')
 
-    def _get_description(self, data: dict[str, Any]) -> Optional[str]:
+    def _get_description(self, data: Dict[str, Any]) -> Optional[str]:
         description = data.get("description", "")
         if description:
             description = description.replace("\n", "\\n")
@@ -138,7 +140,7 @@ class SchemaParser:
 
     def _get_discriminator_base_class_schema(
         self,
-        data: dict[str, Any],
+        data: Dict[str, Any],
     ) -> Optional[models.DiscriminatorBaseClassSchema]:
         description = data.get("description", "")
         if "__discriminator__" not in description:
@@ -150,7 +152,7 @@ class SchemaParser:
             attr=attr,
         )
 
-    def _parse_properties(self, schema_type: models.Type, data: dict[str, Any]) -> ParsedProperties:
+    def _parse_properties(self, schema_type: models.Type, data: Dict[str, Any]) -> ParsedProperties:
         data_format = data.get('format')
         if data_format:
             try:
@@ -160,10 +162,12 @@ class SchemaParser:
 
         properties = []
         inline_schemas = {}
-        if properties_map := data.get('properties'):
+
+        properties_map = data.get('properties')
+        if properties_map:
             for key, property_schema_data in properties_map.items():
-                if ref := property_schema_data.get('$ref', None):
-                    resolved_ref = self._ref_resolver.resolve(ref)
+                if property_schema_data.get('$ref', None):
+                    resolved_ref = self._ref_resolver.resolve(property_schema_data['$ref'])
                     property_schema_data = resolved_ref.ref_data
                     property_schema_id = resolved_ref.ref_id
                     parsed_schema = self.parse_item(property_schema_id, property_schema_data)
@@ -255,12 +259,11 @@ class SchemaParser:
             inline_schemas=inline_schemas,
         )
 
-    def _parse_items(self, data: dict[str, Any]):
-        items = None
-
-        if items_schema_data := data.get('items'):
-            if ref := items_schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+    def _parse_items(self, data: Dict[str, Any]):
+        items_schema_data = data.get('items')
+        if items_schema_data:
+            if items_schema_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
                 parsed_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 return parsed_schema.schema
 
@@ -274,9 +277,9 @@ class SchemaParser:
                 parsed_schema = self.parse_item(items_schema_id, items_schema_data)
                 return parsed_schema.schema
 
-        if any_of := data.get('anyOf'):
+        if data.get('anyOf'):
             items = []
-            for any_ref_item in any_of:
+            for any_ref_item in data['anyOf']:
                 ref = any_ref_item.get('$ref', None)
                 resolved_ref = self._ref_resolver.resolve(ref)
                 ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)

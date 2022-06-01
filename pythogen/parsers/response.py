@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from typing import Any
+from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.references import RefResolver
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ParsedResponse:
     response: models.ResponseObject
-    inline_schemas: dict[str, models.SchemaObject]
+    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class ResponseParser:
@@ -21,12 +22,13 @@ class ResponseParser:
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
 
-    def parse_item(self, response_id: str, response_data: dict[str, Any]) -> ParsedResponse:
+    def parse_item(self, response_id: str, response_data: Dict[str, Any]) -> ParsedResponse:
         """Спарсить спецификацию ответа ручки"""
         schema = None
-        inline_schemas: dict[str, models.SchemaObject] = {}
+        inline_schemas: Dict[str, models.SchemaObject] = {}
 
-        if content := response_data.get('content'):
+        content = response_data.get('content')
+        if content:
             media_types = list(content.keys())
             if len(media_types) > 1:
                 logger.error(f'Unable to parse response "{response_id}", multiple media types not implemented yet')
@@ -34,8 +36,8 @@ class ResponseParser:
             media_type_data = content[media_type]
             schema_data = media_type_data['schema']
 
-            if ref := schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(ref)
+            if schema_data.get('$ref', None):
+                resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
                 parsed_schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 schema = parsed_schema.schema
             else:

@@ -7,7 +7,7 @@
     {%- endif %}
         self,
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and operation.request_body.are_files_required %}
-        files: Union[Mapping[str, FileTypes], Sequence[tuple[str, FileTypes]]],
+        files: Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]],
         {%- endif %}
         {#- path params -#}
         {%- for parameter in operation.path_params %}
@@ -26,7 +26,7 @@
         {%- endif %}
         {%- endfor %}
         {%- if operation.request_body %}
-        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, dict[str, Any]]] = None,
+        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, Dict[str, Any]]] = None,
         {%- endif %}
         {#- optional query params -#}
         {%- for parameter in operation.query_params -%}
@@ -42,7 +42,7 @@
         {%- endfor %}
         auth: Optional[BasicAuth] = None,
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and not operation.request_body.are_files_required %}
-        files: Optional[Union[Mapping[str, FileTypes], Sequence[tuple[str, FileTypes]]]] = None,
+        files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
         {%- endif %}
     ) -> {{ responserepr(operation.responses) }}:
         url = self._get_url(f'{{ path }}')
