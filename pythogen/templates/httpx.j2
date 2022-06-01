@@ -18,7 +18,10 @@ from datetime import datetime
 from datetime import date
 
 from httpx import Timeout
-from typing import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 from typing import List
 from typing import Tuple
 from typing import Any
@@ -352,8 +355,8 @@ class {{ name }}:
         msg = f"request error"
         msg += f" | client={client_name}"
         msg += f" | method={method}"
-        msg += f" | {url=}"
-        msg += f" | {params=}"
+        msg += f" | url={url}"
+        msg += f" | params={params}"
         msg += f" | content={content}"
         msg += f" | headers={headers}"
 
