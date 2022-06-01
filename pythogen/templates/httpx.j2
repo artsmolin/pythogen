@@ -168,23 +168,23 @@ class BaseMetricsIntegration(abc.ABC):
         self._client_non_http_errors_counter = client_non_http_errors_counter
 
     @abc.abstractmethod
-    def on_request_error(self) -> None: ...
+    def on_request_error(self, error: Exception, http_method: str, http_target: str) -> None: ...
 
     @abc.abstractmethod
-    def on_request_success(self) -> None: ...
+    def on_request_success(self, response, http_method: str, http_target: str) -> None: ...
 
 
 class DefaultMetricsIntegration(BaseMetricsIntegration):
-    def on_request_error(self, error: Exception) -> None:
+    def on_request_error(self, error: Exception, http_method: str, http_target: str) -> None:
         self._client_non_http_errors_counter.labels(
             client_name='{{ name | replace('Client', '') | lower }}',
-            http_method='{{ method }}',
-            http_target='{{ path | replace('{', ':') | replace('}', '') }}',
+            http_method=http_method,
+            http_target=http_target,
             exception=error.__class__.__name__,
         ).inc(1)
         raise error
 
-    def on_request_success(self, response) -> None:
+    def on_request_success(self, response, http_method: str, http_target: str) -> None:
         self._client_response_time_histogram.labels(
             client_name='{{ name | replace('Client', '') | lower }}',
             http_method='{{ method }}',
