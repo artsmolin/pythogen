@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pythogen"
-version = "0.0.20"
+version = "0.0.22"
 description = "Generator of python HTTP-clients from OpenApi specification."
 homepage = "https://github.com/artsmolin/pythogen"
 repository = "https://github.com/artsmolin/pythogen"
