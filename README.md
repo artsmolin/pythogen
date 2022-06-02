@@ -26,6 +26,9 @@ Generator of python HTTP-clients from OpenApi specification based on `httpx` and
 - Tracing
 - Metrics
 
+## Examples
+- [**Petstore OpenAPI**](/examples/petstore/openapi.yaml):  [client_sync.py](/examples/petstore/client_sync.py) | [client_async.py](/examples/petstore/client_async.py)
+
 ## Installation
 ```shell
 pip install pythogen

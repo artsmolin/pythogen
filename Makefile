@@ -8,6 +8,10 @@ clients-for-tests:
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client.py
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
 
+clients-for-examples:
+	python pythogen/entrypoint.py examples/petstore/openapi.yaml examples/petstore/client_async.py
+	python pythogen/entrypoint.py examples/petstore/openapi.yaml examples/petstore/client_sync.py --sync
+
 requirements:
 	pip install --upgrade pip
 	poetry install --remove-untracked
