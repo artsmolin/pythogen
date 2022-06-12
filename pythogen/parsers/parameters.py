@@ -37,8 +37,9 @@ class ParameterParser:
             parsed_schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)
 
         description = schema_data.get('description', '')
-        match = re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description)
-        safety_key = match['safety_key'] if match else match
+        safety_key = None
+        if match := re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description):
+            safety_key = match['safety_key']
 
         return models.ParameterObject(
             id=id_,
