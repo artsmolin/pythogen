@@ -88,13 +88,12 @@ class SchemaParser:
         if discr_schema and discr_schema not in self._discriminator_base_class_schemas:
             self._discriminator_base_class_schemas.append(discr_schema)
 
-        _enum: List[str] = schema_data.get('enum', [])
         return ParsedSchema(
             schema=models.SchemaObject(
                 id=schema_id,
                 title=schema_data.get('title'),
                 required=schema_data.get('required'),
-                enum=_enum,
+                enum=schema_data.get('enum'),
                 type=schema_type,
                 format=self._parse_format(schema_data),
                 items=self._parse_items(schema_data),
