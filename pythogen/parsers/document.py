@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from typing import Dict
+from typing import List
 
 import yaml
 
@@ -33,7 +34,7 @@ def parse_openapi_file(file_path: str) -> models.Document:
 
     # Сюда будут складываться найденные в процессе парсинга базовые классы,
     # в которых определён дискриминатор.
-    discriminator_base_class_schemas = []
+    discriminator_base_class_schemas: List[models.DiscriminatorBaseClassSchema] = []
 
     ref_resolver = RefResolver(
         openapi_data=openapi_data,

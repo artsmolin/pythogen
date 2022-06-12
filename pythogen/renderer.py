@@ -7,6 +7,7 @@ that was parsed from an OpenAPI file.
 import logging
 from dataclasses import dataclass
 from typing import Dict
+from typing import Generic
 from typing import List
 from typing import Tuple
 from typing import TypeVar
@@ -36,15 +37,15 @@ def render_client(*, output_path: str, document: models.Document, name, sync) ->
         Спаршенный в python-объекты OpenApi-файл
     """
     env = Environment(loader=FileSystemLoader(settings.TEMPLATES_DIR_PATH), extensions=['jinja2.ext.loopcontrols'])
-    template = env.get_template(settings.CLIENT_TEMPLATE_NAME)
-    template.globals.update(
-        {
+    template = env.get_template(
+        settings.CLIENT_TEMPLATE_NAME,
+        globals={
             'varname': varname,
             'classname': classname,
             'typerepr': j2_typerepr,
             'responserepr': j2_responserepr,
             'iterresponsemap': iterresponsemap,
-        }
+        },
     )
 
     prepared_operations = prepare_operations(document)
@@ -67,7 +68,7 @@ def render_client(*, output_path: str, document: models.Document, name, sync) ->
 
 
 @dataclass
-class PreparedOperations:
+class PreparedOperations(Generic[PathStr]):
     get: Dict[PathStr, models.OperationObject]
     post: Dict[PathStr, models.OperationObject]
     post_no_body: Dict[PathStr, models.OperationObject]
@@ -77,7 +78,7 @@ class PreparedOperations:
 
 
 def prepare_operations(document: models.Document) -> PreparedOperations:
-    prepared_operations = PreparedOperations(
+    prepared_operations: PreparedOperations = PreparedOperations(
         get={},
         post={},
         post_no_body={},
@@ -114,7 +115,7 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
             if response.schema.type == models.Type.object:
                 mapper = f'{classname(response.schema.id)}.parse_obj(response.json())'
 
-            elif response.schema.type is models.Type.array:
+            elif response.schema.type is models.Type.array and response.schema.items:
                 if response.schema.items.type is models.Type.object:
                     items_class_name = classname(response.schema.items.id)
                     mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'
@@ -183,13 +184,13 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
     if schema.type == models.Type.object and schema.id != '<inline+SchemaObject>':
         representation = classname(schema.id)
 
-    elif schema.type == models.Type.array:
+    elif schema.type == models.Type.array and schema.items:
         if schema.items.type is models.Type.any_of:
             items = [classname(item.schema.id) for item in schema.items.items]  # type: ignore
             representation = f'List[Union{items}]'
         else:
-            items = j2_typerepr(schema.items)
-            representation = f'List[{items}]'
+            item = j2_typerepr(schema.items)
+            representation = f'List[{item}]'
 
     elif schema.type == models.Type.any_of:
         representation = classname(schema.id)

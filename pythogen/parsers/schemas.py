@@ -88,12 +88,13 @@ class SchemaParser:
         if discr_schema and discr_schema not in self._discriminator_base_class_schemas:
             self._discriminator_base_class_schemas.append(discr_schema)
 
+        _enum: List[str] = schema_data.get('enum', [])
         return ParsedSchema(
             schema=models.SchemaObject(
                 id=schema_id,
                 title=schema_data.get('title'),
                 required=schema_data.get('required'),
-                enum=schema_data.get('enum'),
+                enum=_enum,
                 type=schema_type,
                 format=self._parse_format(schema_data),
                 items=self._parse_items(schema_data),
@@ -115,11 +116,11 @@ class SchemaParser:
         elif 'anyOf' in data:
             data_type = models.Type.any_of
         else:
-            raw_data_type: str = data.get('type')
+            raw_data_type: Optional[str] = data.get('type')
             try:
                 data_type = models.Type(raw_data_type)
             except ValueError:
-                raise Exception(f'Unable to parse schema "{id}", uknown type "{raw_data_type}"')
+                raise Exception(f'Unable to parse schema "{id}", unknown type "{raw_data_type}"')
         return data_type
 
     def _parse_format(self, data: Dict[str, Any]) -> Optional[models.Format]:
@@ -128,7 +129,8 @@ class SchemaParser:
             try:
                 return models.Format[data_format.replace('-', '_')]
             except Exception:
-                raise Exception(f'Unable to parse schema "{id}", uknown format "{data_format}"')
+                raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
+        return None
 
     def _get_description(self, data: Dict[str, Any]) -> Optional[str]:
         description = data.get("description", "")
@@ -158,7 +160,7 @@ class SchemaParser:
             try:
                 data_format = models.Format[data_format.replace('-', '_')]
             except Exception:
-                raise Exception(f'Unable to parse schema "{id}", uknown format "{data_format}"')
+                raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
 
         properties = []
         inline_schemas = {}
@@ -228,7 +230,7 @@ class SchemaParser:
                             id='',
                             type=models.Type.string,
                             enum=None,
-                            properties=None,
+                            properties=[],
                             title=None,
                             format=None,
                             items=None,
@@ -245,7 +247,7 @@ class SchemaParser:
                             id='',
                             type=models.Type.string,
                             enum=None,
-                            properties=None,
+                            properties=[],
                             title=None,
                             format=models.Format.binary,
                             items=None,
@@ -269,8 +271,9 @@ class SchemaParser:
 
             if items_schema_data.get('type') == models.Type.object.value and 'properties' in items_schema_data:
                 # extract items object definition to schema
-                items_schema_id = id + "_item"
-                parsed_schema = self._parse_schema(items_schema_id, items_schema_data)
+                # TODO(@artsmolin): This code segment doesn't look right.
+                items_schema_id = id + "_item"  # type: ignore
+                parsed_schema = self._parse_schema(items_schema_id, items_schema_data)  # type: ignore
                 return parsed_schema.schema
             else:
                 items_schema_id = f'<inline+{models.SchemaObject.__name__}>'

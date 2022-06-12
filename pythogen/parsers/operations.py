@@ -40,7 +40,7 @@ class OperationParser:
         responses: Dict[str, models.ResponseObject] = {}
         inline_schemas: Dict[str, models.SchemaObject] = {}
 
-        for status_code, response_data in operation_data.get('responses').items():
+        for status_code, response_data in operation_data['responses'].items():
             if status_code == 'default':
                 logger.error('Unable to parse responses, "default" not implemented yet')
                 continue

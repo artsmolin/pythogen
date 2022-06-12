@@ -133,9 +133,9 @@ class SchemaObject:
     id: str
     title: Optional[str]
     required: Optional[List[str]]
-    enum: List[str]
+    enum: Optional[List[str]]
     type: Type
-    format: Optional[str]
+    format: Optional[Format]
     items: Optional['SchemaObject']
     properties: List[SchemaProperty]
     description: Optional[str] = None
@@ -219,9 +219,10 @@ class OperationObject:
         return [parameter for parameter in self.parameters if parameter.location == ParameterLocation.header]
 
     @property
-    def fn_name(self) -> str:
-        value = self.operation_id.replace('-', '_')
-        return value
+    def fn_name(self) -> Optional[str]:
+        if self.operation_id is not None:
+            return self.operation_id.replace('-', '_')
+        return None
 
 
 @dataclass
@@ -258,25 +259,25 @@ class Document:
 
     @property
     def sorted_schemas(self) -> List[SchemaObject]:
-        sorted = []
+        _sorted: List[str] = []
         keys = list(self.schemas.keys())
         while keys:
             key = keys.pop()
-            if key in sorted:
-                index = sorted.index(key)
+            if key in _sorted:
+                index = _sorted.index(key)
             else:
-                sorted.append(key)
-                index = len(sorted) - 1
+                _sorted.append(key)
+                index = len(_sorted) - 1
 
             schema = self.schemas[key]
             for property in schema.properties:
-                if property.schema.id in self.schemas and property.schema.id not in sorted:
-                    sorted.insert(index, property.schema.id)
+                if property.schema.id in self.schemas and property.schema.id not in _sorted:
+                    _sorted.insert(index, property.schema.id)
                 if property.schema.items and property.schema.items.id in self.schemas:
-                    sorted.insert(index, property.schema.items.id)
+                    _sorted.insert(index, property.schema.items.id)
 
         sorted_schemas = []
-        for key in sorted:
+        for key in _sorted:
             if self.schemas[key] not in sorted_schemas:
                 sorted_schemas.append(self.schemas[key])
         return sorted_schemas
