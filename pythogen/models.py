@@ -259,25 +259,25 @@ class Document:
 
     @property
     def sorted_schemas(self) -> List[SchemaObject]:
-        _sorted: List[str] = []
+        sorted: List[str] = []
         keys = list(self.schemas.keys())
         while keys:
             key = keys.pop()
-            if key in _sorted:
-                index = _sorted.index(key)
+            if key in sorted:
+                index = sorted.index(key)
             else:
-                _sorted.append(key)
-                index = len(_sorted) - 1
+                sorted.append(key)
+                index = len(sorted) - 1
 
             schema = self.schemas[key]
             for property in schema.properties:
-                if property.schema.id in self.schemas and property.schema.id not in _sorted:
-                    _sorted.insert(index, property.schema.id)
+                if property.schema.id in self.schemas and property.schema.id not in sorted:
+                    sorted.insert(index, property.schema.id)
                 if property.schema.items and property.schema.items.id in self.schemas:
-                    _sorted.insert(index, property.schema.items.id)
+                    sorted.insert(index, property.schema.items.id)
 
         sorted_schemas = []
-        for key in _sorted:
+        for key in sorted:
             if self.schemas[key] not in sorted_schemas:
                 sorted_schemas.append(self.schemas[key])
         return sorted_schemas
