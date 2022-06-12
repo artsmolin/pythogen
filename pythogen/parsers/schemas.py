@@ -209,9 +209,8 @@ class SchemaParser:
                         schema = parsed_schema.schema
 
                 description = property_schema_data.get("description", "")
-                safety_key = None
-                if match := re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description):
-                    safety_key = match['safety_key']
+                match = re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description)
+                safety_key = match['safety_key'] if match else None
 
                 properties.append(
                     models.SchemaProperty(
