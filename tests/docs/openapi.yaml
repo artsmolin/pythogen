@@ -3,6 +3,55 @@ info:
   title: test server
   version: 0.1.0
 paths:
+  /objects/no-ref-schema/{object_id}:
+    get:
+      tags:
+        - test
+      summary: Get Object No Ref Schema
+      operationId: get_object_no_ref_schema
+      parameters:
+        - required: true
+          schema:
+            title: Object Id
+            type: string
+          name: object_id
+          in: path
+        - required: false
+          schema:
+            title: Return Error
+            type: string
+          name: return_error
+          in: query
+        - required: true
+          schema: { title: From, type: string, description: __safety_key__(from_) }
+          name: from
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                title: GetObjectResp
+                type: object
+                properties:
+                  string_data:
+                    title: String Data
+                    type: string
+                    description: "String Data. [__discriminator__(BaseObjectResp.string_data)]"
+                  integer_data:
+                    title: Integer Data
+                    type: integer
+                  array_data:
+                    title: Array Data
+                    type: array
+                    items:
+                      type: string
+                  boolean_data:
+                    title: Boolean Data
+                    type: boolean
+                additionalProperties: false
+
   /objects/{object_id}:
     get:
       tags:

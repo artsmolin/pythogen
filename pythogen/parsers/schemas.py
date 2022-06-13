@@ -267,13 +267,6 @@ class SchemaParser:
                 resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
                 parsed_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 return parsed_schema.schema
-
-            if items_schema_data.get('type') == models.Type.object.value and 'properties' in items_schema_data:
-                # extract items object definition to schema
-                # TODO(@artsmolin): This code segment doesn't look right.
-                items_schema_id = id + "_item"  # type: ignore
-                parsed_schema = self._parse_schema(items_schema_id, items_schema_data)  # type: ignore
-                return parsed_schema.schema
             else:
                 items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
                 parsed_schema = self.parse_item(items_schema_id, items_schema_data)

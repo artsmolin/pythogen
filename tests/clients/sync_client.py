@@ -242,6 +242,20 @@ class GetListobjectsResponse200(BaseModel):
     # optional ---
 
 
+class GetObjectNoRefSchemaResponse200(BaseModel):
+    """
+    GetObjectResp
+    """
+
+    # required ---
+
+    # optional ---
+    string_data: Optional[str] = Field(description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
+    integer_data: Optional[int] = None
+    array_data: Optional[List[str]] = None
+    boolean_data: Optional[bool] = None
+
+
 class AllOfRefObj(BaseModel):
     """
     All Of
@@ -476,6 +490,47 @@ class Client:
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
         self.metrics_integration=metrics_integration
+    @tracing
+    def get_object_no_ref_schema(
+        self,
+        object_id: str,
+        from_: str,
+        return_error: Optional[str] = None,
+        auth: Optional[BasicAuth] = None,
+    ) -> Optional[GetObjectNoRefSchemaResponse200]:
+        url = self._get_url(f'/objects/no-ref-schema/{object_id}')
+
+        params = {
+            'from': from_,
+        }
+        if return_error is not None:
+            params['return_error'] = return_error
+
+        headers_ = self.headers.copy()
+
+        if self.tracer_integration:
+            self.add_tracing_data_to_headers(headers_)
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+        
+        try:
+            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(exc, "", "get", "/objects/no-ref-schema/:object_id")
+            raise exc
+        
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(response, "", "get", "/objects/no-ref-schema/:object_id")
+
+        if response.status_code == 200:
+            return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
+    
     @tracing
     def get_object(
         self,
@@ -1133,6 +1188,7 @@ class Client:
 GetBinaryResponse200.update_forward_refs()
 GetTextResponse200.update_forward_refs()
 GetListobjectsResponse200.update_forward_refs()
+GetObjectNoRefSchemaResponse200.update_forward_refs()
 AllOfRefObj.update_forward_refs()
 TestSafetyKey.update_forward_refs()
 UnknownError.update_forward_refs()

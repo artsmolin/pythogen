@@ -56,10 +56,9 @@ pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0
 - Activate environment
     ```shell
     rm -rf venv || true
-    python3.9 -m venv venv
+    python3 -m venv venv
     source venv/bin/activate
     make requirements
     ```
 - Make changes
-- Run `make test`
 - Execute `make clients-for-tests && make test-clients`
