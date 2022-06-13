@@ -38,14 +38,14 @@ class ParameterParser:
 
         description = schema_data.get('description', '')
         match = re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description)
-        safety_key = match['safety_key'] if match else match
+        safety_key = match['safety_key'] if match else None
 
         return models.ParameterObject(
             id=id_,
             orig_key=data['name'],
             safety_key=safety_key,
             description=description,
-            location=models.ParameterLocation[data.get('in')],
+            location=models.ParameterLocation[data['in']],
             required=data.get('required', False),
             schema=parsed_schema.schema,
         )

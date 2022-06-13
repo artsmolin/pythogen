@@ -133,9 +133,9 @@ class SchemaObject:
     id: str
     title: Optional[str]
     required: Optional[List[str]]
-    enum: List[str]
+    enum: Optional[List[str]]
     type: Type
-    format: Optional[str]
+    format: Optional[Format]
     items: Optional['SchemaObject']
     properties: List[SchemaProperty]
     description: Optional[str] = None
@@ -219,9 +219,10 @@ class OperationObject:
         return [parameter for parameter in self.parameters if parameter.location == ParameterLocation.header]
 
     @property
-    def fn_name(self) -> str:
-        value = self.operation_id.replace('-', '_')
-        return value
+    def fn_name(self) -> Optional[str]:
+        if self.operation_id is not None:
+            return self.operation_id.replace('-', '_')
+        return None
 
 
 @dataclass
@@ -258,7 +259,7 @@ class Document:
 
     @property
     def sorted_schemas(self) -> List[SchemaObject]:
-        sorted = []
+        sorted: List[str] = []
         keys = list(self.schemas.keys())
         while keys:
             key = keys.pop()

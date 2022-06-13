@@ -4,11 +4,28 @@ version = "0.0.22"
 description = "Generator of python HTTP-clients from OpenApi specification."
 homepage = "https://github.com/artsmolin/pythogen"
 repository = "https://github.com/artsmolin/pythogen"
-authors = ["Artur Smolin <artursmolin@outlook.com>", "Vladimir Vyazovetskov <erhosen@gmail.com>"]
+authors = [
+    "Artur Smolin <artursmolin@outlook.com>",
+    "Vladimir Vyazovetskov <erhosen@gmail.com>",
+    "Evgeny Solomatin <solgenya@gmail.com>"
+]
 license = "MIT"
 readme = "README.md"
 include = [
     "LICENSE",
+]
+keywords = ["openapi", "openapi-generator", "swagger", "http-client", "generator"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Utilities",
+    "Typing :: Typed"
 ]
 
 [tool.poetry.dependencies]
@@ -26,6 +43,7 @@ pythogen = 'pythogen.entrypoint:run'
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
 importlib-metadata = "^4.11.4"
+pre-commit = "^2.19.0"
 
 [build-system]
 requires = ["poetry>=1.1.0"]

@@ -15,14 +15,20 @@ repos:
         stages: [ commit ]
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.9.3
+    rev: 5.10.1
     hooks:
       - id: isort
         args: [ --profile=black, --force-grid-wrap=2, --lines-after-imports=2, --force-single-line, --line-length=120, --project=pythogen]
         stages: [ commit ]
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.961
+    hooks:
+      - id: mypy
+        additional_dependencies: [ types-PyYAML ]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.3.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
