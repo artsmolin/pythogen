@@ -37,9 +37,9 @@ class RequestBodyParser:
             schema_data = media_type_data['schema']
             if schema_data.get('$ref', None):
                 resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
-                parsed_schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
+                schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
-                parsed_schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)
+                schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)
 
             if media_type == constants.MULTIPART_FORM_DATA_TYPE:
                 files_required = self._drop_binary_strings(schema_data)
@@ -51,7 +51,7 @@ class RequestBodyParser:
         return models.RequestBodyObject(
             id=id_,
             description=data.get('description'),
-            schema=parsed_schema.schema,
+            schema=schema,
             required=data.get('required', False),
             is_form_data=type_schema == constants.FORM_DATA_TYPE,
             is_multipart_form_data=type_schema == constants.MULTIPART_FORM_DATA_TYPE,

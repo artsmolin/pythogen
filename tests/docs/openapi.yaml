@@ -172,6 +172,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostObjectResp'
+
+  /object-with-inline-array:
+    get:
+      tags:
+        - test
+      summary: Get Object With Inline Array
+      operationId: get_object_with_inline_array
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [pricePlanCode, quantity]
+                  properties:
+                    pricePlanCode:
+                      type: string
+                    quantity:
+                      type: number
+
   /objects:
     get:
       tags:

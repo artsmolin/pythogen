@@ -210,6 +210,18 @@ class BaseObjectResp(BaseModel):
         return v
 
 
+class AllOfRefObj(BaseModel):
+    """
+    All Of
+    """
+
+    # required ---
+
+    # optional ---
+    id: Optional[str] = None
+    data: Optional[int] = None
+
+
 class GetBinaryResponse200(BaseModel):
     """
     None
@@ -242,6 +254,39 @@ class GetListobjectsResponse200(BaseModel):
     # optional ---
 
 
+class GetObjectWithInlineArrayResponse200(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+
+    # optional ---
+
+
+class GetObjectWithInlineArrayResponse200_InlineItem_e4212f523a52347f69979782747c1725(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+    pricePlanCode: str
+    quantity: float
+
+    # optional ---
+
+
+class ArrayDataList_InlineItem_206148a771924301533c257d414cc14a(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+
+    # optional ---
+    text: Optional[str] = None
+
+
 class GetObjectNoRefSchemaResponse200(BaseModel):
     """
     GetObjectResp
@@ -254,18 +299,6 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     integer_data: Optional[int] = None
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
-
-
-class AllOfRefObj(BaseModel):
-    """
-    All Of
-    """
-
-    # required ---
-
-    # optional ---
-    id: Optional[str] = None
-    data: Optional[int] = None
 
 
 class TestSafetyKey(BaseModel):
@@ -583,6 +616,41 @@ class Client:
             self.log_error(client_name, method, url, params, content, headers_)
 
             return UnknownError.parse_obj(response.json())
+    
+    @tracing
+    def get_object_with_inline_array(
+        self,
+        auth: Optional[BasicAuth] = None,
+    ) -> Optional[List[GetObjectWithInlineArrayResponse200_InlineItem_e4212f523a52347f69979782747c1725]]:
+        url = self._get_url(f'/object-with-inline-array')
+
+        params = {
+        }
+
+        headers_ = self.headers.copy()
+
+        if self.tracer_integration:
+            self.add_tracing_data_to_headers(headers_)
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+        
+        try:
+            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(exc, "", "get", "/object-with-inline-array")
+            raise exc
+        
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(response, "", "get", "/object-with-inline-array")
+
+        if response.status_code == 200:
+            return [GetObjectWithInlineArrayResponse200_InlineItem_e4212f523a52347f69979782747c1725.parse_obj(item) for item in response.json()]
     
     @tracing
     def get_list_objects(
@@ -1185,11 +1253,14 @@ class Client:
         headers_['x-trace-id'] = trace_id
 
 
+AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
 GetTextResponse200.update_forward_refs()
 GetListobjectsResponse200.update_forward_refs()
+GetObjectWithInlineArrayResponse200.update_forward_refs()
+GetObjectWithInlineArrayResponse200_InlineItem_e4212f523a52347f69979782747c1725.update_forward_refs()
+ArrayDataList_InlineItem_206148a771924301533c257d414cc14a.update_forward_refs()
 GetObjectNoRefSchemaResponse200.update_forward_refs()
-AllOfRefObj.update_forward_refs()
 TestSafetyKey.update_forward_refs()
 UnknownError.update_forward_refs()
 DeleteObjectResp.update_forward_refs()

@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from typing import Any
 from typing import Dict
 
@@ -12,12 +11,6 @@ from pythogen.parsers.schemas import SchemaParser
 
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class ParsedOperation:
-    operation: models.OperationObject
-    inline_schemas: Dict[str, models.SchemaObject]
 
 
 class OperationParser:
@@ -35,10 +28,9 @@ class OperationParser:
         self._request_body_parser = request_body_parser
         self._parameters_parser = parameters_parser
 
-    def parse_item(self, method: models.HttpMethod, operation_data: Dict[str, Any]) -> ParsedOperation:
+    def parse_item(self, method: models.HttpMethod, operation_data: Dict[str, Any]) -> models.OperationObject:
         """Спарсить спецификацию метода ручки (POST-, GET-, PUT-запроса и т.п.)"""
         responses: Dict[str, models.ResponseObject] = {}
-        inline_schemas: Dict[str, models.SchemaObject] = {}
 
         for status_code, response_data in operation_data['responses'].items():
             if status_code == 'default':
@@ -52,9 +44,7 @@ class OperationParser:
             else:
                 response_id = f"{operation_data['summary'].replace(' ', '')}Response{status_code}"
 
-            parsed_response = self._response_parser.parse_item(response_id, response_data)
-            responses[status_code] = parsed_response.response
-            inline_schemas.update(parsed_response.inline_schemas)
+            responses[status_code] = self._response_parser.parse_item(response_id, response_data)
 
         request_body_data = operation_data.get('requestBody')
         if request_body_data:
@@ -73,15 +63,12 @@ class OperationParser:
                 parameter = self._parameters_parser.parse_item(parameter_id, parameter_data)
                 parameters.append(parameter)
 
-        return ParsedOperation(
-            operation=models.OperationObject(
-                method=method,
-                summary=operation_data.get('summary'),
-                description=operation_data.get('description'),
-                operation_id=operation_data.get('operationId'),
-                request_body=request_body,
-                responses=models.ResponsesObject(patterned=responses),
-                parameters=parameters,
-            ),
-            inline_schemas=inline_schemas,
+        return models.OperationObject(
+            method=method,
+            summary=operation_data.get('summary'),
+            description=operation_data.get('description'),
+            operation_id=operation_data.get('operationId'),
+            request_body=request_body,
+            responses=models.ResponsesObject(patterned=responses),
+            parameters=parameters,
         )
