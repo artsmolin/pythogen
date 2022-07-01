@@ -161,34 +161,32 @@ except AttributeError:
 class BaseMetricsIntegration(abc.ABC):
     def __init__(
         self,
-        client_name: str = "{{ name | replace('Client', '') | lower }}",
         client_response_time_histogram: Optional[Histogram] = None,
         client_non_http_errors_counter: Optional[Counter] = None,
     ):
-        self._client_name = client_name
         self._client_response_time_histogram = client_response_time_histogram
         self._client_non_http_errors_counter = client_non_http_errors_counter
 
     @abc.abstractmethod
-    def on_request_error(self, error: Exception, http_method: str, http_target: str) -> None: ...
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None: ...
 
     @abc.abstractmethod
-    def on_request_success(self, response, http_method: str, http_target: str) -> None: ...
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None: ...
 
 
 class DefaultMetricsIntegration(BaseMetricsIntegration):
-    def on_request_error(self,  error: Exception, http_method: str, http_target: str) -> None:
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
         self._client_non_http_errors_counter.labels(
-            client_name=self._client_name,
+            client_name=client_name,
             http_method=http_method,
             http_target=http_target,
             exception=error.__class__.__name__,
         ).inc(1)
         raise error
 
-    def on_request_success(self, response, http_method: str, http_target: str) -> None:
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
         self._client_response_time_histogram.labels(
-            client_name=self._client_name,
+            client_name=client_name,
             http_method=http_method,
             http_target=http_target,
             http_status_code=response.status_code,
