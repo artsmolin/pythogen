@@ -439,6 +439,15 @@ components:
         boolean_data:
           title: Boolean Data
           type: boolean
+        tier:
+          type: object
+          properties:
+            code:
+              type: string
+            name:
+              type: string
+            priority:
+              type: integer
       additionalProperties: false
     PostObjectData:
       title: PostObjectData

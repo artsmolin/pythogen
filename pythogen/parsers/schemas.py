@@ -163,6 +163,7 @@ class SchemaParser:
                         # extract inline object definition to schema
                         property_schema_id = key + "_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)
+                        self._inline_schema_aggregator.add(property_schema_id, schema)
                     elif 'allOf' in property_schema_data:
                         property_schema_id = key + "_ref_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)

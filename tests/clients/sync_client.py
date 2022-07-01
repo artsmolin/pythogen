@@ -289,6 +289,19 @@ class GetObjectWithInlineArrayResponse200Item(BaseModel):
     # optional ---
 
 
+class TierObj(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+
+    # optional ---
+    code: Optional[str] = None
+    name: Optional[str] = None
+    priority: Optional[int] = None
+
+
 class GetObjectNoRefSchemaResponse200(BaseModel):
     """
     GetObjectResp
@@ -480,6 +493,7 @@ class GetObjectResp(BaseModel):
     integer_data: Optional[int] = None
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
+    tier: Optional[TierObj] = None
 
 
 class Data(BaseModel):
@@ -1298,6 +1312,7 @@ GetListobjectsResponse200.update_forward_refs()
 RewardsListItem.update_forward_refs()
 GetObjectWithInlineArrayResponse200.update_forward_refs()
 GetObjectWithInlineArrayResponse200Item.update_forward_refs()
+TierObj.update_forward_refs()
 GetObjectNoRefSchemaResponse200.update_forward_refs()
 TestSafetyKey.update_forward_refs()
 UnknownError.update_forward_refs()
