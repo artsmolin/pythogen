@@ -1,14 +1,16 @@
-import json
 import re
-from hashlib import md5
 from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pythogen import models
 from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
 from pythogen.parsers.references import RefResolver
+
+
+PRIMITIVE_TYPES = ('string', 'number', 'integer', 'boolean')
 
 
 class SchemaParser:
@@ -131,7 +133,11 @@ class SchemaParser:
             attr=attr,
         )
 
-    def _parse_properties(self, schema_type: models.Type, data: Dict[str, Any]) -> List[models.SchemaProperty]:
+    def _parse_properties(
+        self,
+        schema_type: models.Type,
+        data: Dict[str, Any],
+    ) -> List[models.SchemaProperty]:
         data_format = data.get('format')
         if data_format:
             try:
@@ -229,7 +235,11 @@ class SchemaParser:
 
         return properties
 
-    def _parse_items(self, parent_schema_id: str, data: Dict[str, Any]):
+    def _parse_items(
+        self,
+        parent_schema_id: str,
+        data: Dict[str, Any],
+    ) -> Union[Optional[models.SchemaObject], List[models.SchemaObject]]:
         items_schema_data = data.get('items')
         if items_schema_data:
             if items_schema_data.get('$ref', None):
@@ -237,9 +247,14 @@ class SchemaParser:
                 schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 return schema
             else:
-                items_schema_id = f'{parent_schema_id}__InlineItem__' + md5(json.dumps(data).encode()).hexdigest()
+                parent_raw_type = data.get('type')
+                if parent_raw_type == 'array':
+                    items_schema_id = f'{parent_schema_id}Item'
+                else:
+                    items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
                 schema = self.parse_item(items_schema_id, items_schema_data)
-                self._inline_schema_aggregator.add(items_schema_id, schema)
+                if items_schema_data.get('type') not in PRIMITIVE_TYPES:
+                    self._inline_schema_aggregator.add(items_schema_id, schema)
                 return schema
 
         if data.get('anyOf'):
@@ -250,3 +265,5 @@ class SchemaParser:
                 ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 items.append(ref_schema)
             return items
+
+        return None

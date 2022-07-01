@@ -116,11 +116,17 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
                 mapper = f'{classname(response.schema.id)}.parse_obj(response.json())'
 
             elif response.schema.type is models.Type.array and response.schema.items:
-                if response.schema.items.type is models.Type.object:
-                    items_class_name = classname(response.schema.items.id)
-                    mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'
+                if isinstance(response.schema.items, list):
+                    items_collection = response.schema.items
                 else:
-                    mapper = f'response.json()'
+                    items_collection = [response.schema.items]
+
+                for items in items_collection:
+                    if items.type is models.Type.object:
+                        items_class_name = classname(items.id)
+                        mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'
+                    else:
+                        mapper = f'response.json()'
 
             elif response.schema.type == models.Type.string:
                 if response.schema.format is models.Format.binary:
@@ -181,15 +187,15 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
         else:
             representation = primitive_type_mapping[schema.type]
 
-    if schema.type == models.Type.object and schema.id != '<inline+SchemaObject>':
+    elif schema.type == models.Type.object and schema.id != '<inline+SchemaObject>':
         representation = classname(schema.id)
 
     elif schema.type == models.Type.array and schema.items:
-        if schema.items.type is models.Type.any_of:
+        if schema.items.type is models.Type.any_of:  # type: ignore
             items = [classname(item.schema.id) for item in schema.items.items]  # type: ignore
             representation = f'List[Union{items}]'
         else:
-            item = j2_typerepr(schema.items)
+            item = j2_typerepr(schema.items)  # type: ignore
             representation = f'List[{item}]'
 
     elif schema.type == models.Type.any_of:

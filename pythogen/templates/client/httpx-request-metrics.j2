@@ -7,7 +7,7 @@
             {%- endif %}
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(exc, "{{ name | replace('Client', '') | lower }}", "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+                self.metrics_integration.on_request_error(exc, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
             raise exc
         {#
             https://www.python-httpx.org/api/#response
@@ -16,4 +16,4 @@
             total_seconds() to correctly get the total elapsed seconds.
         #}
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(response, "{{ name | replace('Client', '') | lower }}", "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+            self.metrics_integration.on_request_success(response, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
