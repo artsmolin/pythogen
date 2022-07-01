@@ -1,9 +1,9 @@
 import logging
-from dataclasses import dataclass
 from typing import Any
 from typing import Dict
 
 from pythogen import models
+from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
 from pythogen.parsers.references import RefResolver
 from pythogen.parsers.schemas import SchemaParser
 
@@ -11,21 +11,20 @@ from pythogen.parsers.schemas import SchemaParser
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class ParsedResponse:
-    response: models.ResponseObject
-    inline_schemas: Dict[str, models.SchemaObject]
-
-
 class ResponseParser:
-    def __init__(self, ref_resolver: RefResolver, schema_parser: SchemaParser) -> None:
+    def __init__(
+        self,
+        ref_resolver: RefResolver,
+        schema_parser: SchemaParser,
+        inline_schema_aggregator: InlineSchemasAggregator,
+    ) -> None:
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
+        self._inline_schema_aggregator = inline_schema_aggregator
 
-    def parse_item(self, response_id: str, response_data: Dict[str, Any]) -> ParsedResponse:
+    def parse_item(self, response_id: str, response_data: Dict[str, Any]) -> models.ResponseObject:
         """Спарсить спецификацию ответа ручки"""
         schema = None
-        inline_schemas: Dict[str, models.SchemaObject] = {}
 
         content = response_data.get('content')
         if content:
@@ -38,18 +37,13 @@ class ResponseParser:
 
             if schema_data.get('$ref', None):
                 resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
-                parsed_schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
-                schema = parsed_schema.schema
+                schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
-                parsed_schema = self._schema_parser.parse_item(response_id, schema_data)
-                inline_schemas[response_id] = parsed_schema.schema
-                schema = parsed_schema.schema
+                schema = self._schema_parser.parse_item(response_id, schema_data)
+                self._inline_schema_aggregator.add(response_id, schema)
 
-        return ParsedResponse(
-            response=models.ResponseObject(
-                id=response_id,
-                description=response_data['description'],
-                schema=schema,
-            ),
-            inline_schemas=inline_schemas,
+        return models.ResponseObject(
+            id=response_id,
+            description=response_data['description'],
+            schema=schema,
         )

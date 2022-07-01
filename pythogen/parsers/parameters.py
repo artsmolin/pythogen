@@ -32,9 +32,9 @@ class ParameterParser:
         schema_data = data['schema']
         if schema_data.get('$ref', None):
             resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
-            parsed_schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
+            schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
         else:
-            parsed_schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)
+            schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)
 
         description = schema_data.get('description', '')
         match = re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description)
@@ -47,5 +47,5 @@ class ParameterParser:
             description=description,
             location=models.ParameterLocation[data['in']],
             required=data.get('required', False),
-            schema=parsed_schema.schema,
+            schema=schema,
         )

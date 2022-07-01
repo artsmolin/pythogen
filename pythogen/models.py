@@ -11,6 +11,7 @@ from enum import Enum
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Union
 
 
 class HttpMethod(Enum):
@@ -136,7 +137,7 @@ class SchemaObject:
     enum: Optional[List[str]]
     type: Type
     format: Optional[Format]
-    items: Optional['SchemaObject']
+    items: Optional[Union['SchemaObject', List['SchemaObject']]]
     properties: List[SchemaProperty]
     description: Optional[str] = None
 
@@ -273,8 +274,13 @@ class Document:
             for property in schema.properties:
                 if property.schema.id in self.schemas and property.schema.id not in sorted:
                     sorted.insert(index, property.schema.id)
-                if property.schema.items and property.schema.items.id in self.schemas:
-                    sorted.insert(index, property.schema.items.id)
+                if property.schema.items:
+                    if isinstance(property.schema.items, list):
+                        for items in property.schema.items:
+                            if items.id in self.schemas:
+                                sorted.insert(index, items.id)
+                    elif property.schema.items.id in self.schemas:
+                        sorted.insert(index, property.schema.items.id)
 
         sorted_schemas = []
         for key in sorted:
