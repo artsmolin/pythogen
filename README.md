@@ -51,6 +51,15 @@ pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0
 - `--package-version` — required;
 - `--package-authors` — optional;
 - `path/to/package/output` — path to the directory where package will be saved.
+### Usage client
+```python
+from petstore.client_async import Client
+from petstore.client_async import Pet
+from petstore.client_async import EmptyBody
+
+client = Client(base_url="http://your.base.url")
+pets: List[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
+```
 
 ## Development
 - Activate environment
