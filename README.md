@@ -58,7 +58,7 @@ from petstore.client_async import Pet
 from petstore.client_async import EmptyBody
 
 client = Client(base_url="http://your.base.url")
-pets: List[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
+pets: list[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
 ```
 
 ## Development
