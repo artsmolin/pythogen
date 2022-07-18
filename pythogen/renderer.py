@@ -192,7 +192,7 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
 
     elif schema.type == models.Type.array and schema.items:
         if schema.items.type is models.Type.any_of:  # type: ignore
-            items = [classname(item.schema.id) for item in schema.items.items]  # type: ignore
+            items = [classname(item.id) for item in schema.items.items]  # type: ignore
             representation = f'List[Union{items}]'
         else:
             item = j2_typerepr(schema.items)  # type: ignore
