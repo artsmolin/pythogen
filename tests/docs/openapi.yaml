@@ -420,6 +420,22 @@ components:
           title: Data
           type: integer
       additionalProperties: false
+    Cat:
+      title: Cat
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+      additionalProperties: false
+    Dog:
+      title: Dog
+      type: object
+      properties:
+        name:
+          title: name
+          type: string
+      additionalProperties: false
     GetObjectResp:
       title: GetObjectResp
       type: object
@@ -448,6 +464,11 @@ components:
               type: string
             priority:
               type: integer
+        animal:
+          type: object
+          anyOf:
+            - {$ref: '#/components/schemas/Cat'}
+            - {$ref: '#/components/schemas/Dog'}
       additionalProperties: false
     PostObjectData:
       title: PostObjectData

@@ -99,7 +99,7 @@ class SchemaParser:
             try:
                 data_type = models.Type(raw_data_type)
             except ValueError:
-                raise Exception(f'Unable to parse schema "{id}", unknown type "{raw_data_type}"')
+                raise Exception(f'Unable to parse schema "{id}", unknown type "{raw_data_type}" on "{data}"')
         return data_type
 
     def _parse_format(self, data: Dict[str, Any]) -> Optional[models.Format]:
@@ -183,6 +183,11 @@ class SchemaParser:
                         # specify inline array name
                         property_schema_id = key + "_list"
                         schema = self.parse_item(property_schema_id, property_schema_data)
+                    elif 'anyOf' in property_schema_data:
+                        # extract inline object definition to schema
+                        property_schema_id = key + "_obj"
+                        schema = self.parse_item(property_schema_id, property_schema_data)
+                        self._inline_schema_aggregator.add(property_schema_id, schema)
                     else:
                         property_schema_id = f'<inline+{models.SchemaObject.__name__}>'
                         schema = self.parse_item(property_schema_id, property_schema_data)

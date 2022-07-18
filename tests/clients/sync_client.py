@@ -289,6 +289,16 @@ class GetObjectWithInlineArrayResponse200Item(BaseModel):
     # optional ---
 
 
+class AnimalObj(BaseModel):
+    """
+    None
+    """
+    __root__: Union[
+        'Cat',
+        'Dog',
+    ]
+
+
 class TierObj(BaseModel):
     """
     None
@@ -481,6 +491,28 @@ class PostObjectData(BaseModel):
         return values
 
 
+class Dog(BaseModel):
+    """
+    Dog
+    """
+
+    # required ---
+
+    # optional ---
+    name: Optional[str] = None
+
+
+class Cat(BaseModel):
+    """
+    Cat
+    """
+
+    # required ---
+
+    # optional ---
+    name: Optional[str] = None
+
+
 class GetObjectResp(BaseModel):
     """
     GetObjectResp
@@ -494,6 +526,7 @@ class GetObjectResp(BaseModel):
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
     tier: Optional[TierObj] = None
+    animal: Optional[AnimalObj] = None
 
 
 class Data(BaseModel):
@@ -1312,6 +1345,7 @@ GetListobjectsResponse200.update_forward_refs()
 RewardsListItem.update_forward_refs()
 GetObjectWithInlineArrayResponse200.update_forward_refs()
 GetObjectWithInlineArrayResponse200Item.update_forward_refs()
+AnimalObj.update_forward_refs()
 TierObj.update_forward_refs()
 GetObjectNoRefSchemaResponse200.update_forward_refs()
 TestSafetyKey.update_forward_refs()
@@ -1324,6 +1358,8 @@ PostFile.update_forward_refs()
 PutObjectData.update_forward_refs()
 PatchObjectData.update_forward_refs()
 PostObjectData.update_forward_refs()
+Dog.update_forward_refs()
+Cat.update_forward_refs()
 GetObjectResp.update_forward_refs()
 Data.update_forward_refs()
 AllOfResp.update_forward_refs()
