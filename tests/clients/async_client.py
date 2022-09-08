@@ -553,8 +553,8 @@ class AllOfResp(BaseModel):
 
 
 class BasicAuth(BaseModel):
-        username: str
-        password: str
+    username: str
+    password: str
 
 
 class Client:
@@ -562,8 +562,9 @@ class Client:
         self,
         base_url: str,
         timeout: int = 5,
+        client_name: str = "",
         client: Optional[httpx.AsyncClient] = None,
-        headers: Dict[str, str] = None,
+        headers: Optional[Dict[str, str]] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
@@ -572,6 +573,7 @@ class Client:
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
         self.metrics_integration=metrics_integration
+        self.client_name = client_name
     
     @tracing
     async def get_object_no_ref_schema(
@@ -605,11 +607,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/objects/no-ref-schema/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/objects/no-ref-schema/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/no-ref-schema/:object_id")
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
@@ -646,24 +648,23 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/objects/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/objects/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/:object_id")
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
 
         if response.status_code == 500:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return UnknownError.parse_obj(response.json())
     
@@ -693,11 +694,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/object-with-array-response")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/object-with-array-response")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-array-response")
 
         if response.status_code == 200:
             return [GetObjectWithInlineArrayResponse200Item.parse_obj(item) for item in response.json()]
@@ -728,11 +729,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/object-with-inline-array")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/object-with-inline-array")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-inline-array")
 
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
@@ -763,11 +764,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/objects")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/objects")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects")
 
         if response.status_code == 200:
             return [GetObjectResp.parse_obj(item) for item in response.json()]
@@ -798,11 +799,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/text")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/text")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/text")
 
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
@@ -833,11 +834,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/empty")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/empty")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/empty")
 
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
@@ -868,11 +869,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/binary")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/binary")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/binary")
 
         if response.status_code == 200:
             return GetBinaryResponse200(content=response.content)
@@ -903,11 +904,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/allof")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/allof")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/allof")
 
         if response.status_code == 200:
             return AllOfResp.parse_obj(response.json())
@@ -942,24 +943,23 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/slow/objects/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/slow/objects/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/slow/objects/:object_id")
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
 
         if response.status_code == 500:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return UnknownError.parse_obj(response.json())
     
@@ -989,11 +989,11 @@ class Client:
             response = await self.client.post(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/post-without-body")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/post-without-body")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/post-without-body")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1032,11 +1032,11 @@ class Client:
             response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/objects")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/objects")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1076,11 +1076,11 @@ class Client:
             response = await self.client.post(url, data=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/objects-form-data")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/objects-form-data")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects-form-data")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1124,11 +1124,11 @@ class Client:
             response = await self.client.post(url, data=json, headers=headers_, params=params, auth=auth_, files=files)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/multipart-form-data")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/multipart-form-data")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/multipart-form-data")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1168,11 +1168,11 @@ class Client:
             response = await self.client.patch(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "patch", "/objects/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "patch", "/objects/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "patch", "/objects/:object_id")
 
         if response.status_code == 200:
             return PatchObjectResp.parse_obj(response.json())
@@ -1212,11 +1212,11 @@ class Client:
             response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "put", "/objects/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "put", "/objects/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "put", "/objects/:object_id")
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1256,11 +1256,11 @@ class Client:
             response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "put", "/slow/objects/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "put", "/slow/objects/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "put", "/slow/objects/:object_id")
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1292,11 +1292,11 @@ class Client:
             response = await self.client.delete(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "delete", "/objects/:object_id")
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/:object_id")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "delete", "/objects/:object_id")
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/objects/:object_id")
 
         if response.status_code == 200:
             return DeleteObjectResp.parse_obj(response.json())

@@ -364,8 +364,9 @@ class Client:
         self,
         base_url: str,
         timeout: int = 5,
+        client_name: str = "",
         client: Optional[httpx.AsyncClient] = None,
-        headers: Dict[str, str] = None,
+        headers: Optional[Dict[str, str]] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
@@ -374,6 +375,7 @@ class Client:
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
         self.metrics_integration = metrics_integration
+        self.client_name = client_name
 
     @tracing
     async def findPetsByStatus(
@@ -403,24 +405,23 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/pet/findByStatus")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/pet/findByStatus")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/pet/findByStatus")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/pet/findByStatus")
 
         if response.status_code == 200:
             return [Pet.parse_obj(item) for item in response.json()]
 
         if response.status_code == 400:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -452,24 +453,23 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/pet/findByTags")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/pet/findByTags")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/pet/findByTags")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/pet/findByTags")
 
         if response.status_code == 200:
             return [Pet.parse_obj(item) for item in response.json()]
 
         if response.status_code == 400:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -499,36 +499,34 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/pet/:petId")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/pet/:petId")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/pet/:petId")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/pet/:petId")
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
 
         if response.status_code == 400:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -557,11 +555,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/store/inventory")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/store/inventory")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/store/inventory")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/store/inventory")
 
         if response.status_code == 200:
             return ReturnspetinventoriesbystatusResponse200.parse_obj(response.json())
@@ -592,36 +590,34 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/store/order/:orderId")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/store/order/:orderId")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/store/order/:orderId")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/store/order/:orderId")
 
         if response.status_code == 200:
             return Order.parse_obj(response.json())
 
         if response.status_code == 400:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -656,24 +652,23 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/user/login")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/user/login")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/user/login")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/user/login")
 
         if response.status_code == 200:
             return LogsuserintothesystemResponse200(text=response.text)
 
         if response.status_code == 400:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -702,11 +697,11 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/user/logout")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/user/logout")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/user/logout")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/user/logout")
 
     @tracing
     async def getUserByName(
@@ -734,36 +729,34 @@ class Client:
             response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "get", "/user/:username")
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/user/:username")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "get", "/user/:username")
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/user/:username")
 
         if response.status_code == 200:
             return User.parse_obj(response.json())
 
         if response.status_code == 400:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            client_name = ""
             method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -800,24 +793,23 @@ class Client:
             response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/pet")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/pet")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/pet")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/pet")
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
 
         if response.status_code == 405:
-            client_name = ""
             method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -853,21 +845,20 @@ class Client:
             response = await self.client.post(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/pet/:petId")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/pet/:petId")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/pet/:petId")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/pet/:petId")
 
         if response.status_code == 405:
-            client_name = ""
             method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -908,11 +899,11 @@ class Client:
             response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/pet/:petId/uploadImage")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/pet/:petId/uploadImage")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/pet/:petId/uploadImage")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/pet/:petId/uploadImage")
 
         if response.status_code == 200:
             return ApiResponse.parse_obj(response.json())
@@ -950,24 +941,23 @@ class Client:
             response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/store/order")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/store/order")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/store/order")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/store/order")
 
         if response.status_code == 200:
             return Order.parse_obj(response.json())
 
         if response.status_code == 405:
-            client_name = ""
             method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1004,11 +994,11 @@ class Client:
             response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/user")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/user")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/user")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/user")
 
     @tracing
     async def createUsersWithListInput(
@@ -1043,11 +1033,11 @@ class Client:
             response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "post", "/user/createWithList")
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/user/createWithList")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "post", "/user/createWithList")
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/user/createWithList")
 
         if response.status_code == 200:
             return User.parse_obj(response.json())
@@ -1085,48 +1075,45 @@ class Client:
             response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "put", "/pet")
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/pet")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "put", "/pet")
+            self.metrics_integration.on_request_success(self.client_name, response, "put", "/pet")
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
 
         if response.status_code == 400:
-            client_name = ""
             method = "put"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            client_name = ""
             method = "put"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 405:
-            client_name = ""
             method = "put"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1164,11 +1151,11 @@ class Client:
             response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "put", "/user/:username")
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/user/:username")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "put", "/user/:username")
+            self.metrics_integration.on_request_success(self.client_name, response, "put", "/user/:username")
 
     @tracing
     async def deletePet(
@@ -1199,21 +1186,20 @@ class Client:
             response = await self.client.delete(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "delete", "/pet/:petId")
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/pet/:petId")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "delete", "/pet/:petId")
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/pet/:petId")
 
         if response.status_code == 400:
-            client_name = ""
             method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1243,33 +1229,31 @@ class Client:
             response = await self.client.delete(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "delete", "/store/order/:orderId")
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/store/order/:orderId")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "delete", "/store/order/:orderId")
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/store/order/:orderId")
 
         if response.status_code == 400:
-            client_name = ""
             method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            client_name = ""
             method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1299,33 +1283,31 @@ class Client:
             response = await self.client.delete(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error("", exc, "delete", "/user/:username")
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/user/:username")
             raise exc
 
         if self.metrics_integration:
-            self.metrics_integration.on_request_success("", response, "delete", "/user/:username")
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/user/:username")
 
         if response.status_code == 400:
-            client_name = ""
             method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            client_name = ""
             method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 

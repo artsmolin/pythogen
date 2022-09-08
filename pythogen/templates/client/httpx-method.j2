@@ -111,14 +111,13 @@
 
         if response.status_code == {{ code }}:
             {% if code | int >= 400 -%}
-            client_name = "{{ name | replace('Client', '') | lower }}"
             method = "{{ method }}"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(client_name, method, url, params, content, headers_)
+            self.log_error(self.client_name, method, url, params, content, headers_)
 
             {% endif -%}
             return {{ mapper }}

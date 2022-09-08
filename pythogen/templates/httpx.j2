@@ -284,8 +284,8 @@ class {{ classname(model.id) }}(BaseModel):
 
 
 class BasicAuth(BaseModel):
-        username: str
-        password: str
+    username: str
+    password: str
 
 
 class {{ name }}:
@@ -293,12 +293,13 @@ class {{ name }}:
         self,
         base_url: str,
         timeout: int = 5,
+        client_name: str = "{{ name | replace('Client', '') | lower }}",
         {%- if sync %}
         client: Optional[httpx.Client] = None,
         {%- else %}
         client: Optional[httpx.AsyncClient] = None,
         {%- endif %}
-        headers: Dict[str, str] = None,
+        headers: Optional[Dict[str, str]] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
@@ -311,6 +312,7 @@ class {{ name }}:
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
         self.metrics_integration=metrics_integration
+        self.client_name = client_name
 
     {#-  get items begin  #}
     {% with items=get.items(), method='get'%}

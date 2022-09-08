@@ -71,3 +71,4 @@ pets: list[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
     ```
 - Make changes
 - Execute `make clients-for-tests && make test-clients`
+- Execute `make clients-for-examples`
