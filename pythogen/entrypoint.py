@@ -23,6 +23,7 @@ def main(
     sync: bool = typer.Option(False, help="sync client"),
     package_version: Optional[str] = typer.Option(None, help="package version"),
     package_authors: Optional[str] = typer.Option(None, help="package authors"),
+    metrics: bool = typer.Option(False, help="include metrics integration"),
 ):
     """
     Generate HTTP clients for python from OpenAPI
@@ -43,6 +44,7 @@ def main(
         document=document,
         name=name,
         sync=sync,
+        metrics=metrics,
     )
 
 

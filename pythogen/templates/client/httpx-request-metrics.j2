@@ -6,8 +6,10 @@
             response = await self.client.{{ method }}(url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
             {%- endif %}
         except Exception as exc:
+            {%- if metrics %}
             if self.metrics_integration:
                 self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+            {%- endif %}
             raise exc
         {#
             https://www.python-httpx.org/api/#response
@@ -15,5 +17,7 @@
             and calling close() on the corresponding response received for that request.
             total_seconds() to correctly get the total elapsed seconds.
         #}
+        {%- if metrics %}
         if self.metrics_integration:
             self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+        {%- endif %}

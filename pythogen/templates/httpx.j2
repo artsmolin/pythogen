@@ -38,10 +38,10 @@ from typing import cast
 from jaeger_client import Tracer
 from jaeger_client.span import Span
 from opentracing.propagation import Format
-
+{%- if metrics %}
 from prometheus_client import Counter
 from prometheus_client import Histogram
-
+{%- endif %}
 import httpx
 from pydantic import BaseModel
 from pydantic import Field
@@ -157,7 +157,7 @@ try:
 except AttributeError:
     DEFAULT_AUTH = None
 
-
+{%- if metrics %}
 class BaseMetricsIntegration(abc.ABC):
     def __init__(
         self,
@@ -191,7 +191,7 @@ class DefaultMetricsIntegration(BaseMetricsIntegration):
             http_target=http_target,
             http_status_code=response.status_code,
         ).observe(response.elapsed.total_seconds())
-
+{%- endif %}
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -301,7 +301,9 @@ class {{ name }}:
         {%- endif %}
         headers: Optional[Dict[str, str]] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
+        {%- if metrics %}
         metrics_integration: Optional[BaseMetricsIntegration] = None,
+        {%- endif %}
     ):
         {%- if sync %}
         self.client = client or httpx.Client(timeout=Timeout(timeout))
@@ -311,7 +313,9 @@ class {{ name }}:
         self.base_url = base_url
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
+        {%- if metrics %}
         self.metrics_integration=metrics_integration
+        {%- endif %}
         self.client_name = client_name
 
     {#-  get items begin  #}

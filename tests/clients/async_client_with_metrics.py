@@ -38,6 +38,8 @@ from typing import cast
 from jaeger_client import Tracer
 from jaeger_client.span import Span
 from opentracing.propagation import Format
+from prometheus_client import Counter
+from prometheus_client import Histogram
 import httpx
 from pydantic import BaseModel
 from pydantic import Field
@@ -110,9 +112,9 @@ class DefaultTracerIntegration(BaseTracerIntegration):
 
 def tracing(f: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(f)
-    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+    async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if not self.tracer_integration:
-            return f(self, *args, **kwargs)
+            return await f(self, *args, **kwargs)
 
         db_query = kwargs.get('query', None)
         current_tags = {}
@@ -124,7 +126,7 @@ def tracing(f: Callable[..., Any]) -> Callable[..., Any]:
         span = tracer.start_span(operation_name=f.__qualname__, child_of=self.tracer_integration.get_current_span(), tags=current_tags)
         scope = tracer.scope_manager.activate(span, True)
         try:
-            result = f(self, *args, **kwargs)
+            result = await f(self, *args, **kwargs)
         except Exception as exp:
             span.set_tag(tags.ERROR, True)
             span.set_tag('error.message', str(exp))
@@ -140,6 +142,39 @@ try:
     DEFAULT_AUTH = httpx.USE_CLIENT_DEFAULT
 except AttributeError:
     DEFAULT_AUTH = None
+class BaseMetricsIntegration(abc.ABC):
+    def __init__(
+        self,
+        client_response_time_histogram: Optional[Histogram] = None,
+        client_non_http_errors_counter: Optional[Counter] = None,
+    ):
+        self._client_response_time_histogram = client_response_time_histogram
+        self._client_non_http_errors_counter = client_non_http_errors_counter
+
+    @abc.abstractmethod
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None: ...
+
+    @abc.abstractmethod
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None: ...
+
+
+class DefaultMetricsIntegration(BaseMetricsIntegration):
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
+        self._client_non_http_errors_counter.labels(
+            client_name=client_name,
+            http_method=http_method,
+            http_target=http_target,
+            exception=error.__class__.__name__,
+        ).inc(1)
+        raise error
+
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
+        self._client_response_time_histogram.labels(
+            client_name=client_name,
+            http_method=http_method,
+            http_target=http_target,
+            http_status_code=response.status_code,
+        ).observe(response.elapsed.total_seconds())
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -523,18 +558,20 @@ class Client:
         base_url: str,
         timeout: int = 5,
         client_name: str = "",
-        client: Optional[httpx.Client] = None,
+        client: Optional[httpx.AsyncClient] = None,
         headers: Optional[Dict[str, str]] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
+        metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
-        self.client = client or httpx.Client(timeout=Timeout(timeout))
+        self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
+        self.metrics_integration=metrics_integration
         self.client_name = client_name
     
     @tracing
-    def get_object_no_ref_schema(
+    async def get_object_no_ref_schema(
         self,
         object_id: str,
         from_: str,
@@ -562,16 +599,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/no-ref-schema/:object_id")
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
     
     @tracing
-    def get_object(
+    async def get_object(
         self,
         object_id: str,
         from_: str,
@@ -599,10 +640,14 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/:object_id")
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -619,7 +664,7 @@ class Client:
             return UnknownError.parse_obj(response.json())
     
     @tracing
-    def get_object_with_inline_array(
+    async def get_object_with_inline_array(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[List[GetObjectWithInlineArrayResponse200Item]]:
@@ -641,16 +686,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-array-response")
 
         if response.status_code == 200:
             return [GetObjectWithInlineArrayResponse200Item.parse_obj(item) for item in response.json()]
     
     @tracing
-    def get_object_with_inline_array(
+    async def get_object_with_inline_array(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[GetObjectWithInlineArrayResponse200]:
@@ -672,16 +721,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-inline-array")
 
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
     
     @tracing
-    def get_list_objects(
+    async def get_list_objects(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[List[GetObjectResp]]:
@@ -703,16 +756,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects")
 
         if response.status_code == 200:
             return [GetObjectResp.parse_obj(item) for item in response.json()]
     
     @tracing
-    def get_text(
+    async def get_text(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[GetTextResponse200]:
@@ -734,16 +791,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/text")
 
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
     
     @tracing
-    def get_empty(
+    async def get_empty(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[EmptyBody]:
@@ -765,16 +826,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/empty")
 
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
     
     @tracing
-    def get_binary(
+    async def get_binary(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[GetBinaryResponse200]:
@@ -796,16 +861,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/binary")
 
         if response.status_code == 200:
             return GetBinaryResponse200(content=response.content)
     
     @tracing
-    def get_allof(
+    async def get_allof(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[AllOfResp]:
@@ -827,16 +896,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/allof")
 
         if response.status_code == 200:
             return AllOfResp.parse_obj(response.json())
     
     @tracing
-    def get_object_slow(
+    async def get_object_slow(
         self,
         object_id: str,
         return_error: Optional[str] = None,
@@ -862,10 +935,14 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "get", "/slow/objects/:object_id")
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -882,7 +959,7 @@ class Client:
             return UnknownError.parse_obj(response.json())
     
     @tracing
-    def post_object_without_body(
+    async def post_object_without_body(
         self,
         auth: Optional[BasicAuth] = None,
     ) -> Optional[PostObjectResp]:
@@ -904,16 +981,20 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.post(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.post(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/post-without-body")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
     
     @tracing
-    def post_object(
+    async def post_object(
         self,
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
@@ -943,16 +1024,20 @@ class Client:
             json = None
         
         try:
-            response = self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
     
     @tracing
-    def post_form_object(
+    async def post_form_object(
         self,
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
@@ -983,16 +1068,20 @@ class Client:
         
         headers_.update({'Content-Type': 'application/x-www-form-urlencoded'})
         try:
-            response = self.client.post(url, data=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.post(url, data=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects-form-data")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
     
     @tracing
-    def post_multipart_form_data(
+    async def post_multipart_form_data(
         self,
         body: Optional[Union[PostFile, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
@@ -1027,16 +1116,20 @@ class Client:
         headers_.pop("Content-Type", None)
         
         try:
-            response = self.client.post(url, data=json, headers=headers_, params=params, auth=auth_, files=files)
+            response = await self.client.post(url, data=json, headers=headers_, params=params, auth=auth_, files=files)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "post", "/multipart-form-data")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
     
     @tracing
-    def patch_object(
+    async def patch_object(
         self,
         object_id: str,
         body: Optional[Union[PatchObjectData, Dict[str, Any]]] = None,
@@ -1067,16 +1160,20 @@ class Client:
             json = None
         
         try:
-            response = self.client.patch(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.patch(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "patch", "/objects/:object_id")
 
         if response.status_code == 200:
             return PatchObjectResp.parse_obj(response.json())
     
     @tracing
-    def put_object(
+    async def put_object(
         self,
         object_id: str,
         body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
@@ -1107,16 +1204,20 @@ class Client:
             json = None
         
         try:
-            response = self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "put", "/objects/:object_id")
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
     
     @tracing
-    def put_object_slow(
+    async def put_object_slow(
         self,
         object_id: str,
         body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
@@ -1147,16 +1248,20 @@ class Client:
             json = None
         
         try:
-            response = self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "put", "/slow/objects/:object_id")
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
     
     @tracing
-    def delete_object(
+    async def delete_object(
         self,
         object_id: str,
         auth: Optional[BasicAuth] = None,
@@ -1179,17 +1284,21 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = self.client.delete(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.delete(url, headers=headers_, params=params, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/:object_id")
             raise exc
         
+        if self.metrics_integration:
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/objects/:object_id")
 
         if response.status_code == 200:
             return DeleteObjectResp.parse_obj(response.json())
     
     
-    def close(self) -> None:
-        self.client.close()
+    async def close(self) -> None:
+        await self.client.aclose()
 
     def _get_url(self, path: str) -> str:
         return f'{self.base_url}{path}'

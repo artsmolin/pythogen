@@ -26,7 +26,7 @@ PathStr = TypeVar('PathStr', bound=str)
 logger = logging.getLogger(__name__)
 
 
-def render_client(*, output_path: str, document: models.Document, name, sync) -> None:
+def render_client(*, output_path: str, document: models.Document, name: str, sync: bool, metrics: bool) -> None:
     """Отрисовывает сгенерированный клиент на основе j2-шаблонов
 
     Arguments
@@ -61,6 +61,7 @@ def render_client(*, output_path: str, document: models.Document, name, sync) ->
         put=prepared_operations.put,
         delete_no_body=prepared_operations.delete_no_body,
         sync=sync,
+        metrics=metrics,
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
     )
     with open(output_path, 'w') as output_file:
