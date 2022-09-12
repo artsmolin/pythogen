@@ -112,31 +112,50 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
     for code, response in responses.patterned.items():
         if response.schema is None:
             mapper = 'EmptyBody(status_code=response.status_code, text=response.text)'
-        else:
-            if response.schema.type == models.Type.object:
-                mapper = f'{classname(response.schema.id)}.parse_obj(response.json())'
+            mapping.append((code, mapper))
+            continue
 
-            elif response.schema.type is models.Type.array and response.schema.items:
-                if isinstance(response.schema.items, list):
-                    items_collection = response.schema.items
-                else:
-                    items_collection = [response.schema.items]
+        if response.schema.type == models.Type.object:
+            mapper = f'{classname(response.schema.id)}.parse_obj(response.json())'
+            mapping.append((code, mapper))
+            continue
 
-                for items in items_collection:
-                    if items.type is models.Type.object:
-                        items_class_name = classname(items.id)
-                        mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'
-                    else:
-                        mapper = f'response.json()'
+        if response.schema.type == models.Type.any_of and isinstance(response.schema.items, list):
+            items_class_names = [classname(items.id) for items in response.schema.items]
+            items_class_names_str: str = '[' + ', '.join(items_class_names) + ']'
+            mapper = f'self._parse_any_of(response.json(), {items_class_names_str})'
+            mapping.append((code, mapper))
+            continue
 
-            elif response.schema.type == models.Type.string:
-                if response.schema.format is models.Format.binary:
-                    mapper = f'{classname(response.schema.id)}(content=response.content)'
-                else:
-                    mapper = f'{classname(response.schema.id)}(text=response.text)'
+        if response.schema.type is models.Type.array and response.schema.items:
+            if isinstance(response.schema.items, list):
+                items_collection = response.schema.items
             else:
-                raise NotImplementedError(f'Unable to create response mapping of {response.id}')
-        mapping.append((code, mapper))
+                items_collection = [response.schema.items]
+
+            for items in items_collection:
+                if items.type is models.Type.object:
+                    items_class_name = classname(items.id)
+                    mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'
+                    mapping.append((code, mapper))
+                    continue
+
+                mapper = f'response.json()'
+                mapping.append((code, mapper))
+                continue
+            continue
+
+        if response.schema.type == models.Type.string:
+            if response.schema.format is models.Format.binary:
+                mapper = f'{classname(response.schema.id)}(content=response.content)'
+                mapping.append((code, mapper))
+                continue
+
+            mapper = f'{classname(response.schema.id)}(text=response.text)'
+            mapping.append((code, mapper))
+            continue
+
+        raise NotImplementedError(f'Unable to create response mapping of {response.id} <{response.schema.type=}>')
 
     return mapping
 

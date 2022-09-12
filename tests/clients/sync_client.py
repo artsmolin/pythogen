@@ -1223,6 +1223,16 @@ class Client:
         trace_id = self.tracer_integration.get_current_trace_id() or ''
         headers_['x-trace-id'] = trace_id
 
+    def _parse_any_of(self, item: Dict[str, Any], schema_classes: List[Any]) -> Any:
+        for schema_class in schema_classes:
+            try:
+                return schema_class.parse_obj(item)
+            except:
+                continue
+
+        raise Exception("Can't parse \"{item}\"")
+
+
 
 AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
