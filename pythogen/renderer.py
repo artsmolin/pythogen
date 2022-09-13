@@ -155,7 +155,9 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
             mapping.append((code, mapper))
             continue
 
-        raise NotImplementedError(f'Unable to create response mapping of {response.id} <{response.schema.type=}>')
+        raise NotImplementedError(
+            f'Unable to create response mapping of {response.id} <response.schema.type={response.schema.type}>'
+        )
 
     return mapping
 
