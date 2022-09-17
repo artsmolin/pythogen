@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import io
 import logging
 import os
@@ -7,6 +8,9 @@ from clients import async_client
 from clients import sync_client
 from jaeger_client import Config
 from opentracing.scope_managers.contextvars import ContextVarsScopeManager
+from rich.console import Console
+
+console = Console()
 
 
 logging.basicConfig(level=logging.INFO)
@@ -281,7 +285,42 @@ async def test_httpx_async_tracing_client():
 
 
 if __name__ == '__main__':
-    test_httpx_sync_client()
-    test_httpx_sync_tracing_client()
-    asyncio.run(test_httpx_async_client())
-    asyncio.run(test_httpx_async_tracing_client())
+    mapping = {
+        'sync': {
+            'fn': test_httpx_sync_client,
+            'ok': False,
+        },
+        'sync with tracing': {
+            'fn': test_httpx_sync_tracing_client,
+            'ok': False,
+        },
+        'async': {
+            'fn': test_httpx_async_client,
+            'ok': False,
+        },
+        'async with tracing': {
+            'fn': test_httpx_async_tracing_client,
+            'ok': False,
+        },
+    }
+    
+    for test_name, test_data in mapping.items():
+        try:
+            fn = test_data['fn']
+            if inspect.iscoroutinefunction(fn):
+                asyncio.run(fn())
+            else:
+                fn()
+            test_data['ok'] = True
+        except AssertionError as exc:
+            logging.error(exc, exc_info=True)
+    
+    console.print('\n\ntest clients results')
+    for test_name, test_data in mapping.items():
+        console.print(f'  - {test_name}', end=' ')
+        if test_data['ok']:
+            console.print('ok', style='green')
+        else:
+            console.print('error', style='red')
+    
+    

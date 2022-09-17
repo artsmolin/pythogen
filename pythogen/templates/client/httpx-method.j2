@@ -41,6 +41,7 @@
         {%- endif %}
         {%- endfor %}
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and not operation.request_body.are_files_required %}
         files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
         {%- endif %}

@@ -17,6 +17,7 @@ services:
     environment:
       TEST_SERVER_URL: http://mock_server:8080
     command: python main.py
+    tty: true
     networks:
       clientator:
         aliases:

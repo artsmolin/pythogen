@@ -540,6 +540,7 @@ class Client:
         from_: str,
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[GetObjectNoRefSchemaResponse200]:
         url = self._get_url(f'/objects/no-ref-schema/{object_id}')
 
@@ -562,7 +563,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -577,6 +578,7 @@ class Client:
         from_: str,
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -599,7 +601,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -622,6 +624,7 @@ class Client:
     async def get_object_with_inline_array(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[List[GetObjectWithInlineArrayResponse200Item]]:
         url = self._get_url(f'/object-with-array-response')
 
@@ -641,7 +644,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -653,6 +656,7 @@ class Client:
     async def get_object_with_inline_array(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[GetObjectWithInlineArrayResponse200]:
         url = self._get_url(f'/object-with-inline-array')
 
@@ -672,7 +676,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -684,6 +688,7 @@ class Client:
     async def get_list_objects(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[List[GetObjectResp]]:
         url = self._get_url(f'/objects')
 
@@ -703,7 +708,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -715,6 +720,7 @@ class Client:
     async def get_text(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[GetTextResponse200]:
         url = self._get_url(f'/text')
 
@@ -734,7 +740,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -746,6 +752,7 @@ class Client:
     async def get_empty(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f'/empty')
 
@@ -765,7 +772,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -777,6 +784,7 @@ class Client:
     async def get_binary(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[GetBinaryResponse200]:
         url = self._get_url(f'/binary')
 
@@ -796,7 +804,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -808,6 +816,7 @@ class Client:
     async def get_allof(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[AllOfResp]:
         url = self._get_url(f'/allof')
 
@@ -827,7 +836,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -841,6 +850,7 @@ class Client:
         object_id: str,
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
@@ -862,7 +872,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -885,6 +895,7 @@ class Client:
     async def post_object_without_body(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/post-without-body')
 
@@ -904,7 +915,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.post(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("post", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -917,6 +928,7 @@ class Client:
         self,
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/objects')
 
@@ -943,7 +955,7 @@ class Client:
             json = None
         
         try:
-            response = await self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -956,6 +968,7 @@ class Client:
         self,
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/objects-form-data')
 
@@ -983,7 +996,7 @@ class Client:
         
         headers_.update({'Content-Type': 'application/x-www-form-urlencoded'})
         try:
-            response = await self.client.post(url, data=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -996,6 +1009,7 @@ class Client:
         self,
         body: Optional[Union[PostFile, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
         files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/multipart-form-data')
@@ -1027,7 +1041,7 @@ class Client:
         headers_.pop("Content-Type", None)
         
         try:
-            response = await self.client.post(url, data=json, headers=headers_, params=params, auth=auth_, files=files)
+            response = await self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_, files=files)
         except Exception as exc:
             raise exc
         
@@ -1041,6 +1055,7 @@ class Client:
         object_id: str,
         body: Optional[Union[PatchObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[PatchObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -1067,7 +1082,7 @@ class Client:
             json = None
         
         try:
-            response = await self.client.patch(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("patch", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -1081,6 +1096,7 @@ class Client:
         object_id: str,
         body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[PutObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -1107,7 +1123,7 @@ class Client:
             json = None
         
         try:
-            response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -1121,6 +1137,7 @@ class Client:
         object_id: str,
         body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[PutObjectResp]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
@@ -1147,7 +1164,7 @@ class Client:
             json = None
         
         try:
-            response = await self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         
@@ -1160,6 +1177,7 @@ class Client:
         self,
         object_id: str,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[DeleteObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -1179,7 +1197,7 @@ class Client:
             auth_ = (auth.username, auth.password)
         
         try:
-            response = await self.client.delete(url, headers=headers_, params=params, auth=auth_)
+            response = await self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
         

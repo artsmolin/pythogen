@@ -1,10 +1,6 @@
 
         try:
-            {%- if sync %}
-            response = self.client.{{ method }}(url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
-            {%- else %}
-            response = await self.client.{{ method }}(url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
-            {%- endif %}
+            response = {% if not sync %}await {% endif %}self.client.request("{{ method }}", url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, content=content, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
         except Exception as exc:
             {%- if metrics %}
             if self.metrics_integration:

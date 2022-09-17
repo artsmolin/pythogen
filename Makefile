@@ -15,7 +15,6 @@ format: install-pre-commit clean
 clients-for-tests:
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client.py
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client_with_metrics.py --metrics
-	python pythogen/entrypoint.py tests/docs/openapi_sendsay.yaml tests/clients/sendsay.py --metrics
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client_with_metrics.py --sync --metrics
 

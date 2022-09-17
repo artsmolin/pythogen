@@ -40,8 +40,6 @@ from jaeger_client import Tracer
 from jaeger_client.span import Span
 from opentracing.ext import tags
 from opentracing.propagation import Format
-from prometheus_client import Counter
-from prometheus_client import Histogram
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -144,44 +142,6 @@ try:
     DEFAULT_AUTH = httpx.USE_CLIENT_DEFAULT
 except AttributeError:
     DEFAULT_AUTH = None
-
-
-class BaseMetricsIntegration(abc.ABC):
-    def __init__(
-        self,
-        client_response_time_histogram: Optional[Histogram] = None,
-        client_non_http_errors_counter: Optional[Counter] = None,
-    ):
-        self._client_response_time_histogram = client_response_time_histogram
-        self._client_non_http_errors_counter = client_non_http_errors_counter
-
-    @abc.abstractmethod
-    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
-        ...
-
-    @abc.abstractmethod
-    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
-        ...
-
-
-class DefaultMetricsIntegration(BaseMetricsIntegration):
-    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
-        self._client_non_http_errors_counter.labels(
-            client_name=client_name,
-            http_method=http_method,
-            http_target=http_target,
-            exception=error.__class__.__name__,
-        ).inc(1)
-        raise error
-
-    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
-        self._client_response_time_histogram.labels(
-            client_name=client_name,
-            http_method=http_method,
-            http_target=http_target,
-            http_status_code=response.status_code,
-        ).observe(response.elapsed.total_seconds())
-
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -368,13 +328,11 @@ class Client:
         client: Optional[httpx.Client] = None,
         headers: Optional[Dict[str, str]] = None,
         tracer_integration: Optional[BaseTracerIntegration] = None,
-        metrics_integration: Optional[BaseMetricsIntegration] = None,
     ):
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
         self.tracer_integration = tracer_integration
-        self.metrics_integration = metrics_integration
         self.client_name = client_name
 
     @tracing
@@ -382,6 +340,7 @@ class Client:
         self,
         status: Optional[Literal['available', 'pending', 'sold']] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[List[Pet], EmptyBody]:
         url = self._get_url(f'/pet/findByStatus')
 
@@ -402,14 +361,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/pet/findByStatus")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/pet/findByStatus")
 
         if response.status_code == 200:
             return [Pet.parse_obj(item) for item in response.json()]
@@ -430,6 +384,7 @@ class Client:
         self,
         tags: Optional[List[str]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[List[Pet], EmptyBody]:
         url = self._get_url(f'/pet/findByTags')
 
@@ -450,14 +405,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/pet/findByTags")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/pet/findByTags")
 
         if response.status_code == 200:
             return [Pet.parse_obj(item) for item in response.json()]
@@ -478,6 +428,7 @@ class Client:
         self,
         petId: int,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[Pet, EmptyBody, EmptyBody]:
         url = self._get_url(f'/pet/{petId}')
 
@@ -496,14 +447,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/pet/:petId")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/pet/:petId")
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
@@ -534,6 +480,7 @@ class Client:
     def getInventory(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[ReturnspetinventoriesbystatusResponse200]:
         url = self._get_url(f'/store/inventory')
 
@@ -552,14 +499,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/store/inventory")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/store/inventory")
 
         if response.status_code == 200:
             return ReturnspetinventoriesbystatusResponse200.parse_obj(response.json())
@@ -569,6 +511,7 @@ class Client:
         self,
         orderId: int,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[Order, EmptyBody, EmptyBody]:
         url = self._get_url(f'/store/order/{orderId}')
 
@@ -587,14 +530,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/store/order/:orderId")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/store/order/:orderId")
 
         if response.status_code == 200:
             return Order.parse_obj(response.json())
@@ -627,6 +565,7 @@ class Client:
         username: Optional[str] = None,
         password: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
         url = self._get_url(f'/user/login')
 
@@ -649,14 +588,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/user/login")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/user/login")
 
         if response.status_code == 200:
             return LogsuserintothesystemResponse200(text=response.text)
@@ -676,6 +610,7 @@ class Client:
     def logoutUser(
         self,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> None:
         url = self._get_url(f'/user/logout')
 
@@ -694,20 +629,16 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/user/logout")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/user/logout")
 
     @tracing
     def getUserByName(
         self,
         username: str,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[User, EmptyBody, EmptyBody]:
         url = self._get_url(f'/user/{username}')
 
@@ -726,14 +657,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.get(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/user/:username")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/user/:username")
 
         if response.status_code == 200:
             return User.parse_obj(response.json())
@@ -765,6 +691,7 @@ class Client:
         self,
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[Pet, EmptyBody]:
         url = self._get_url(f'/pet')
 
@@ -790,14 +717,11 @@ class Client:
             json = None
 
         try:
-            response = self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/pet")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/pet")
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
@@ -820,6 +744,7 @@ class Client:
         name: Optional[str] = None,
         status: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f'/pet/{petId}')
 
@@ -842,14 +767,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.post(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("post", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/pet/:petId")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/pet/:petId")
 
         if response.status_code == 405:
             method = "post"
@@ -869,6 +789,7 @@ class Client:
         body: Optional[Union[bytes, Dict[str, Any]]] = None,
         additional_metadata: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[ApiResponse]:
         url = self._get_url(f'/pet/{petId}/uploadImage')
 
@@ -896,14 +817,11 @@ class Client:
             json = None
 
         try:
-            response = self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/pet/:petId/uploadImage")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/pet/:petId/uploadImage")
 
         if response.status_code == 200:
             return ApiResponse.parse_obj(response.json())
@@ -913,6 +831,7 @@ class Client:
         self,
         body: Optional[Union[Order, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[Order, EmptyBody]:
         url = self._get_url(f'/store/order')
 
@@ -938,14 +857,11 @@ class Client:
             json = None
 
         try:
-            response = self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/store/order")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/store/order")
 
         if response.status_code == 200:
             return Order.parse_obj(response.json())
@@ -966,6 +882,7 @@ class Client:
         self,
         body: Optional[Union[User, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> None:
         url = self._get_url(f'/user')
 
@@ -991,20 +908,18 @@ class Client:
             json = None
 
         try:
-            response = self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/user")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/user")
 
     @tracing
     def createUsersWithListInput(
         self,
         body: Optional[Union[List[User], Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[User]:
         url = self._get_url(f'/user/createWithList')
 
@@ -1030,14 +945,11 @@ class Client:
             json = None
 
         try:
-            response = self.client.post(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/user/createWithList")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/user/createWithList")
 
         if response.status_code == 200:
             return User.parse_obj(response.json())
@@ -1047,6 +959,7 @@ class Client:
         self,
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[Pet, EmptyBody, EmptyBody, EmptyBody]:
         url = self._get_url(f'/pet')
 
@@ -1072,14 +985,11 @@ class Client:
             json = None
 
         try:
-            response = self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "put", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/pet")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "put", "/pet")
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
@@ -1123,6 +1033,7 @@ class Client:
         username: str,
         body: Optional[Union[User, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> None:
         url = self._get_url(f'/user/{username}')
 
@@ -1148,14 +1059,11 @@ class Client:
             json = None
 
         try:
-            response = self.client.put(url, json=json, headers=headers_, params=params, auth=auth_)
+            response = self.client.request(
+                "put", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/user/:username")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "put", "/user/:username")
 
     @tracing
     def deletePet(
@@ -1163,6 +1071,7 @@ class Client:
         petId: int,
         api_key: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f'/pet/{petId}')
 
@@ -1183,14 +1092,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.delete(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/pet/:petId")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/pet/:petId")
 
         if response.status_code == 400:
             method = "delete"
@@ -1208,6 +1112,7 @@ class Client:
         self,
         orderId: int,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[EmptyBody, EmptyBody]:
         url = self._get_url(f'/store/order/{orderId}')
 
@@ -1226,14 +1131,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.delete(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/store/order/:orderId")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/store/order/:orderId")
 
         if response.status_code == 400:
             method = "delete"
@@ -1262,6 +1162,7 @@ class Client:
         self,
         username: str,
         auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
     ) -> Union[EmptyBody, EmptyBody]:
         url = self._get_url(f'/user/{username}')
 
@@ -1280,14 +1181,9 @@ class Client:
             auth_ = (auth.username, auth.password)
 
         try:
-            response = self.client.delete(url, headers=headers_, params=params, auth=auth_)
+            response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
-            if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/user/:username")
             raise exc
-
-        if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/user/:username")
 
         if response.status_code == 400:
             method = "delete"
@@ -1345,6 +1241,15 @@ class Client:
         headers_.update(tracing_headers)
         trace_id = self.tracer_integration.get_current_trace_id() or ''
         headers_['x-trace-id'] = trace_id
+
+    def _parse_any_of(self, item: Dict[str, Any], schema_classes: List[Any]) -> Any:
+        for schema_class in schema_classes:
+            try:
+                return schema_class.parse_obj(item)
+            except:
+                continue
+
+        raise Exception("Can't parse \"{item}\"")
 
 
 LogsuserintothesystemResponse200.update_forward_refs()
