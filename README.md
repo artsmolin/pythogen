@@ -22,9 +22,8 @@ Generator of python HTTP-clients from OpenApi specification based on `httpx` and
 
 ## Features
 - [Discriminator](/docs/discriminator.md)
-- Sync and async clients
-- Tracing
 - [Metrics](/docs/metrics.md)
+- Sync/async clients
 
 ## Examples
 - [**Petstore OpenAPI**](/examples/petstore/openapi.yaml):  [client_sync.py](/examples/petstore/client_sync.py) | [client_async.py](/examples/petstore/client_async.py)
