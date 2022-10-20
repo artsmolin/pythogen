@@ -1,5 +1,4 @@
     {%- for path, operation in items %}
-    @tracing
     {%- if sync %}
     def {{ operation.fn_name }}(
     {%- else %}
@@ -63,9 +62,6 @@
         {%- endfor %}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         {%- for parameter in operation.headers %}
         {%- if parameter.required %}

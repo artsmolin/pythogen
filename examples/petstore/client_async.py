@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-import abc
 from datetime import datetime
 
 from httpx import Timeout
@@ -24,117 +23,17 @@ except ImportError:
     from typing_extensions import Literal
 
 import logging
-from functools import wraps
 from typing import IO
 from typing import Any
-from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from typing import cast
 
 import httpx
-from jaeger_client import Tracer
-from jaeger_client.span import Span
-from opentracing.ext import tags
-from opentracing.propagation import Format
 from pydantic import BaseModel
 from pydantic import Field
-
-
-tracer: Tracer
-
-
-class TracerNotConfigured(Exception):
-    pass
-
-
-class TracerConfig(BaseModel):
-    app_name: str
-    host: str
-    port: int
-    propagation: str
-    jaeger_enabled: bool
-
-
-class BaseTracerIntegration(abc.ABC):
-    def __init__(self, tracer: Optional[Tracer] = None):
-        self.tracer = tracer
-
-    @abc.abstractmethod
-    def get_tracing_http_headers(self) -> Dict[str, str]:
-        ...
-
-    @abc.abstractmethod
-    def get_current_trace_id(self) -> Optional[str]:
-        ...
-
-    @abc.abstractmethod
-    def get_tracer(self) -> Tracer:
-        ...
-
-    @abc.abstractmethod
-    def get_current_span(self) -> Optional[Span]:
-        ...
-
-
-class DefaultTracerIntegration(BaseTracerIntegration):
-    def get_tracing_http_headers(self) -> Dict[str, str]:
-        tracer = self.get_tracer()
-        span = self.get_current_span()
-        if not span:
-            return {}
-        span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
-        headers: Dict[str, str] = {}
-        tracer.inject(span, Format.HTTP_HEADERS, headers)
-        return headers
-
-    def get_current_trace_id(self) -> Optional[str]:
-        span = self.get_current_span()
-        trace_id = span.trace_id if span else None
-        return '{:x}'.format(trace_id) if trace_id else None
-
-    def get_tracer(self) -> Tracer:
-        if not self.tracer:
-            raise TracerNotConfigured('configure tracing first')
-        return self.tracer
-
-    def get_current_span(self) -> Optional[Span]:
-        tracer = self.get_tracer()
-        active = tracer.scope_manager.active
-        return cast(Span, active.span) if active else None
-
-
-def tracing(f: Callable[..., Any]) -> Callable[..., Any]:
-    @wraps(f)
-    async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        if not self.tracer_integration:
-            return await f(self, *args, **kwargs)
-
-        db_query = kwargs.get('query', None)
-        current_tags = {}
-        if db_query is not None:
-            current_tags[tags.DATABASE_TYPE] = 'postgres'
-            current_tags[tags.DATABASE_STATEMENT] = db_query
-
-        tracer = self.tracer_integration.get_tracer()
-        span = tracer.start_span(
-            operation_name=f.__qualname__, child_of=self.tracer_integration.get_current_span(), tags=current_tags
-        )
-        scope = tracer.scope_manager.activate(span, True)
-        try:
-            result = await f(self, *args, **kwargs)
-        except Exception as exp:
-            span.set_tag(tags.ERROR, True)
-            span.set_tag('error.message', str(exp))
-            raise exp
-        finally:
-            scope.close()
-        return result
-
-    return wrapper
 
 
 # backward compatibility for httpx<0.18.2
@@ -327,15 +226,12 @@ class Client:
         client_name: str = "",
         client: Optional[httpx.AsyncClient] = None,
         headers: Optional[Dict[str, str]] = None,
-        tracer_integration: Optional[BaseTracerIntegration] = None,
     ):
         self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
-        self.tracer_integration = tracer_integration
         self.client_name = client_name
 
-    @tracing
     async def findPetsByStatus(
         self,
         status: Optional[Literal['available', 'pending', 'sold']] = None,
@@ -350,9 +246,6 @@ class Client:
 
         headers_ = self.headers.copy()
 
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
-
         if auth is None:
             auth_ = DEFAULT_AUTH
         elif isinstance(auth, httpx.Auth):
@@ -381,7 +274,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def findPetsByTags(
         self,
         tags: Optional[List[str]] = None,
@@ -396,9 +288,6 @@ class Client:
 
         headers_ = self.headers.copy()
 
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
-
         if auth is None:
             auth_ = DEFAULT_AUTH
         elif isinstance(auth, httpx.Auth):
@@ -427,7 +316,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def getPetById(
         self,
         petId: int,
@@ -439,9 +327,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -482,7 +367,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def getInventory(
         self,
         auth: Optional[BasicAuth] = None,
@@ -493,9 +377,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -514,7 +395,6 @@ class Client:
         if response.status_code == 200:
             return ReturnspetinventoriesbystatusResponse200.parse_obj(response.json())
 
-    @tracing
     async def getOrderById(
         self,
         orderId: int,
@@ -526,9 +406,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -569,7 +446,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def loginUser(
         self,
         username: Optional[str] = None,
@@ -586,9 +462,6 @@ class Client:
             params['password'] = password
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -618,7 +491,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def logoutUser(
         self,
         auth: Optional[BasicAuth] = None,
@@ -629,9 +501,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -647,7 +516,6 @@ class Client:
         except Exception as exc:
             raise exc
 
-    @tracing
     async def getUserByName(
         self,
         username: str,
@@ -659,9 +527,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -702,7 +567,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def addPet(
         self,
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
@@ -714,9 +578,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -753,7 +614,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def updatePetWithForm(
         self,
         petId: int,
@@ -771,9 +631,6 @@ class Client:
             params['status'] = status
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -800,7 +657,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def uploadFile(
         self,
         petId: int,
@@ -816,9 +672,6 @@ class Client:
             params['additionalMetadata'] = additional_metadata
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -844,7 +697,6 @@ class Client:
         if response.status_code == 200:
             return ApiResponse.parse_obj(response.json())
 
-    @tracing
     async def placeOrder(
         self,
         body: Optional[Union[Order, Dict[str, Any]]] = None,
@@ -856,9 +708,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -895,7 +744,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def createUser(
         self,
         body: Optional[Union[User, Dict[str, Any]]] = None,
@@ -907,9 +755,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -932,7 +777,6 @@ class Client:
         except Exception as exc:
             raise exc
 
-    @tracing
     async def createUsersWithListInput(
         self,
         body: Optional[Union[List[User], Dict[str, Any]]] = None,
@@ -944,9 +788,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -972,7 +813,6 @@ class Client:
         if response.status_code == 200:
             return User.parse_obj(response.json())
 
-    @tracing
     async def updatePet(
         self,
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
@@ -984,9 +824,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -1045,7 +882,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def updateUser(
         self,
         username: str,
@@ -1058,9 +894,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -1083,7 +916,6 @@ class Client:
         except Exception as exc:
             raise exc
 
-    @tracing
     async def deletePet(
         self,
         petId: int,
@@ -1096,9 +928,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
         if api_key is not None:
             headers_['api_key'] = api_key
 
@@ -1127,7 +956,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def deleteOrder(
         self,
         orderId: int,
@@ -1139,9 +967,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -1179,7 +1004,6 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    @tracing
     async def deleteUser(
         self,
         username: str,
@@ -1191,9 +1015,6 @@ class Client:
         params = {}
 
         headers_ = self.headers.copy()
-
-        if self.tracer_integration:
-            self.add_tracing_data_to_headers(headers_)
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -1259,12 +1080,6 @@ class Client:
                 params=params,
             ),
         )
-
-    def add_tracing_data_to_headers(self, headers_: Dict[str, str]) -> None:
-        tracing_headers = self.tracer_integration.get_tracing_http_headers()
-        headers_.update(tracing_headers)
-        trace_id = self.tracer_integration.get_current_trace_id() or ''
-        headers_['x-trace-id'] = trace_id
 
     def _parse_any_of(self, item: Dict[str, Any], schema_classes: List[Any]) -> Any:
         for schema_class in schema_classes:
