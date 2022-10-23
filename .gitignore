@@ -12,6 +12,7 @@
 *.pyc
 /env
 /venv
+/.venv
 /etc
 celerybeat-schedule.db
 celerybeat.pid
