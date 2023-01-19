@@ -57,9 +57,11 @@ class BaseMetricsIntegration(abc.ABC):
         self,
         client_response_time_histogram: Optional[Histogram] = None,
         client_non_http_errors_counter: Optional[Counter] = None,
+        shadow_path: bool = True,
     ):
         self._client_response_time_histogram = client_response_time_histogram
         self._client_non_http_errors_counter = client_non_http_errors_counter
+        self.shadow_path = shadow_path
 
     @abc.abstractmethod
     def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None: ...
@@ -507,7 +509,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/{object_id}")
             raise exc
         
         if self.metrics_integration:
@@ -545,7 +550,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
@@ -588,7 +596,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
             raise exc
         
         if self.metrics_integration:
@@ -620,7 +631,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
             raise exc
         
         if self.metrics_integration:
@@ -652,7 +666,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
             raise exc
         
         if self.metrics_integration:
@@ -684,7 +701,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
             raise exc
         
         if self.metrics_integration:
@@ -716,7 +736,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
             raise exc
         
         if self.metrics_integration:
@@ -748,7 +771,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
             raise exc
         
         if self.metrics_integration:
@@ -780,7 +806,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
             raise exc
         
         if self.metrics_integration:
@@ -816,7 +845,10 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
@@ -859,7 +891,10 @@ class Client:
             response = self.client.request("post", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
             raise exc
         
         if self.metrics_integration:
@@ -899,7 +934,10 @@ class Client:
             response = self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
             raise exc
         
         if self.metrics_integration:
@@ -940,7 +978,10 @@ class Client:
             response = self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
             raise exc
         
         if self.metrics_integration:
@@ -985,7 +1026,10 @@ class Client:
             response = self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_, files=files)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
             raise exc
         
         if self.metrics_integration:
@@ -1026,7 +1070,10 @@ class Client:
             response = self.client.request("patch", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
@@ -1067,7 +1114,10 @@ class Client:
             response = self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
@@ -1108,7 +1158,10 @@ class Client:
             response = self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
@@ -1141,7 +1194,10 @@ class Client:
             response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             if self.metrics_integration:
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/:object_id")
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/:object_id")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:

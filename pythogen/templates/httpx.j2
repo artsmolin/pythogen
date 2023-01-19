@@ -62,9 +62,11 @@ class BaseMetricsIntegration(abc.ABC):
         self,
         client_response_time_histogram: Optional[Histogram] = None,
         client_non_http_errors_counter: Optional[Counter] = None,
+        shadow_path: bool = True,
     ):
         self._client_response_time_histogram = client_response_time_histogram
         self._client_non_http_errors_counter = client_non_http_errors_counter
+        self.shadow_path = shadow_path
 
     @abc.abstractmethod
     def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None: ...
