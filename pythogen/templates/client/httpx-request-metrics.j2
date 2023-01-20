@@ -7,7 +7,7 @@
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", "{{ path }}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", f"{{ path }}")
 
             {%- endif %}
             raise exc
