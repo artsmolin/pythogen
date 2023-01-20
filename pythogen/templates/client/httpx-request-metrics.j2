@@ -19,5 +19,8 @@
         #}
         {%- if metrics %}
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}",  f"{{ path }}")
         {%- endif %}
