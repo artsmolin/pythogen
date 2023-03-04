@@ -1,8 +1,8 @@
 <div>
   <p align="center">
-    <img src="docs/images/logo.png" height="100">
+    <img src="docs/images/logo_long.png" height="auto" width="400px">
   </p>
-  <h1 align="center"><strong>Pythogen</strong></h1>
+  <br/>
 </div>
 
 Generator of python HTTP-clients from OpenApi specification based on `httpx` and `pydantic`.
