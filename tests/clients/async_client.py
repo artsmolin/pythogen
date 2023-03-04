@@ -169,6 +169,16 @@ class AnimalObj(BaseModel):
     ]
 
 
+class AnyOfChildObj(BaseModel):
+    """
+    None
+    """
+    __root__: Union[
+        'GetObjectResp',
+        'Cat',
+    ]
+
+
 class TierObj(BaseModel):
     """
     None
@@ -396,6 +406,9 @@ class GetObjectResp(BaseModel):
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
     tier: Optional[TierObj] = None
+    anyOfChild: Optional[AnyOfChildObj] = None
+    child: Optional[GetObjectResp] = None
+    childs: Optional[List[GetObjectResp]] = None
     animal: Optional[AnimalObj] = None
 
 
@@ -1090,6 +1103,7 @@ RewardsListItem.update_forward_refs()
 GetObjectWithInlineArrayResponse200.update_forward_refs()
 GetObjectWithInlineArrayResponse200Item.update_forward_refs()
 AnimalObj.update_forward_refs()
+AnyOfChildObj.update_forward_refs()
 TierObj.update_forward_refs()
 GetObjectNoRefSchemaResponse200.update_forward_refs()
 TestSafetyKey.update_forward_refs()

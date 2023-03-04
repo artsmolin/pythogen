@@ -143,6 +143,7 @@ class SchemaObject:
 
     # Технические поля
     discriminator_base_class_schema: Optional[DiscriminatorBaseClassSchema] = None
+    is_fake: bool = False
 
     @property
     def required_properties(self) -> List[SchemaProperty]:

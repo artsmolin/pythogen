@@ -206,6 +206,16 @@ class AnimalObj(BaseModel):
     ]
 
 
+class AnyOfChildObj(BaseModel):
+    """
+    None
+    """
+    __root__: Union[
+        'GetObjectResp',
+        'Cat',
+    ]
+
+
 class TierObj(BaseModel):
     """
     None
@@ -433,6 +443,9 @@ class GetObjectResp(BaseModel):
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
     tier: Optional[TierObj] = None
+    anyOfChild: Optional[AnyOfChildObj] = None
+    child: Optional[GetObjectResp] = None
+    childs: Optional[List[GetObjectResp]] = None
     animal: Optional[AnimalObj] = None
 
 
@@ -512,11 +525,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/no-ref-schema/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/objects/no-ref-schema/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/no-ref-schema/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/no-ref-schema/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/objects/no-ref-schema/{object_id}")
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
@@ -553,11 +569,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/objects/{object_id}")
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -599,11 +618,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-array-response")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/object-with-array-response")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-array-response")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-array-response")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/object-with-array-response")
 
         if response.status_code == 200:
             return [GetObjectWithInlineArrayResponse200Item.parse_obj(item) for item in response.json()]
@@ -634,11 +656,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/object-with-inline-array")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/object-with-inline-array")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-inline-array")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-inline-array")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/object-with-inline-array")
 
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
@@ -669,11 +694,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/objects")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/objects")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/objects")
 
         if response.status_code == 200:
             return [GetObjectResp.parse_obj(item) for item in response.json()]
@@ -704,11 +732,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/text")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/text")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/text")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/text")
 
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
@@ -739,11 +770,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/empty")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/empty")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/empty")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/empty")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/empty")
 
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
@@ -774,11 +808,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/binary")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/binary")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/binary")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/binary")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/binary")
 
         if response.status_code == 200:
             return GetBinaryResponse200(content=response.content)
@@ -809,11 +846,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/allof")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/allof")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/allof")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/allof")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/allof")
 
         if response.status_code == 200:
             return AllOfResp.parse_obj(response.json())
@@ -848,11 +888,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/slow/objects/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/slow/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "get", "/slow/objects/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/slow/objects/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/slow/objects/{object_id}")
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -894,11 +937,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/post-without-body")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", f"/post-without-body")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/post-without-body")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "post", "/post-without-body")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/post-without-body")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -937,11 +983,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", f"/objects")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/objects")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -981,11 +1030,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/objects-form-data")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", f"/objects-form-data")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects-form-data")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects-form-data")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/objects-form-data")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1029,11 +1081,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/multipart-form-data")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", f"/multipart-form-data")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "post", "/multipart-form-data")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "post", "/multipart-form-data")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/multipart-form-data")
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1073,11 +1128,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "patch", "/objects/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "patch", f"/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "patch", "/objects/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "patch", "/objects/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "patch",  f"/objects/{object_id}")
 
         if response.status_code == 200:
             return PatchObjectResp.parse_obj(response.json())
@@ -1117,11 +1175,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "put", "/objects/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "put", f"/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "put", "/objects/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "put", "/objects/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "put",  f"/objects/{object_id}")
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1161,11 +1222,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "put", "/slow/objects/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "put", f"/slow/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "put", "/slow/objects/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "put", "/slow/objects/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "put",  f"/slow/objects/{object_id}")
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1197,11 +1261,14 @@ class Client:
                 if self.metrics_integration.shadow_path:
                     self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/:object_id")
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "delete", "/objects/{object_id}")
+                    self.metrics_integration.on_request_error(self.client_name, exc, "delete", f"/objects/{object_id}")
             raise exc
         
         if self.metrics_integration:
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", "/objects/:object_id")
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "delete", "/objects/:object_id")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "delete",  f"/objects/{object_id}")
 
         if response.status_code == 200:
             return DeleteObjectResp.parse_obj(response.json())
@@ -1255,6 +1322,7 @@ RewardsListItem.update_forward_refs()
 GetObjectWithInlineArrayResponse200.update_forward_refs()
 GetObjectWithInlineArrayResponse200Item.update_forward_refs()
 AnimalObj.update_forward_refs()
+AnyOfChildObj.update_forward_refs()
 TierObj.update_forward_refs()
 GetObjectNoRefSchemaResponse200.update_forward_refs()
 TestSafetyKey.update_forward_refs()

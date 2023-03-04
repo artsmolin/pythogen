@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 from typing import Any
 from typing import Dict
 from typing import List
@@ -51,6 +52,9 @@ class SchemaParser:
         self._discriminator_base_class_schemas = discriminator_base_class_schemas
         self._inline_schema_aggregator = inline_schema_aggregator
 
+        self._schema_ids = list(self._openapi_data["components"].get('schemas', {}))
+        self._processiong_parsed_schema_id_count: dict[str, int] = defaultdict(int)
+
     def parse_collection(self) -> Dict[str, models.SchemaObject]:
         schemas_data = self._openapi_data["components"].get('schemas', {})
         schemas = {}
@@ -60,12 +64,53 @@ class SchemaParser:
                 schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
                 schema = self.parse_item(schema_id, schema_data)
-            schemas[schema_id] = schema
+
+            if not schema.is_fake:
+                schemas[schema_id] = schema
+
         return schemas
 
-    def parse_item(self, schema_id: str, schema_data: Dict[str, Any]) -> models.SchemaObject:
+    def parse_item(
+        self, schema_id: str, schema_data: Dict[str, Any], from_depth_level: bool = False
+    ) -> models.SchemaObject:
+        """Спарсить схему из OpenAPI-спеки
+
+        Attributes
+        ----------
+        schema_id
+            Идентификатор схемы (ключ в поле components -> schemas)
+        schema_data
+            Данные схемы
+        from_depth_level
+            Флаг, указывающий, что схема была спарсена внутри другой схемы.
+            Используется для разрешения циклических схем.
+        """
         schema_type = self._parse_type(schema_data)
-        properties = self._parse_properties(schema_type, schema_data)
+
+        self._processiong_parsed_schema_id_count[schema_id] += 1
+        if self._processiong_parsed_schema_id_count[schema_id] > 1 and from_depth_level:
+            """
+            Парсинг циклических схем
+            components:
+              schemas:
+                Schema1:
+                  type: object
+                  properties:
+                    property1:
+                      $ref: '#/components/schemas/Schema1'
+            """
+            return models.SchemaObject(
+                id=schema_id,
+                title=schema_data.get('title'),
+                required=schema_data.get('required'),
+                enum=schema_data.get('enum'),
+                type=schema_type,
+                format=self._parse_format(schema_data),
+                items=[],
+                properties=[],
+                description=self._get_description(schema_data),
+                is_fake=True,
+            )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
         if discr_schema and discr_schema not in self._discriminator_base_class_schemas:
@@ -79,7 +124,7 @@ class SchemaParser:
             type=schema_type,
             format=self._parse_format(schema_data),
             items=self._parse_items(schema_id, schema_data),
-            properties=properties,
+            properties=self._parse_properties(schema_type, schema_data),
             description=self._get_description(schema_data),
         )
 
@@ -154,7 +199,7 @@ class SchemaParser:
                     resolved_ref = self._ref_resolver.resolve(property_schema_data['$ref'])
                     property_schema_data = resolved_ref.ref_data
                     property_schema_id = resolved_ref.ref_id
-                    schema = self.parse_item(property_schema_id, property_schema_data)
+                    schema = self.parse_item(property_schema_id, property_schema_data, from_depth_level=True)
                 else:
                     if (
                         property_schema_data.get('type') == models.Type.object.value
@@ -250,7 +295,7 @@ class SchemaParser:
         if items_schema_data:
             if items_schema_data.get('$ref', None):
                 resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
-                schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
+                schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 return schema
             else:
                 parent_raw_type = data.get('type')
@@ -268,7 +313,7 @@ class SchemaParser:
             for any_ref_item in data['anyOf']:
                 ref = any_ref_item.get('$ref', None)
                 resolved_ref = self._ref_resolver.resolve(ref)
-                ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
+                ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 items.append(ref_schema)
             return items
 
