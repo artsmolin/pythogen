@@ -46,5 +46,5 @@ importlib-metadata = "^4.11.4"
 pre-commit = "^2.19.0"
 
 [build-system]
-requires = ["poetry>=1.1.0"]
+requires = ["poetry>=1.4.0"]
 build-backend = "poetry.masonry.api"
