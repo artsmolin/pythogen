@@ -127,13 +127,18 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
             mapping.append((code, mapper))
             continue
 
-        if response.schema.type is models.Type.array and response.schema.items:
+        if response.schema.type == models.Type.array:
             if isinstance(response.schema.items, list):
                 items_collection = response.schema.items
             else:
-                items_collection = [response.schema.items]
+                items_collection = [response.schema.items]  # type: ignore
 
             for items in items_collection:
+                if items is None:
+                    mapper = 'EmptyBody(status_code=response.status_code, text=response.text)'
+                    mapping.append((code, mapper))
+                    continue
+
                 if items.type is models.Type.object:
                     items_class_name = classname(items.id)
                     mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'

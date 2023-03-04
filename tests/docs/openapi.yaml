@@ -464,6 +464,17 @@ components:
               type: string
             priority:
               type: integer
+        anyOfChild:
+          type: object
+          anyOf:
+            - {$ref: '#/components/schemas/GetObjectResp'}
+            - {$ref: '#/components/schemas/Cat'}
+        child:
+          $ref: '#/components/schemas/GetObjectResp'
+        childs:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetObjectResp'
         animal:
           type: object
           anyOf:

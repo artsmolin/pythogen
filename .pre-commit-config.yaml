@@ -15,7 +15,7 @@ repos:
         stages: [ commit ]
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.12.0
     hooks:
       - id: isort
         args: [ --profile=black, --force-grid-wrap=2, --lines-after-imports=2, --force-single-line, --line-length=120, --project=pythogen]
