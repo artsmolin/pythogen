@@ -160,6 +160,16 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
             mapping.append((code, mapper))
             continue
 
+        if response.schema.type == models.Type.integer:
+            if response.schema.format in [models.Format.int32, models.Format.int64]:
+                mapper = f'{classname(response.schema.id)}(content=response.content)'
+                mapping.append((code, mapper))
+                continue
+
+            mapper = f'{classname(response.schema.id)}(text=response.text)'
+            mapping.append((code, mapper))
+            continue
+
         raise NotImplementedError(
             f'Unable to create response mapping of {response.id} <response.schema.type={response.schema.type}>'
         )
@@ -169,16 +179,15 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
 
 def j2_responserepr(responses: models.ResponsesObject) -> str:
     """Represent method response on j2 template"""
-    # print(responses)
     types = []
 
     for response in responses.patterned.values():
         if not response.schema:
             types.append('EmptyBody')
-        elif response.schema.type != models.Type.string:
-            types.append(j2_typerepr(response.schema))
-        else:
+        elif response.schema.type in [models.Type.string, models.Type.integer]:
             types.append(classname(response.schema.id))
+        else:
+            types.append(j2_typerepr(response.schema))
 
     if not types:
         return 'None'

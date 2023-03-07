@@ -284,6 +284,24 @@ class SchemaParser:
                     )
                 )
 
+            if schema_type == models.Type.integer:
+                properties.append(
+                    models.SchemaProperty(
+                        orig_key='text',
+                        safety_key=None,
+                        schema=models.SchemaObject(
+                            id='',
+                            type=models.Type.integer,
+                            enum=None,
+                            properties=[],
+                            title=None,
+                            format=None,
+                            items=None,
+                            required=None,
+                        ),
+                    )
+                )
+
         return properties
 
     def _parse_items(
