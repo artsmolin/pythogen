@@ -161,11 +161,6 @@ def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
             continue
 
         if response.schema.type == models.Type.integer:
-            if response.schema.format in [models.Format.int32, models.Format.int64]:
-                mapper = f'{classname(response.schema.id)}(content=response.content)'
-                mapping.append((code, mapper))
-                continue
-
             mapper = f'{classname(response.schema.id)}(text=response.text)'
             mapping.append((code, mapper))
             continue
