@@ -267,6 +267,20 @@ paths:
             text/plain:
               schema:
                 type: string
+
+  /text_as_integer:
+    get:
+      tags:
+        - test
+      summary: Get Text As Integer
+      operationId: get_text_as_integer
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: integer
   /empty:
     get:
       tags:

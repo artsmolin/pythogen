@@ -1,13 +1,14 @@
 [tool.poetry]
 name = "pythogen"
-version = "0.1.4"
+version = "0.1.5"
 description = "Generator of python HTTP-clients from OpenApi specification."
 homepage = "https://github.com/artsmolin/pythogen"
 repository = "https://github.com/artsmolin/pythogen"
 authors = [
     "Artur Smolin <artursmolin@outlook.com>",
     "Vladimir Vyazovetskov <erhosen@gmail.com>",
-    "Evgeny Solomatin <solgenya@gmail.com>"
+    "Evgeny Solomatin <solgenya@gmail.com>",
+    "Aleksandr Kirpichnikov <razerboy@yandex.ru>"
 ]
 license = "MIT"
 readme = "README.md"
