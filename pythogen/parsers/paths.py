@@ -59,10 +59,10 @@ class PathParser:
         parsed_paths: Dict[str, models.PathItemObject] = {}
         paths = self._openapi_data.get('paths', {})
         for path_str, path_item_data in paths.items():
-            parsed_paths[path_str] = self.parse_item(path_item_data)
+            parsed_paths[path_str] = self.parse_item(path_str, path_item_data)
         return parsed_paths
 
-    def parse_item(self, path_data: Dict[str, Any]) -> models.PathItemObject:
+    def parse_item(self, path_str: str, path_data: Dict[str, Any]) -> models.PathItemObject:
         """Спарсить спецификацию ручки"""
         operations = {}
 
@@ -71,7 +71,7 @@ class PathParser:
                 continue
 
             operation_data = path_data[method.value]
-            operations[method] = self._operation_parser.parse_item(method, operation_data)
+            operations[method] = self._operation_parser.parse_item(path_str, method, operation_data)
 
         return models.PathItemObject(
             summary=path_data.get('summary'),

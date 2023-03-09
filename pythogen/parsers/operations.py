@@ -28,7 +28,9 @@ class OperationParser:
         self._request_body_parser = request_body_parser
         self._parameters_parser = parameters_parser
 
-    def parse_item(self, method: models.HttpMethod, operation_data: Dict[str, Any]) -> models.OperationObject:
+    def parse_item(
+        self, path_str: str, method: models.HttpMethod, operation_data: Dict[str, Any]
+    ) -> models.OperationObject:
         """Спарсить спецификацию метода ручки (POST-, GET-, PUT-запроса и т.п.)"""
         responses: Dict[str, models.ResponseObject] = {}
 
@@ -71,4 +73,5 @@ class OperationParser:
             request_body=request_body,
             responses=models.ResponsesObject(patterned=responses),
             parameters=parameters,
+            path_str=path_str,
         )

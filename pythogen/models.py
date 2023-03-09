@@ -207,6 +207,7 @@ class OperationObject:
     request_body: Optional[RequestBodyObject]
     responses: ResponsesObject
     parameters: List[ParameterObject]
+    path_str: str
 
     @property
     def path_params(self) -> List[ParameterObject]:
@@ -224,7 +225,11 @@ class OperationObject:
     def fn_name(self) -> Optional[str]:
         if self.operation_id is not None:
             return self.operation_id.replace('-', '_')
-        return None
+
+        name = self.path_str.removeprefix('/').replace('-', '_').replace('/', '_').replace('{', '').replace('}', '')
+        name = self.method.value + '_' + name
+        name = name.lower()
+        return name
 
 
 @dataclass
