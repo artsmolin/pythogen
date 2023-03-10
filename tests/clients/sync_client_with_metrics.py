@@ -140,6 +140,17 @@ class GetBinaryResponse200(BaseModel):
     content: Optional[bytes] = None
 
 
+class GetTextAsIntegerResponse200(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+
+    # optional ---
+    text: Optional[int] = None
+
+
 class GetTextResponse200(BaseModel):
     """
     None
@@ -544,7 +555,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+    ) -> Union[UnknownError, GetObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
         params = {
@@ -744,6 +755,44 @@ class Client:
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
     
+    def get_text_as_integer(
+        self,
+        auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
+    ) -> Optional[GetTextAsIntegerResponse200]:
+        url = self._get_url(f'/text_as_integer')
+
+        params = {
+        }
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+        
+        try:
+            response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", "/text_as_integer")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "get", f"/text_as_integer")
+            raise exc
+        
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "get", "/text_as_integer")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/text_as_integer")
+
+        if response.status_code == 200:
+            return GetTextAsIntegerResponse200(text=response.text)
+    
     def get_empty(
         self,
         auth: Optional[BasicAuth] = None,
@@ -864,7 +913,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+    ) -> Union[UnknownError, GetObjectResp]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
         params = {
@@ -1316,6 +1365,7 @@ class Client:
 
 AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
+GetTextAsIntegerResponse200.update_forward_refs()
 GetTextResponse200.update_forward_refs()
 GetListobjectsResponse200.update_forward_refs()
 RewardsListItem.update_forward_refs()

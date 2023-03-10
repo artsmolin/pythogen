@@ -184,8 +184,11 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         else:
             types.append(j2_typerepr(response.schema))
 
+    types = list(set(types))
+
     if not types:
         return 'None'
+
     elif len(types) == 1:
         return f'Optional[{types[0]}]'
     else:
