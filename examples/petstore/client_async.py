@@ -400,7 +400,7 @@ class Client:
         orderId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Order, EmptyBody]:
+    ) -> Union[EmptyBody, Order]:
         url = self._get_url(f'/store/order/{orderId}')
 
         params = {}
@@ -702,7 +702,7 @@ class Client:
         body: Optional[Union[Order, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Order, EmptyBody]:
+    ) -> Union[EmptyBody, Order]:
         url = self._get_url(f'/store/order')
 
         params = {}

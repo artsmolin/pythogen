@@ -319,11 +319,12 @@ class SchemaParser:
                 items = []
                 for any_ref_item in items_schema_data['anyOf']:
                     ref = any_ref_item.get('$ref', None)
+                    any_ref_any_type = any_ref_item.get('type')
                     if ref:
                         resolved_ref = self._ref_resolver.resolve(ref)
                         ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                         items.append(ref_schema)
-                    elif (any_ref_any_type := any_ref_item.get('type')) in PRIMITIVE_TYPES:
+                    elif any_ref_any_type in PRIMITIVE_TYPES:
                         items.append(
                             models.SchemaObject(
                                 id='',
