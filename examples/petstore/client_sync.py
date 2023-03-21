@@ -237,7 +237,7 @@ class Client:
         status: Optional[Literal['available', 'pending', 'sold']] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[List[Pet], EmptyBody]:
+    ) -> Union[EmptyBody, List[Pet]]:
         url = self._get_url(f'/pet/findByStatus')
 
         params = {}
@@ -277,7 +277,7 @@ class Client:
         tags: Optional[List[str]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[List[Pet], EmptyBody]:
+    ) -> Union[EmptyBody, List[Pet]]:
         url = self._get_url(f'/pet/findByTags')
 
         params = {}
@@ -442,7 +442,7 @@ class Client:
         password: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
+    ) -> Union[EmptyBody, LogsuserintothesystemResponse200]:
         url = self._get_url(f'/user/login')
 
         params = {}

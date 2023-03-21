@@ -315,6 +315,43 @@ class SchemaParser:
                 resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
                 schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 return schema
+            elif items_schema_data.get('anyOf'):
+                items = []
+                for any_ref_item in items_schema_data['anyOf']:
+                    ref = any_ref_item.get('$ref', None)
+                    any_ref_any_type = any_ref_item.get('type')
+                    if ref:
+                        resolved_ref = self._ref_resolver.resolve(ref)
+                        ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
+                        items.append(ref_schema)
+                    elif any_ref_any_type in PRIMITIVE_TYPES:
+                        items.append(
+                            models.SchemaObject(
+                                id='',
+                                type=models.Type(any_ref_any_type),
+                                enum=None,
+                                properties=[],
+                                title=None,
+                                format=None,
+                                items=None,
+                                required=None,
+                            )
+                        )
+                    else:
+                        items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
+                        schema = self.parse_item(items_schema_id, items_schema_data)
+                        self._inline_schema_aggregator.add(items_schema_id, schema)
+
+                return models.SchemaObject(
+                    id='',
+                    type=models.Type.any_of,
+                    enum=None,
+                    properties=[],
+                    title=None,
+                    format=None,
+                    items=items,
+                    required=None,
+                )
             else:
                 parent_raw_type = data.get('type')
                 if parent_raw_type == 'array':
