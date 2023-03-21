@@ -317,7 +317,7 @@ class Client:
         petId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet/{petId}')
 
         params = {}
@@ -556,7 +556,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -800,7 +800,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
