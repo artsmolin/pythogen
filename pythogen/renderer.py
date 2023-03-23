@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Generic
 from typing import List
+from typing import Optional
 from typing import Tuple
 from typing import TypeVar
 
@@ -51,6 +52,7 @@ def render_client(*, output_path: str, document: models.Document, name: str, syn
     prepared_operations = prepare_operations(document)
 
     rendered_client = template.render(
+        document=document,
         name=name,
         version=document.info.version,
         models=document.sorted_schemas,
@@ -196,7 +198,7 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         return f'Union[{union_args}]'
 
 
-def j2_typerepr(schema: models.SchemaObject) -> str:
+def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document] = None) -> str:
     """Represent data type on j2 template"""
     primitive_type_mapping = {
         models.Type.integer: 'int',
@@ -210,6 +212,10 @@ def j2_typerepr(schema: models.SchemaObject) -> str:
         models.Format.date: 'date',
         models.Format.date_time: 'datetime',
     }
+
+    # TODO: всегда передавать document в функцию
+    if document:
+        schema = document.schemas.get(schema.id, schema)
 
     representation = 'Dict'
 
