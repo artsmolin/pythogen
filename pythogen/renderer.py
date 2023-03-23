@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Generic
 from typing import List
+from typing import Optional
 from typing import Tuple
 from typing import TypeVar
 
@@ -197,7 +198,7 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         return f'Union[{union_args}]'
 
 
-def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = None) -> str:
+def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document] = None) -> str:
     """Represent data type on j2 template"""
     primitive_type_mapping = {
         models.Type.integer: 'int',
