@@ -143,18 +143,18 @@ class {{ classname(model.id) }}(BaseModel):
     # required ---
     {%- for property in model.required_properties %}
         {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+    {{ property.key }}: {{ typerepr(property.schema, document) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
         {%- else %}
-    {{ property.key }}: {{ typerepr(property.schema) }}
+    {{ property.key }}: {{ typerepr(property.schema, document) }}
         {%- endif %}
     {%- endfor %}
 
     # optional ---
     {%- for property in model.optional_properties %}
         {%- if property.schema.description %}
-    {{ property.key }}: Optional[{{ typerepr(property.schema) }}] = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+    {{ property.key }}: Optional[{{ typerepr(property.schema, document) }}] = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
         {%- else %}
-    {{ property.key }}: Optional[{{ typerepr(property.schema) }}] = None
+    {{ property.key }}: Optional[{{ typerepr(property.schema, document) }}] = None
         {%- endif %}
     {%- endfor %}
 
