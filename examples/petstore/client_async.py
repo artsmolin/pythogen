@@ -69,6 +69,16 @@ class LogsuserintothesystemResponse200(BaseModel):
     text: Optional[str] = None
 
 
+class CreateslistofuserswithgiveninputarrayRequestBody(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+
+    # optional ---
+
+
 class ReturnspetinventoriesbystatusResponse200(BaseModel):
     """
     None
@@ -77,6 +87,17 @@ class ReturnspetinventoriesbystatusResponse200(BaseModel):
     # required ---
 
     # optional ---
+
+
+class UploadsanimageRequestBody(BaseModel):
+    """
+    None
+    """
+
+    # required ---
+
+    # optional ---
+    content: Optional[bytes] = None
 
 
 class FindsPetsbytagsResponse200(BaseModel):
@@ -97,6 +118,28 @@ class FindsPetsbystatusResponse200(BaseModel):
     # required ---
 
     # optional ---
+
+
+class AddanewpetortagtothestoreRequestBody(BaseModel):
+    """
+    None
+    """
+
+    __root__: Union[
+        'Pet',
+        'Tag',
+    ]
+
+
+class AddanewpetortagtothestoreResponse200(BaseModel):
+    """
+    None
+    """
+
+    __root__: Union[
+        'Pet',
+        'Tag',
+    ]
 
 
 class ApiResponse(BaseModel):
@@ -321,7 +364,7 @@ class Client:
         petId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet/{petId}')
 
         params = {}
@@ -452,7 +495,7 @@ class Client:
         password: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, LogsuserintothesystemResponse200]:
+    ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
         url = self._get_url(f'/user/login')
 
         params = {}
@@ -572,7 +615,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -602,6 +645,53 @@ class Client:
 
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
+
+        if response.status_code == 405:
+            method = "post"
+            if response.content is None:
+                content = None
+            else:
+                content = response.content[:500]
+
+            self.log_error(self.client_name, method, url, params, content, headers_)
+
+            return EmptyBody(status_code=response.status_code, text=response.text)
+
+    async def addPet(
+        self,
+        body: Optional[Union[AddanewpetortagtothestoreRequestBody, Dict[str, Any]]] = None,
+        auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
+    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
+        url = self._get_url(f'/pet_or_tag')
+
+        params = {}
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+
+        if isinstance(body, dict):
+            json = body
+        elif isinstance(body, AddanewpetortagtothestoreRequestBody):
+            json = body.dict()
+        else:
+            json = None
+
+        try:
+            response = await self.client.request(
+                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+            )
+        except Exception as exc:
+            raise exc
+
+        if response.status_code == 200:
+            return self._parse_any_of(response.json(), [Pet, Tag])
 
         if response.status_code == 405:
             method = "post"
@@ -818,7 +908,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -1092,9 +1182,13 @@ class Client:
 
 
 LogsuserintothesystemResponse200.update_forward_refs()
+CreateslistofuserswithgiveninputarrayRequestBody.update_forward_refs()
 ReturnspetinventoriesbystatusResponse200.update_forward_refs()
+UploadsanimageRequestBody.update_forward_refs()
 FindsPetsbytagsResponse200.update_forward_refs()
 FindsPetsbystatusResponse200.update_forward_refs()
+AddanewpetortagtothestoreRequestBody.update_forward_refs()
+AddanewpetortagtothestoreResponse200.update_forward_refs()
 ApiResponse.update_forward_refs()
 Tag.update_forward_refs()
 Category.update_forward_refs()

@@ -50,7 +50,7 @@ class OperationParser:
 
         request_body_data = operation_data.get('requestBody')
         if request_body_data:
-            request_body = self._request_body_parser.parse_item(request_body_data)
+            request_body = self._request_body_parser.parse_item(request_body_data, operation_data)
         else:
             request_body = None
 
