@@ -80,6 +80,16 @@ class BaseObjectResp(BaseModel):
         return v
 
 
+class PostObjectWithRequestBodyAnyOfRequestBody(BaseModel):
+    """
+    None
+    """
+    __root__: Union[
+        'Data',
+        'PostObjectData',
+    ]
+
+
 class AllOfRefObj(BaseModel):
     """
     All Of
@@ -953,6 +963,42 @@ class Client:
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
     
+    def request_body_anyof(
+        self,
+        body: Optional[Union[PostObjectWithRequestBodyAnyOfRequestBody, Dict[str, Any]]] = None,
+        auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
+    ) -> Optional[PostObjectResp]:
+        url = self._get_url(f'/request-body-anyof')
+
+        params = {
+        }
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+        
+        if isinstance(body, dict):
+            json = body
+        elif isinstance(body, PostObjectWithRequestBodyAnyOfRequestBody):
+            json = body.dict()
+        else:
+            json = None
+        
+        try:
+            response = self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+        except Exception as exc:
+            raise exc
+        
+
+        if response.status_code == 200:
+            return PostObjectResp.parse_obj(response.json())
+    
     def patch_object(
         self,
         object_id: str,
@@ -1134,6 +1180,7 @@ class Client:
 
 
 
+PostObjectWithRequestBodyAnyOfRequestBody.update_forward_refs()
 AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
 GetTextAsIntegerResponse200.update_forward_refs()

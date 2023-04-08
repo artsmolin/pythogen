@@ -117,6 +117,16 @@ class BaseObjectResp(BaseModel):
         return v
 
 
+class PostObjectWithRequestBodyAnyOfRequestBody(BaseModel):
+    """
+    None
+    """
+    __root__: Union[
+        'Data',
+        'PostObjectData',
+    ]
+
+
 class AllOfRefObj(BaseModel):
     """
     All Of
@@ -555,7 +565,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[UnknownError, GetObjectResp]:
+    ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/objects/{object_id}')
 
         params = {
@@ -913,7 +923,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[UnknownError, GetObjectResp]:
+    ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
         params = {
@@ -1142,6 +1152,52 @@ class Client:
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
     
+    async def request_body_anyof(
+        self,
+        body: Optional[Union[PostObjectWithRequestBodyAnyOfRequestBody, Dict[str, Any]]] = None,
+        auth: Optional[BasicAuth] = None,
+        content: Optional[Union[str, bytes]] = None,
+    ) -> Optional[PostObjectResp]:
+        url = self._get_url(f'/request-body-anyof')
+
+        params = {
+        }
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+        
+        if isinstance(body, dict):
+            json = body
+        elif isinstance(body, PostObjectWithRequestBodyAnyOfRequestBody):
+            json = body.dict()
+        else:
+            json = None
+        
+        try:
+            response = await self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", "/request-body-anyof")
+                else:
+                    self.metrics_integration.on_request_error(self.client_name, exc, "post", f"/request-body-anyof")
+            raise exc
+        
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path:
+                self.metrics_integration.on_request_success(self.client_name, response, "post", "/request-body-anyof")
+            else:
+                self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/request-body-anyof")
+
+        if response.status_code == 200:
+            return PostObjectResp.parse_obj(response.json())
+    
     async def patch_object(
         self,
         object_id: str,
@@ -1363,6 +1419,7 @@ class Client:
 
 
 
+PostObjectWithRequestBodyAnyOfRequestBody.update_forward_refs()
 AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
 GetTextAsIntegerResponse200.update_forward_refs()

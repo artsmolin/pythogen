@@ -108,6 +108,52 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Pet'
+  /pet_or_tag:
+    post:
+      tags:
+        - pet_or_tag
+      summary: Add a new pet or tag to the store
+      description: Add a new pet or tag to the store
+      operationId: addPet
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/Pet'
+                  - $ref: '#/components/schemas/Tag'
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/Pet'
+                  - $ref: '#/components/schemas/Tag'
+        '405':
+          description: Invalid input
+      security:
+        - petstore_auth:
+            - 'write:pets'
+            - 'read:pets'
+      requestBody:
+        description: Create a new pet in the store
+        required: true
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/Pet'
+                - $ref: '#/components/schemas/Tag'
+          application/xml:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/Pet'
+                - $ref: '#/components/schemas/Tag'
+          application/x-www-form-urlencoded:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/Pet'
+                - $ref: '#/components/schemas/Tag'
   /pet/findByStatus:
     get:
       tags:

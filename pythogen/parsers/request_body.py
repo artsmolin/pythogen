@@ -4,6 +4,7 @@ from typing import Dict
 
 from pythogen import models
 from pythogen.parsers import constants
+from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
 from pythogen.parsers.references import RefResolver
 from pythogen.parsers.schemas import SchemaParser
 
@@ -12,11 +13,17 @@ logger = logging.getLogger(__name__)
 
 
 class RequestBodyParser:
-    def __init__(self, ref_resolver: RefResolver, schema_parser: SchemaParser) -> None:
+    def __init__(
+        self,
+        ref_resolver: RefResolver,
+        schema_parser: SchemaParser,
+        inline_schema_aggregator: InlineSchemasAggregator,
+    ) -> None:
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
+        self._inline_schema_aggregator = inline_schema_aggregator
 
-    def parse_item(self, request_body_data: Dict[str, Any]) -> models.RequestBodyObject:
+    def parse_item(self, request_body_data: Dict[str, Any], operation_data: Dict[str, Any]) -> models.RequestBodyObject:
         """Спарсить спецификацию тела ручки"""
         if request_body_data.get('$ref', None):
             resolved_ref = self._ref_resolver.resolve(request_body_data['$ref'])
@@ -24,7 +31,7 @@ class RequestBodyParser:
             id_ = resolved_ref.ref_id
         else:
             data = request_body_data
-            id_ = f'<inline+{models.RequestBodyObject.__name__}>'
+            id_ = f"{operation_data['summary'].replace(' ', '')}RequestBody"
 
         files_required = False
         content = data.get('content')
@@ -39,7 +46,8 @@ class RequestBodyParser:
                 resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
                 schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
-                schema = self._schema_parser.parse_item(f'<inline+{models.SchemaObject.__name__}>', schema_data)
+                schema = self._schema_parser.parse_item(id_, schema_data)
+                self._inline_schema_aggregator.add(id_, schema)
 
             if media_type == constants.MULTIPART_FORM_DATA_TYPE:
                 files_required = self._drop_binary_strings(schema_data)

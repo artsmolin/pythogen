@@ -55,6 +55,7 @@ def parse_openapi_file(file_path: str) -> models.Document:
     request_body_parser = RequestBodyParser(
         ref_resolver=ref_resolver,
         schema_parser=schema_parser,
+        inline_schema_aggregator=inline_schema_aggregator,
     )
     parameters_parser = ParameterParser(
         ref_resolver=ref_resolver,
