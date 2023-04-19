@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import abc
+from dataclasses import dataclass
 
 from datetime import datetime
 from datetime import date
@@ -92,6 +93,72 @@ class DefaultMetricsIntegration(BaseMetricsIntegration):
             http_status_code=response.status_code,
         ).observe(response.elapsed.total_seconds())
 {%- endif %}
+
+
+@dataclass
+class RequestBox:
+    client_name: str
+    method: str
+    url: str
+    params: Dict[str, Any]
+    headers: Dict[str, Any]
+    content: Any
+
+
+@dataclass
+class ResponseBox:
+    status_code: int
+
+
+class BaseLogsIntegration(abc.ABC):
+    @abc.abstractmethod
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]: ...
+
+    @abc.abstractmethod
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
+
+    @abc.abstractmethod
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
+
+
+class DefaultLogsIntegration(BaseLogsIntegration):
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+        return {'props': {'data': kwargs}}
+
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        msg = f"request error"
+        msg += f" | client={req.client_name}"
+        msg += f" | method={req.method}"
+        msg += f" | url={req.url}"
+        msg += f" | params={req.params}"
+        msg += f" | content={req.content}"
+        msg += f" | headers={req.headers}"
+
+        level = self.get_log_level(req, resp)
+
+        logging.log(
+            level,
+            msg,
+            extra=self.log_extra(
+                client=req.client_name,
+                method=req.method,
+                content=req.content,
+                url=req.url,
+                params=req.params,
+            ),
+        )
+
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        if resp.status_code >= 500:
+            return logging.ERROR
+        elif resp.status_code >= 400:
+            return logging.ERROR
+        elif resp.status_code >= 300:
+            return logging.INFO
+        elif resp.status_code >= 200:
+            return logging.INFO
+        else:
+            return logging.INFO
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -203,6 +270,7 @@ class {{ name }}:
         {%- if metrics %}
         metrics_integration: Optional[BaseMetricsIntegration] = None,
         {%- endif %}
+        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
     ):
         {%- if sync %}
         self.client = client or httpx.Client(timeout=Timeout(timeout))
@@ -214,6 +282,7 @@ class {{ name }}:
         {%- if metrics %}
         self.metrics_integration=metrics_integration
         {%- endif %}
+        self.logs_integration = logs_integration
         self.client_name = client_name
 
     {#-  get items begin  #}

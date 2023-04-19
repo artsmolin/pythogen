@@ -12,6 +12,8 @@
 
 from __future__ import annotations
 
+import abc
+from dataclasses import dataclass
 from datetime import datetime
 
 from httpx import Timeout
@@ -41,6 +43,76 @@ try:
     DEFAULT_AUTH = httpx.USE_CLIENT_DEFAULT
 except AttributeError:
     DEFAULT_AUTH = None
+
+
+@dataclass
+class RequestBox:
+    client_name: str
+    method: str
+    url: str
+    params: Dict[str, Any]
+    headers: Dict[str, Any]
+    content: Any
+
+
+@dataclass
+class ResponseBox:
+    status_code: int
+
+
+class BaseLogsIntegration(abc.ABC):
+    @abc.abstractmethod
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+        ...
+
+    @abc.abstractmethod
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        ...
+
+    @abc.abstractmethod
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        ...
+
+
+class DefaultLogsIntegration(BaseLogsIntegration):
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+        return {'props': {'data': kwargs}}
+
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        msg = f"request error"
+        msg += f" | client={req.client_name}"
+        msg += f" | method={req.method}"
+        msg += f" | url={req.url}"
+        msg += f" | params={req.params}"
+        msg += f" | content={req.content}"
+        msg += f" | headers={req.headers}"
+
+        level = self.get_log_level(req, resp)
+
+        logging.log(
+            level,
+            msg,
+            extra=self.log_extra(
+                client=req.client_name,
+                method=req.method,
+                content=req.content,
+                url=req.url,
+                params=req.params,
+            ),
+        )
+
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        if resp.status_code >= 500:
+            return logging.ERROR
+        elif resp.status_code >= 400:
+            return logging.ERROR
+        elif resp.status_code >= 300:
+            return logging.INFO
+        elif resp.status_code >= 200:
+            return logging.INFO
+        else:
+            return logging.INFO
+
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -269,10 +341,12 @@ class Client:
         client_name: str = "",
         client: Optional[httpx.Client] = None,
         headers: Optional[Dict[str, str]] = None,
+        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
+        self.logs_integration = logs_integration
         self.client_name = client_name
 
     def findPetsByStatus(
@@ -301,17 +375,30 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return [Pet.parse_obj(item) for item in response.json()]
 
         if response.status_code == 400:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -341,17 +428,30 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return [Pet.parse_obj(item) for item in response.json()]
 
         if response.status_code == 400:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -379,28 +479,41 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
 
         if response.status_code == 400:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -426,6 +539,19 @@ class Client:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
             raise exc
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return ReturnspetinventoriesbystatusResponse200.parse_obj(response.json())
@@ -454,28 +580,41 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return Order.parse_obj(response.json())
 
         if response.status_code == 400:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -508,17 +647,30 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return LogsuserintothesystemResponse200(text=response.text)
 
         if response.status_code == 400:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -545,6 +697,19 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
     def getUserByName(
         self,
         username: str,
@@ -569,28 +734,41 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return User.parse_obj(response.json())
 
         if response.status_code == 400:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            method = "get"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -627,17 +805,30 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
 
         if response.status_code == 405:
-            method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -646,7 +837,7 @@ class Client:
         body: Optional[Union[AddanewpetortagtothestoreRequestBody, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, AddanewpetortagtothestoreResponse200]:
+    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
         url = self._get_url(f'/pet_or_tag')
 
         params = {}
@@ -674,17 +865,30 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return self._parse_any_of(response.json(), [Pet, Tag])
 
         if response.status_code == 405:
-            method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -718,14 +922,27 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 405:
-            method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -766,6 +983,19 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return ApiResponse.parse_obj(response.json())
 
@@ -802,17 +1032,30 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return Order.parse_obj(response.json())
 
         if response.status_code == 405:
-            method = "post"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -849,6 +1092,19 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
     def createUsersWithListInput(
         self,
         body: Optional[Union[List[User], Dict[str, Any]]] = None,
@@ -881,6 +1137,19 @@ class Client:
             )
         except Exception as exc:
             raise exc
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return User.parse_obj(response.json())
@@ -918,39 +1187,52 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="put",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 200:
             return Pet.parse_obj(response.json())
 
         if response.status_code == 400:
-            method = "put"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            method = "put"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 405:
-            method = "put"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -988,6 +1270,19 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="put",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
     def deletePet(
         self,
         petId: int,
@@ -1015,14 +1310,27 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="delete",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 400:
-            method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1050,25 +1358,38 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="delete",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 400:
-            method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1096,25 +1417,38 @@ class Client:
         except Exception as exc:
             raise exc
 
+        req = RequestBox(
+            client_name=self.client_name,
+            method="delete",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
         if response.status_code == 400:
-            method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
         if response.status_code == 404:
-            method = "delete"
             if response.content is None:
                 content = None
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 

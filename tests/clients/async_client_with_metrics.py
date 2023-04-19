@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import abc
+from dataclasses import dataclass
 
 from datetime import datetime
 from datetime import date
@@ -86,6 +87,72 @@ class DefaultMetricsIntegration(BaseMetricsIntegration):
             http_target=http_target,
             http_status_code=response.status_code,
         ).observe(response.elapsed.total_seconds())
+
+
+@dataclass
+class RequestBox:
+    client_name: str
+    method: str
+    url: str
+    params: Dict[str, Any]
+    headers: Dict[str, Any]
+    content: Any
+
+
+@dataclass
+class ResponseBox:
+    status_code: int
+
+
+class BaseLogsIntegration(abc.ABC):
+    @abc.abstractmethod
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]: ...
+
+    @abc.abstractmethod
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
+
+    @abc.abstractmethod
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
+
+
+class DefaultLogsIntegration(BaseLogsIntegration):
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+        return {'props': {'data': kwargs}}
+    
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        msg = f"request error"
+        msg += f" | client={req.client_name}"
+        msg += f" | method={req.method}"
+        msg += f" | url={req.url}"
+        msg += f" | params={req.params}"
+        msg += f" | content={req.content}"
+        msg += f" | headers={req.headers}"
+
+        level = self.get_log_level(req, resp)
+
+        logging.log(
+            level,
+            msg,
+            extra=self.log_extra(
+                client=req.client_name,
+                method=req.method,
+                content=req.content,
+                url=req.url,
+                params=req.params,
+            ),
+        )
+
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        if resp.status_code >= 500:
+            return logging.ERROR
+        elif resp.status_code >= 400:
+            return logging.ERROR
+        elif resp.status_code >= 300:
+            return logging.INFO
+        elif resp.status_code >= 200:
+            return logging.INFO
+        else:
+            return logging.INFO
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -506,11 +573,13 @@ class Client:
         client: Optional[httpx.AsyncClient] = None,
         headers: Optional[Dict[str, str]] = None,
         metrics_integration: Optional[BaseMetricsIntegration] = None,
+        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
         self.metrics_integration=metrics_integration
+        self.logs_integration = logs_integration
         self.client_name = client_name
     
     async def get_object_no_ref_schema(
@@ -553,6 +622,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/no-ref-schema/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/objects/no-ref-schema/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
@@ -597,6 +678,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/objects/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -608,7 +701,8 @@ class Client:
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return UnknownError.parse_obj(response.json())
     
@@ -646,6 +740,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-array-response")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/object-with-array-response")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return [GetObjectWithInlineArrayResponse200Item.parse_obj(item) for item in response.json()]
@@ -684,6 +790,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/object-with-inline-array")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/object-with-inline-array")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
@@ -722,6 +840,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/objects")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/objects")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return [GetObjectResp.parse_obj(item) for item in response.json()]
@@ -760,6 +890,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/text")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/text")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
@@ -798,6 +940,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/text_as_integer")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/text_as_integer")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetTextAsIntegerResponse200(text=response.text)
@@ -836,6 +990,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/empty")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/empty")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
@@ -874,6 +1040,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/binary")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/binary")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetBinaryResponse200(content=response.content)
@@ -912,6 +1090,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/allof")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/allof")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return AllOfResp.parse_obj(response.json())
@@ -954,6 +1144,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "get", "/slow/objects/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "get",  f"/slow/objects/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -965,7 +1167,8 @@ class Client:
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return UnknownError.parse_obj(response.json())
     
@@ -1003,6 +1206,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "post", "/post-without-body")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/post-without-body")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1049,6 +1264,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/objects")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1096,6 +1323,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "post", "/objects-form-data")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/objects-form-data")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1147,6 +1386,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "post", "/multipart-form-data")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/multipart-form-data")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1193,6 +1444,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "post", "/request-body-anyof")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "post",  f"/request-body-anyof")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1240,6 +1503,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "patch", "/objects/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "patch",  f"/objects/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="patch",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PatchObjectResp.parse_obj(response.json())
@@ -1287,6 +1562,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "put", "/objects/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "put",  f"/objects/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="put",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1334,6 +1621,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "put", "/slow/objects/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "put",  f"/slow/objects/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="put",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1373,6 +1672,18 @@ class Client:
                 self.metrics_integration.on_request_success(self.client_name, response, "delete", "/objects/:object_id")
             else:
                 self.metrics_integration.on_request_success(self.client_name, response, "delete",  f"/objects/{object_id}")
+        req = RequestBox(
+            client_name=self.client_name,
+            method="delete",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return DeleteObjectResp.parse_obj(response.json())
