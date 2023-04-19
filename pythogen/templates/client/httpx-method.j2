@@ -102,7 +102,19 @@
 
 {%- with req_body=operation.request_body -%}
 {% include 'client/httpx-request-metrics.j2' %}
-{%- endwith -%}
+{%- endwith %}
+        req = RequestBox(
+            client_name=self.client_name,
+            method="{{ method }}",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         {%- for code, mapper in iterresponsemap(operation.responses) %}
 
@@ -114,7 +126,8 @@
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             {% endif -%}
             return {{ mapper }}

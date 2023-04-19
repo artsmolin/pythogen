@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import abc
+from dataclasses import dataclass
 
 from datetime import datetime
 from datetime import date
@@ -49,6 +50,72 @@ try:
     DEFAULT_AUTH = httpx.USE_CLIENT_DEFAULT
 except AttributeError:
     DEFAULT_AUTH = None
+
+
+@dataclass
+class RequestBox:
+    client_name: str
+    method: str
+    url: str
+    params: Dict[str, Any]
+    headers: Dict[str, Any]
+    content: Any
+
+
+@dataclass
+class ResponseBox:
+    status_code: int
+
+
+class BaseLogsIntegration(abc.ABC):
+    @abc.abstractmethod
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]: ...
+
+    @abc.abstractmethod
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
+
+    @abc.abstractmethod
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
+
+
+class DefaultLogsIntegration(BaseLogsIntegration):
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+        return {'props': {'data': kwargs}}
+    
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        msg = f"request error"
+        msg += f" | client={req.client_name}"
+        msg += f" | method={req.method}"
+        msg += f" | url={req.url}"
+        msg += f" | params={req.params}"
+        msg += f" | content={req.content}"
+        msg += f" | headers={req.headers}"
+
+        level = self.get_log_level(req, resp)
+
+        logging.log(
+            level,
+            msg,
+            extra=self.log_extra(
+                client=req.client_name,
+                method=req.method,
+                content=req.content,
+                url=req.url,
+                params=req.params,
+            ),
+        )
+
+    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        if resp.status_code >= 500:
+            return logging.ERROR
+        elif resp.status_code >= 400:
+            return logging.ERROR
+        elif resp.status_code >= 300:
+            return logging.INFO
+        elif resp.status_code >= 200:
+            return logging.INFO
+        else:
+            return logging.INFO
 
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
@@ -468,10 +535,12 @@ class Client:
         client_name: str = "",
         client: Optional[httpx.Client] = None,
         headers: Optional[Dict[str, str]] = None,
+        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
+        self.logs_integration = logs_integration
         self.client_name = client_name
     
     def get_object_no_ref_schema(
@@ -504,6 +573,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
@@ -538,6 +619,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -549,7 +642,8 @@ class Client:
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return UnknownError.parse_obj(response.json())
     
@@ -577,6 +671,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return [GetObjectWithInlineArrayResponse200Item.parse_obj(item) for item in response.json()]
@@ -605,6 +711,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
@@ -633,6 +751,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return [GetObjectResp.parse_obj(item) for item in response.json()]
@@ -661,6 +791,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
@@ -689,6 +831,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetTextAsIntegerResponse200(text=response.text)
@@ -717,6 +871,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
@@ -745,6 +911,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetBinaryResponse200(content=response.content)
@@ -773,6 +951,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return AllOfResp.parse_obj(response.json())
@@ -805,6 +995,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="get",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return GetObjectResp.parse_obj(response.json())
@@ -816,7 +1018,8 @@ class Client:
             else:
                 content = response.content[:500]
 
-            self.log_error(self.client_name, method, url, params, content, headers_)
+            if self.logs_integration:
+                self.logs_integration.log_error(req, resp)
 
             return UnknownError.parse_obj(response.json())
     
@@ -844,6 +1047,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -880,6 +1095,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -917,6 +1144,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -958,6 +1197,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -994,6 +1245,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="post",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
@@ -1031,6 +1294,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="patch",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PatchObjectResp.parse_obj(response.json())
@@ -1068,6 +1343,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="put",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1105,6 +1392,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="put",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
@@ -1134,6 +1433,18 @@ class Client:
         except Exception as exc:
             raise exc
         
+        req = RequestBox(
+            client_name=self.client_name,
+            method="delete",
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
 
         if response.status_code == 200:
             return DeleteObjectResp.parse_obj(response.json())
