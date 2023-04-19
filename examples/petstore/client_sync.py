@@ -105,7 +105,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
-            return logging.ERROR
+            return logging.WARNING
         elif resp.status_code >= 300:
             return logging.INFO
         elif resp.status_code >= 200:
@@ -354,7 +354,7 @@ class Client:
         status: Optional[Literal['available', 'pending', 'sold']] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, List[Pet]]:
+    ) -> Union[List[Pet], EmptyBody]:
         url = self._get_url(f'/pet/findByStatus')
 
         params = {}
@@ -407,7 +407,7 @@ class Client:
         tags: Optional[List[str]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, List[Pet]]:
+    ) -> Union[List[Pet], EmptyBody]:
         url = self._get_url(f'/pet/findByTags')
 
         params = {}
@@ -837,7 +837,7 @@ class Client:
         body: Optional[Union[AddanewpetortagtothestoreRequestBody, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
+    ) -> Union[EmptyBody, AddanewpetortagtothestoreResponse200]:
         url = self._get_url(f'/pet_or_tag')
 
         params = {}

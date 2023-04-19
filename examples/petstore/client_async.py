@@ -105,7 +105,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
-            return logging.ERROR
+            return logging.WARNING
         elif resp.status_code >= 300:
             return logging.INFO
         elif resp.status_code >= 200:
@@ -464,7 +464,7 @@ class Client:
         petId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, Pet]:
+    ) -> Union[Pet, EmptyBody]:
         url = self._get_url(f'/pet/{petId}')
 
         params = {}
@@ -729,7 +729,7 @@ class Client:
         username: str,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[User, EmptyBody]:
+    ) -> Union[EmptyBody, User]:
         url = self._get_url(f'/user/{username}')
 
         params = {}
@@ -793,7 +793,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, Pet]:
+    ) -> Union[Pet, EmptyBody]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -1177,7 +1177,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, Pet]:
+    ) -> Union[Pet, EmptyBody]:
         url = self._get_url(f'/pet')
 
         params = {}
