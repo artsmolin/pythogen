@@ -112,7 +112,7 @@ class BaseLogsIntegration(abc.ABC):
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
 
     @abc.abstractmethod
-    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
 
 
 class DefaultLogsIntegration(BaseLogsIntegration):
@@ -128,7 +128,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         msg += f" | content={req.content}"
         msg += f" | headers={req.headers}"
 
-        level = self.get_log_level(req, resp)
+        level = self.get_log_error_level(req, resp)
 
         logging.log(
             level,
@@ -142,7 +142,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
             ),
         )
 
-    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
@@ -645,7 +645,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+    ) -> Union[UnknownError, GetObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
         params = {
@@ -1112,7 +1112,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+    ) -> Union[UnknownError, GetObjectResp]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
         params = {

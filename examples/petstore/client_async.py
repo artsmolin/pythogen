@@ -70,7 +70,7 @@ class BaseLogsIntegration(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         ...
 
 
@@ -87,7 +87,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         msg += f" | content={req.content}"
         msg += f" | headers={req.headers}"
 
-        level = self.get_log_level(req, resp)
+        level = self.get_log_error_level(req, resp)
 
         logging.log(
             level,
@@ -101,7 +101,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
             ),
         )
 
-    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
@@ -354,7 +354,7 @@ class Client:
         status: Optional[Literal['available', 'pending', 'sold']] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[List[Pet], EmptyBody]:
+    ) -> Union[EmptyBody, List[Pet]]:
         url = self._get_url(f'/pet/findByStatus')
 
         params = {}
@@ -409,7 +409,7 @@ class Client:
         tags: Optional[List[str]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[List[Pet], EmptyBody]:
+    ) -> Union[EmptyBody, List[Pet]]:
         url = self._get_url(f'/pet/findByTags')
 
         params = {}
@@ -569,7 +569,7 @@ class Client:
         orderId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, Order]:
+    ) -> Union[Order, EmptyBody]:
         url = self._get_url(f'/store/order/{orderId}')
 
         params = {}
@@ -853,7 +853,7 @@ class Client:
         body: Optional[Union[AddanewpetortagtothestoreRequestBody, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
+    ) -> Union[EmptyBody, AddanewpetortagtothestoreResponse200]:
         url = self._get_url(f'/pet_or_tag')
 
         params = {}
@@ -1022,7 +1022,7 @@ class Client:
         body: Optional[Union[Order, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, Order]:
+    ) -> Union[Order, EmptyBody]:
         url = self._get_url(f'/store/order')
 
         params = {}

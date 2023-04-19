@@ -70,7 +70,7 @@ class BaseLogsIntegration(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         ...
 
 
@@ -87,7 +87,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         msg += f" | content={req.content}"
         msg += f" | headers={req.headers}"
 
-        level = self.get_log_level(req, resp)
+        level = self.get_log_error_level(req, resp)
 
         logging.log(
             level,
@@ -101,7 +101,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
             ),
         )
 
-    def get_log_level(self, req: RequestBox, resp: ResponseBox) -> int:
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
