@@ -152,7 +152,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
-            return logging.ERROR
+            return logging.WARNING
         elif resp.status_code >= 300:
             return logging.INFO
         elif resp.status_code >= 200:

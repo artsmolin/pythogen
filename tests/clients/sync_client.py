@@ -81,7 +81,7 @@ class BaseLogsIntegration(abc.ABC):
 class DefaultLogsIntegration(BaseLogsIntegration):
     def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
         return {'props': {'data': kwargs}}
-    
+
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
         msg = f"request error"
         msg += f" | client={req.client_name}"
@@ -109,7 +109,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         if resp.status_code >= 500:
             return logging.ERROR
         elif resp.status_code >= 400:
-            return logging.ERROR
+            return logging.WARNING
         elif resp.status_code >= 300:
             return logging.INFO
         elif resp.status_code >= 200:
