@@ -27,7 +27,15 @@ PathStr = TypeVar('PathStr', bound=str)
 logger = logging.getLogger(__name__)
 
 
-def render_client(*, output_path: str, document: models.Document, name: str, sync: bool, metrics: bool) -> None:
+def render_client(
+    *,
+    output_path: str,
+    document: models.Document,
+    name: str,
+    sync: bool,
+    metrics: bool,
+    required_headers: Optional[List[str]] = None,
+) -> None:
     """Отрисовывает сгенерированный клиент на основе j2-шаблонов
 
     Arguments
@@ -65,6 +73,7 @@ def render_client(*, output_path: str, document: models.Document, name: str, syn
         sync=sync,
         metrics=metrics,
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
+        required_headers=required_headers,
     )
     with open(output_path, 'w') as output_file:
         output_file.write(rendered_client)

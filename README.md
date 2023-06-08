@@ -26,6 +26,7 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 - [Discriminator](/docs/discriminator.md)
 - [Metrics](/docs/metrics.md)
 - [Logs](/docs/logs.md)
+- [Required Headers](/docs/headers.md)
 - Sync/async clients
 
 ## Examples
