@@ -229,20 +229,6 @@ class {{ classname(model.id) }}(BaseModel):
     class Config:
         # Обращение по имени поля, даже если есть алиас.
         allow_population_by_field_name = True
-
-    @root_validator
-    def change_name(cls, values):
-        """
-        Каст полей согласно алиасам
-
-        В OpenApi-спеке названия полей могут быть в формате, в котором
-        нельзя создавать имена переменных в python, они заменяются безопасными алиасами
-        """
-        {%- for property in model.required_properties + model.optional_properties if property.safety_key %}
-        values["{{ property.orig_key }}"] = values["{{ property.safety_key }}"]
-        del values["{{ property.safety_key }}"]
-        {% endfor %}
-        return values
     {%- break %}
     {%- endfor %}
 

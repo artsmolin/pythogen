@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pythogen"
-version = "0.1.17"
+version = "0.1.18"
 description = "Generator of python HTTP-clients from OpenApi specification."
 homepage = "https://github.com/artsmolin/pythogen"
 repository = "https://github.com/artsmolin/pythogen"
@@ -45,6 +45,10 @@ pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
 importlib-metadata = "^4.11.4"
 pre-commit = "^2.19.0"
+
+[tool.poetry.group.dev.dependencies]
+httpx = "^0.24.1"
+pydantic = "^1.10.9"
 
 [build-system]
 requires = ["poetry>=1.4.0"]
