@@ -15,6 +15,8 @@ format: install-pre-commit clean
 clients-for-tests:
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client.py
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client_with_metrics.py --metrics
+	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client_with_headers.py --headers X-API-KEY,X-API-SECRET
+
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client_with_metrics.py --sync --metrics
 
@@ -28,7 +30,7 @@ requirements:
 	make install-pre-commit
 
 test:
-	pytest --cov=pythogen tests/ -sq
+	pytest --cov=pythogen tests/ -sq -v
 
 test-clients:
 	docker-compose up -d --build mock_server ;\

@@ -24,6 +24,7 @@ def main(
     package_version: Optional[str] = typer.Option(None, help="package version"),
     package_authors: Optional[str] = typer.Option(None, help="package authors"),
     metrics: bool = typer.Option(False, help="include metrics integration"),
+    headers: Optional[str] = typer.Option(None, help="required headers"),
 ):
     """
     Generate HTTP clients for python from OpenAPI
@@ -45,6 +46,7 @@ def main(
         name=name,
         sync=sync,
         metrics=metrics,
+        required_headers=headers.split(",") if headers else None,
     )
 
 

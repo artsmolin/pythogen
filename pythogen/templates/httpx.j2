@@ -170,6 +170,11 @@ FileTypes = Union[
     Tuple[Optional[str], FileContent, Optional[str]],
 ]
 
+
+class RequiredHeaders(Exception):
+    ...
+
+
 class EmptyBody(BaseModel):
     status_code: int
     text: str
@@ -270,6 +275,10 @@ class {{ name }}:
         {%- endif %}
         self.logs_integration = logs_integration
         self.client_name = client_name
+        {% if required_headers %}
+        if set({{ required_headers }}) != set(self.headers):
+            raise RequiredHeaders("Headers {{ required_headers }} is required")
+        {%- endif %}
 
     {#-  get items begin  #}
     {% with items=get.items(), method='get'%}
