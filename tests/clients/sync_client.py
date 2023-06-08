@@ -310,28 +310,6 @@ class TestSafetyKey(BaseModel):
         # Обращение по имени поля, даже если есть алиас.
         allow_population_by_field_name = True
 
-    @root_validator
-    def change_name(cls, values):
-        """
-        Каст полей согласно алиасам
-
-        В OpenApi-спеке названия полей могут быть в формате, в котором
-        нельзя создавать имена переменных в python, они заменяются безопасными алиасами
-        """
-        values["for"] = values["for_"]
-        del values["for_"]
-        
-        values["class"] = values["class_"]
-        del values["class_"]
-        
-        values["33with.dot-and-hyphens&*"] = values["with_dot_and_hyphens"]
-        del values["with_dot_and_hyphens"]
-        
-        values["34with.dot-and-hyphens&*"] = values["old_feature_priority"]
-        del values["old_feature_priority"]
-        
-        return values
-
 
 class UnknownError(BaseModel):
     """
@@ -443,19 +421,6 @@ class PostObjectData(BaseModel):
     class Config:
         # Обращение по имени поля, даже если есть алиас.
         allow_population_by_field_name = True
-
-    @root_validator
-    def change_name(cls, values):
-        """
-        Каст полей согласно алиасам
-
-        В OpenApi-спеке названия полей могут быть в формате, в котором
-        нельзя создавать имена переменных в python, они заменяются безопасными алиасами
-        """
-        values["event-data"] = values["event_data"]
-        del values["event_data"]
-        
-        return values
 
 
 class Dog(BaseModel):
@@ -596,7 +561,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[UnknownError, GetObjectResp]:
+    ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/objects/{object_id}')
 
         params = {
@@ -973,7 +938,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[UnknownError, GetObjectResp]:
+    ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
         params = {
@@ -1086,7 +1051,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         
@@ -1134,7 +1099,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         
@@ -1184,7 +1149,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostFile):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         
@@ -1236,7 +1201,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectWithRequestBodyAnyOfRequestBody):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         
@@ -1285,7 +1250,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PatchObjectData):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         
@@ -1334,7 +1299,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         
@@ -1383,7 +1348,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
         

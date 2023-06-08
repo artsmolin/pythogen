@@ -464,7 +464,7 @@ class Client:
         petId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet/{petId}')
 
         params = {}
@@ -569,7 +569,7 @@ class Client:
         orderId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Order, EmptyBody]:
+    ) -> Union[EmptyBody, Order]:
         url = self._get_url(f'/store/order/{orderId}')
 
         params = {}
@@ -634,7 +634,7 @@ class Client:
         password: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, LogsuserintothesystemResponse200]:
+    ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
         url = self._get_url(f'/user/login')
 
         params = {}
@@ -793,7 +793,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -810,7 +810,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, Pet):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -853,7 +853,7 @@ class Client:
         body: Optional[Union[AddanewpetortagtothestoreRequestBody, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[EmptyBody, AddanewpetortagtothestoreResponse200]:
+    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
         url = self._get_url(f'/pet_or_tag')
 
         params = {}
@@ -870,7 +870,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, AddanewpetortagtothestoreRequestBody):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -990,7 +990,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, bytes):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -1022,7 +1022,7 @@ class Client:
         body: Optional[Union[Order, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Order, EmptyBody]:
+    ) -> Union[EmptyBody, Order]:
         url = self._get_url(f'/store/order')
 
         params = {}
@@ -1039,7 +1039,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, Order):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -1099,7 +1099,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, User):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -1145,7 +1145,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, List[User]):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -1177,7 +1177,7 @@ class Client:
         body: Optional[Union[Pet, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -1194,7 +1194,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, Pet):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
@@ -1277,7 +1277,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, User):
-            json = body.dict()
+            json = body.dict(by_alias=True)
         else:
             json = None
 
