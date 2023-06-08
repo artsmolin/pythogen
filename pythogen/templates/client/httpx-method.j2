@@ -44,6 +44,7 @@
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and not operation.request_body.are_files_required %}
         files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
         {%- endif %}
+        headers: Optional[Dict[str, Any]] = None,
     ) -> {{ responserepr(operation.responses) }}:
         url = self._get_url(f'{{ path }}')
 
@@ -98,7 +99,8 @@
         # let library do it for us
         headers_.pop("Content-Type", None)
         {% endif %}
-
+        if headers:
+            headers_ = headers
 
 {%- with req_body=operation.request_body -%}
 {% include 'client/httpx-request-metrics.j2' %}

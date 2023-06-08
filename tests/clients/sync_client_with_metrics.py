@@ -164,6 +164,11 @@ FileTypes = Union[
     Tuple[Optional[str], FileContent, Optional[str]],
 ]
 
+
+class RequiredHeaders(Exception):
+    ...
+
+
 class EmptyBody(BaseModel):
     status_code: int
     text: str
@@ -546,6 +551,7 @@ class Client:
         self.metrics_integration=metrics_integration
         self.logs_integration = logs_integration
         self.client_name = client_name
+        
     
     def get_object_no_ref_schema(
         self,
@@ -554,6 +560,7 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetObjectNoRefSchemaResponse200]:
         url = self._get_url(f'/objects/no-ref-schema/{object_id}')
 
@@ -572,6 +579,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -610,7 +619,8 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[UnknownError, GetObjectResp]:
+        headers: Optional[Dict[str, Any]] = None,
+    ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/objects/{object_id}')
 
         params = {
@@ -628,6 +638,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -675,6 +687,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[List[GetObjectWithInlineArrayResponse200Item]]:
         url = self._get_url(f'/object-with-array-response')
 
@@ -690,6 +703,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -725,6 +740,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetObjectWithInlineArrayResponse200]:
         url = self._get_url(f'/object-with-inline-array')
 
@@ -740,6 +756,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -775,6 +793,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[List[GetObjectResp]]:
         url = self._get_url(f'/objects')
 
@@ -790,6 +809,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -825,6 +846,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetTextResponse200]:
         url = self._get_url(f'/text')
 
@@ -840,6 +862,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -875,6 +899,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetTextAsIntegerResponse200]:
         url = self._get_url(f'/text_as_integer')
 
@@ -890,6 +915,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -925,6 +952,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f'/empty')
 
@@ -940,6 +968,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -975,6 +1005,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetBinaryResponse200]:
         url = self._get_url(f'/binary')
 
@@ -990,6 +1021,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1025,6 +1058,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[AllOfResp]:
         url = self._get_url(f'/allof')
 
@@ -1040,6 +1074,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1077,7 +1113,8 @@ class Client:
         return_error: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-    ) -> Union[UnknownError, GetObjectResp]:
+        headers: Optional[Dict[str, Any]] = None,
+    ) -> Union[GetObjectResp, UnknownError]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
         params = {
@@ -1094,6 +1131,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1141,6 +1180,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/post-without-body')
 
@@ -1156,6 +1196,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("post", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1192,6 +1234,7 @@ class Client:
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/objects')
 
@@ -1214,6 +1257,8 @@ class Client:
         else:
             json = None
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1250,6 +1295,7 @@ class Client:
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/objects-form-data')
 
@@ -1273,6 +1319,8 @@ class Client:
             json = None
         
         headers_.update({'Content-Type': 'application/x-www-form-urlencoded'})
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1310,6 +1358,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/multipart-form-data')
 
@@ -1336,6 +1385,8 @@ class Client:
         # let library do it for us
         headers_.pop("Content-Type", None)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_, files=files)
         except Exception as exc:
@@ -1372,6 +1423,7 @@ class Client:
         body: Optional[Union[PostObjectWithRequestBodyAnyOfRequestBody, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
         url = self._get_url(f'/request-body-anyof')
 
@@ -1394,6 +1446,8 @@ class Client:
         else:
             json = None
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1431,6 +1485,7 @@ class Client:
         body: Optional[Union[PatchObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PatchObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -1453,6 +1508,8 @@ class Client:
         else:
             json = None
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("patch", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1490,6 +1547,7 @@ class Client:
         body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PutObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -1512,6 +1570,8 @@ class Client:
         else:
             json = None
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1549,6 +1609,7 @@ class Client:
         body: Optional[Union[PutObjectData, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PutObjectResp]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
@@ -1571,6 +1632,8 @@ class Client:
         else:
             json = None
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
@@ -1607,6 +1670,7 @@ class Client:
         object_id: str,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
+        headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[DeleteObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
@@ -1622,6 +1686,8 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
         
+        if headers:
+            headers_ = headers
         try:
             response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
