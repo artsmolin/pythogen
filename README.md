@@ -27,42 +27,32 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 - [Metrics](/docs/metrics.md)
 - [Logs](/docs/logs.md)
 - [Required Headers](/docs/headers.md)
-- Sync/async clients
+- [Sync/async clients](/docs/sync_async.md)
+- [Client as python-package](/docs/client_as_pkg.md)
 
 ## Examples
 - [**Petstore OpenAPI**](/examples/petstore/openapi.yaml):  [client_sync.py](/examples/petstore/client_sync.py) | [client_async.py](/examples/petstore/client_async.py)
 
 ## Installation
+Docker
+```shell
+docker pull artsmolin/pythogen
+```
+Python
 ```shell
 pip install pythogen
 ```
 
-## Usage
-### Generate ordinary clients
-- Asynchronous client
-  ```shell
-  pythogen path/to/input/openapi.yaml path/to/output/client.py
-  ```
-- Asynchronous client with integration for metrics
-  ```shell
-  pythogen path/to/input/openapi.yaml path/to/output/client.py --metrics
-  ```
-- Synchronous client
-  ```shell
-  pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
-  ```
-- Synchronous client with integration for metrics
-  ```shell
-  pythogen path/to/input/openapi.yaml path/to/output/client.py --sync --metrics
-  ```
-### Generate client as python-package
+## Generate clients
+Docker
 ```shell
-pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0.1 --package-authors="Rick, Morty"
+docker run -v ./path/to/input:/opt/path/to/input -v ./path/to/output:/opt/path/to/output artsmolin/pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
-- `--package-version` — required;
-- `--package-authors` — optional;
-- `path/to/package/output` — path to the directory where package will be saved.
-### Usage client
+Python
+```shell
+pythogen path/to/input/openapi.yaml path/to/output/client.py
+```
+## Usage client
 ```python
 from petstore.client_async import Client
 from petstore.client_async import Pet
