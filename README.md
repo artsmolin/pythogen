@@ -39,7 +39,7 @@ Docker
 docker pull artsmolin/pythogen
 docker run -v ./path/to/input:/opt/path/to/input -v ./path/to/output:/opt/path/to/output artsmolin/pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
-Python
+Directly
 ```shell
 pip install pythogen
 pythogen path/to/input/openapi.yaml path/to/output/client.py
