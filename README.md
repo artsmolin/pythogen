@@ -31,7 +31,7 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 - [Client as python-package](/docs/client_as_pkg.md)
 
 ## Examples
-- [**Petstore OpenAPI**](/examples/petstore/openapi.yaml):  [client_sync.py](/examples/petstore/client_sync.py) | [client_async.py](/examples/petstore/client_async.py)
+- [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
 
 ## Installation
 Docker
