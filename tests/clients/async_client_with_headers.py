@@ -573,7 +573,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+    ) -> Union[UnknownError, GetObjectResp]:
         url = self._get_url(f'/objects/{object_id}')
 
         params = {
@@ -977,7 +977,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+    ) -> Union[UnknownError, GetObjectResp]:
         url = self._get_url(f'/slow/objects/{object_id}')
 
         params = {

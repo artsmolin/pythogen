@@ -367,9 +367,28 @@ class SchemaParser:
             items = []
             for any_ref_item in data['anyOf']:
                 ref = any_ref_item.get('$ref', None)
-                resolved_ref = self._ref_resolver.resolve(ref)
-                ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
-                items.append(ref_schema)
+                any_ref_any_type = any_ref_item.get('type')
+                if ref:
+                    resolved_ref = self._ref_resolver.resolve(ref)
+                    ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
+                    items.append(ref_schema)
+                elif any_ref_any_type in PRIMITIVE_TYPES:
+                    items.append(
+                        models.SchemaObject(
+                            id='',
+                            type=models.Type(any_ref_any_type),
+                            enum=None,
+                            properties=[],
+                            title=None,
+                            format=None,
+                            items=None,
+                            required=None,
+                        )
+                    )
+                else:
+                    items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
+                    schema = self.parse_item(items_schema_id, items_schema_data)  # type: ignore
+                    self._inline_schema_aggregator.add(items_schema_id, schema)
             return items
 
         return None

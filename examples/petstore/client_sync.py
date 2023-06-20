@@ -471,7 +471,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet/{petId}')
 
         params = {}
@@ -578,7 +578,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[Order, EmptyBody]:
+    ) -> Union[EmptyBody, Order]:
         url = self._get_url(f'/store/order/{orderId}')
 
         params = {}
@@ -644,7 +644,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
+    ) -> Union[EmptyBody, LogsuserintothesystemResponse200]:
         url = self._get_url(f'/user/login')
 
         params = {}
@@ -741,7 +741,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[User, EmptyBody]:
+    ) -> Union[EmptyBody, User]:
         url = self._get_url(f'/user/{username}')
 
         params = {}
@@ -806,7 +806,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
@@ -869,7 +869,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
+    ) -> Union[EmptyBody, AddanewpetortagtothestoreResponse200]:
         url = self._get_url(f'/pet_or_tag')
 
         params = {}
@@ -1045,7 +1045,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[Order, EmptyBody]:
+    ) -> Union[EmptyBody, Order]:
         url = self._get_url(f'/store/order')
 
         params = {}
@@ -1209,7 +1209,7 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[Pet, EmptyBody]:
+    ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f'/pet')
 
         params = {}
