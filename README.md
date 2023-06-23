@@ -39,6 +39,8 @@ docker pull artsmolin/pythogen
 ```
 
 ## Generation client
+- `path/to/input` — path to the directory with openapi.yaml;
+- `path/to/output` — the path to the directory where the generated client will be saved;
 ### Pip
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
@@ -52,9 +54,6 @@ artsmolin/pythogen \
 path/to/input/openapi.yaml \
 path/to/output/client.py
 ```
-Where
-- `./path/to/input` — path to the directory with openapi.yaml;
-- `./path/to/output` — the path to the directory where the generated client will be saved;
 
 ## Usage client
 ```python
