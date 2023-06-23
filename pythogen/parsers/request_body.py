@@ -1,6 +1,5 @@
 import logging
 from typing import Any
-from typing import Dict
 
 from pythogen import models
 from pythogen.parsers import constants
@@ -23,7 +22,7 @@ class RequestBodyParser:
         self._schema_parser = schema_parser
         self._inline_schema_aggregator = inline_schema_aggregator
 
-    def parse_item(self, request_body_data: Dict[str, Any], operation_data: Dict[str, Any]) -> models.RequestBodyObject:
+    def parse_item(self, request_body_data: dict[str, Any], operation_data: dict[str, Any]) -> models.RequestBodyObject:
         """Спарсить спецификацию тела ручки"""
         if request_body_data.get('$ref', None):
             resolved_ref = self._ref_resolver.resolve(request_body_data['$ref'])

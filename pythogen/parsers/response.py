@@ -1,6 +1,5 @@
 import logging
 from typing import Any
-from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
@@ -22,7 +21,7 @@ class ResponseParser:
         self._schema_parser = schema_parser
         self._inline_schema_aggregator = inline_schema_aggregator
 
-    def parse_item(self, response_id: str, response_data: Dict[str, Any]) -> models.ResponseObject:
+    def parse_item(self, response_id: str, response_data: dict[str, Any]) -> models.ResponseObject:
         """Спарсить спецификацию ответа ручки"""
         schema = None
 

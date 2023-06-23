@@ -1,8 +1,6 @@
 import re
 from collections import defaultdict
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Union
 
@@ -43,8 +41,8 @@ class SchemaParser:
     def __init__(
         self,
         ref_resolver: RefResolver,
-        openapi_data: Dict[str, Any],
-        discriminator_base_class_schemas: List[models.DiscriminatorBaseClassSchema],
+        openapi_data: dict[str, Any],
+        discriminator_base_class_schemas: list[models.DiscriminatorBaseClassSchema],
         inline_schema_aggregator: InlineSchemasAggregator,
     ) -> None:
         self._openapi_data = openapi_data
@@ -55,7 +53,7 @@ class SchemaParser:
         self._schema_ids = list(self._openapi_data["components"].get('schemas', {}))
         self._processiong_parsed_schema_id_count: dict[str, int] = defaultdict(int)
 
-    def parse_collection(self) -> Dict[str, models.SchemaObject]:
+    def parse_collection(self) -> dict[str, models.SchemaObject]:
         schemas_data = self._openapi_data["components"].get('schemas', {})
         schemas = {}
         for schema_id, schema_data in schemas_data.items():
@@ -71,7 +69,7 @@ class SchemaParser:
         return schemas
 
     def parse_item(
-        self, schema_id: str, schema_data: Dict[str, Any], from_depth_level: bool = False
+        self, schema_id: str, schema_data: dict[str, Any], from_depth_level: bool = False
     ) -> models.SchemaObject:
         """Спарсить схему из OpenAPI-спеки
 
@@ -128,7 +126,7 @@ class SchemaParser:
             description=self._get_description(schema_data),
         )
 
-    def _parse_type(self, data: Dict[str, Any]) -> models.Type:
+    def _parse_type(self, data: dict[str, Any]) -> models.Type:
         if data == {}:
             # Парсинг пустой схемы
             # application/json:
@@ -147,7 +145,7 @@ class SchemaParser:
                 raise Exception(f'Unable to parse schema "{id}", unknown type "{raw_data_type}" on "{data}"')
         return data_type
 
-    def _parse_format(self, data: Dict[str, Any]) -> Optional[models.Format]:
+    def _parse_format(self, data: dict[str, Any]) -> Optional[models.Format]:
         data_format = data.get('format')
         if data_format:
             try:
@@ -156,7 +154,7 @@ class SchemaParser:
                 raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
         return None
 
-    def _get_description(self, data: Dict[str, Any]) -> Optional[str]:
+    def _get_description(self, data: dict[str, Any]) -> Optional[str]:
         description = data.get("description", "")
         if description:
             description = description.replace("\n", "\\n")
@@ -166,7 +164,7 @@ class SchemaParser:
 
     def _get_discriminator_base_class_schema(
         self,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ) -> Optional[models.DiscriminatorBaseClassSchema]:
         description = data.get("description", "")
         if "__discriminator__" not in description:
@@ -181,8 +179,8 @@ class SchemaParser:
     def _parse_properties(
         self,
         schema_type: models.Type,
-        data: Dict[str, Any],
-    ) -> List[models.SchemaProperty]:
+        data: dict[str, Any],
+    ) -> list[models.SchemaProperty]:
         data_format = data.get('format')
         if data_format:
             try:
@@ -307,8 +305,8 @@ class SchemaParser:
     def _parse_items(
         self,
         parent_schema_id: str,
-        data: Dict[str, Any],
-    ) -> Union[Optional[models.SchemaObject], List[models.SchemaObject]]:
+        data: dict[str, Any],
+    ) -> Union[Optional[models.SchemaObject], list[models.SchemaObject]]:
         items_schema_data = data.get('items')
         if items_schema_data:
             if items_schema_data.get('$ref', None):

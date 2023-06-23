@@ -25,7 +25,7 @@
         {%- endif %}
         {%- endfor %}
         {%- if operation.request_body %}
-        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, Dict[str, Any]]] = None,
+        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, dict[str, Any]]] = None,
         {%- endif %}
         {#- optional query params -#}
         {%- for parameter in operation.query_params -%}
@@ -44,7 +44,7 @@
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and not operation.request_body.are_files_required %}
         files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
         {%- endif %}
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> {{ responserepr(operation.responses) }}:
         url = self._get_url(f'{{ path }}')
 

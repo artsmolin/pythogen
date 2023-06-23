@@ -1,6 +1,5 @@
 import logging
 from typing import Any
-from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.parameters import ParameterParser
@@ -29,10 +28,10 @@ class OperationParser:
         self._parameters_parser = parameters_parser
 
     def parse_item(
-        self, path_str: str, method: models.HttpMethod, operation_data: Dict[str, Any]
+        self, path_str: str, method: models.HttpMethod, operation_data: dict[str, Any]
     ) -> models.OperationObject:
         """Спарсить спецификацию метода ручки (POST-, GET-, PUT-запроса и т.п.)"""
-        responses: Dict[str, models.ResponseObject] = {}
+        responses: dict[str, models.ResponseObject] = {}
 
         for status_code, response_data in operation_data['responses'].items():
             if status_code == 'default':

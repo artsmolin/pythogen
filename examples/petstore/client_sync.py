@@ -27,8 +27,6 @@ except ImportError:
 import logging
 from typing import IO
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -50,8 +48,8 @@ class RequestBox:
     client_name: str
     method: str
     url: str
-    params: Dict[str, Any]
-    headers: Dict[str, Any]
+    params: dict[str, Any]
+    headers: dict[str, Any]
     content: Any
 
 
@@ -62,7 +60,7 @@ class ResponseBox:
 
 class BaseLogsIntegration(abc.ABC):
     @abc.abstractmethod
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         ...
 
     @abc.abstractmethod
@@ -75,7 +73,7 @@ class BaseLogsIntegration(abc.ABC):
 
 
 class DefaultLogsIntegration(BaseLogsIntegration):
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {"props": {"data": kwargs}}
 
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
@@ -262,12 +260,12 @@ class Pet(BaseModel):
 
     # required ---
     name: str
-    photoUrls: List[str]
+    photoUrls: list[str]
 
     # optional ---
     id: Optional[int] = None
     category: Optional[Category] = None
-    tags: Optional[List[Tag]] = None
+    tags: Optional[list[Tag]] = None
     status: Optional[Literal["available", "pending", "sold"]] = Field(description="pet status in the store")
 
 
@@ -313,7 +311,7 @@ class Customer(BaseModel):
     # optional ---
     id: Optional[int] = None
     username: Optional[str] = None
-    address: Optional[List[Address]] = None
+    address: Optional[list[Address]] = None
 
 
 class Order(BaseModel):
@@ -344,7 +342,7 @@ class Client:
         timeout: int = 5,
         client_name: str = "",
         client: Optional[httpx.Client] = None,
-        headers: Optional[Dict[str, str]] = None,
+        headers: Optional[dict[str, str]] = None,
         logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.Client(timeout=Timeout(timeout))
@@ -358,8 +356,8 @@ class Client:
         status: Optional[Literal["available", "pending", "sold"]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[List[Pet], EmptyBody]:
+        headers: Optional[dict[str, Any]] = None,
+    ) -> Union[list[Pet], EmptyBody]:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -411,11 +409,11 @@ class Client:
 
     def findPetsByTags(
         self,
-        tags: Optional[List[str]] = None,
+        tags: Optional[list[str]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[List[Pet], EmptyBody]:
+        headers: Optional[dict[str, Any]] = None,
+    ) -> Union[list[Pet], EmptyBody]:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -470,7 +468,7 @@ class Client:
         petId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f"/pet/{petId}")
 
@@ -534,7 +532,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[ReturnspetinventoriesbystatusResponse200]:
         url = self._get_url(f"/store/inventory")
 
@@ -577,7 +575,7 @@ class Client:
         orderId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[Order, EmptyBody]:
         url = self._get_url(f"/store/order/{orderId}")
 
@@ -643,7 +641,7 @@ class Client:
         password: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
         url = self._get_url(f"/user/login")
 
@@ -700,7 +698,7 @@ class Client:
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> None:
         url = self._get_url(f"/user/logout")
 
@@ -740,7 +738,7 @@ class Client:
         username: str,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[User, EmptyBody]:
         url = self._get_url(f"/user/{username}")
 
@@ -802,10 +800,10 @@ class Client:
 
     def addPet(
         self,
-        body: Optional[Union[Pet, Dict[str, Any]]] = None,
+        body: Optional[Union[Pet, dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f"/pet")
 
@@ -871,10 +869,10 @@ class Client:
 
     def addPet(
         self,
-        body: Optional[Union[AddanewpetortagtothestoreRequestBody, Dict[str, Any]]] = None,
+        body: Optional[Union[AddanewpetortagtothestoreRequestBody, dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
         url = self._get_url(f"/pet_or_tag")
 
@@ -945,7 +943,7 @@ class Client:
         status: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f"/pet/{petId}")
 
@@ -1005,11 +1003,11 @@ class Client:
     def uploadFile(
         self,
         petId: int,
-        body: Optional[Union[bytes, Dict[str, Any]]] = None,
+        body: Optional[Union[bytes, dict[str, Any]]] = None,
         additional_metadata: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[ApiResponse]:
         url = self._get_url(f"/pet/{petId}/uploadImage")
 
@@ -1066,10 +1064,10 @@ class Client:
 
     def placeOrder(
         self,
-        body: Optional[Union[Order, Dict[str, Any]]] = None,
+        body: Optional[Union[Order, dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[Order, EmptyBody]:
         url = self._get_url(f"/store/order")
 
@@ -1135,10 +1133,10 @@ class Client:
 
     def createUser(
         self,
-        body: Optional[Union[User, Dict[str, Any]]] = None,
+        body: Optional[Union[User, dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> None:
         url = self._get_url(f"/user")
 
@@ -1190,10 +1188,10 @@ class Client:
 
     def createUsersWithListInput(
         self,
-        body: Optional[Union[List[User], Dict[str, Any]]] = None,
+        body: Optional[Union[list[User], dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[User]:
         url = self._get_url(f"/user/createWithList")
 
@@ -1210,7 +1208,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, List[User]):
+        elif isinstance(body, list[User]):
             json = body.dict(by_alias=True)
         else:
             json = None
@@ -1248,10 +1246,10 @@ class Client:
 
     def updatePet(
         self,
-        body: Optional[Union[Pet, Dict[str, Any]]] = None,
+        body: Optional[Union[Pet, dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Union[EmptyBody, Pet]:
         url = self._get_url(f"/pet")
 
@@ -1340,10 +1338,10 @@ class Client:
     def updateUser(
         self,
         username: str,
-        body: Optional[Union[User, Dict[str, Any]]] = None,
+        body: Optional[Union[User, dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> None:
         url = self._get_url(f"/user/{username}")
 
@@ -1399,7 +1397,7 @@ class Client:
         api_key: Optional[str] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f"/pet/{petId}")
 
@@ -1459,7 +1457,7 @@ class Client:
         orderId: int,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f"/store/order/{orderId}")
 
@@ -1528,7 +1526,7 @@ class Client:
         username: str,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        headers: Optional[Dict[str, Any]] = None,
+        headers: Optional[dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
         url = self._get_url(f"/user/{username}")
 
@@ -1598,7 +1596,7 @@ class Client:
     def _get_url(self, path: str) -> str:
         return f"{self.base_url}{path}"
 
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {"extra": {"props": {"data": kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
@@ -1621,7 +1619,7 @@ class Client:
             ),
         )
 
-    def _parse_any_of(self, item: Dict[str, Any], schema_classes: List[Any]) -> Any:
+    def _parse_any_of(self, item: dict[str, Any], schema_classes: list[Any]) -> Any:
         for schema_class in schema_classes:
             try:
                 return schema_class.parse_obj(item)

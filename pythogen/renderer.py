@@ -4,9 +4,7 @@ that was parsed from an OpenAPI file.
 """
 import logging
 from dataclasses import dataclass
-from typing import Dict
 from typing import Generic
-from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import TypeVar
@@ -33,7 +31,7 @@ def render_client(
     name: str,
     sync: bool,
     metrics: bool,
-    required_headers: Optional[List[str]] = None,
+    required_headers: Optional[list[str]] = None,
 ) -> None:
     """Отрисовывает сгенерированный клиент на основе j2-шаблонов
 
@@ -81,12 +79,12 @@ def render_client(
 
 @dataclass
 class PreparedOperations(Generic[PathStr]):
-    get: Dict[PathStr, models.OperationObject]
-    post: Dict[PathStr, models.OperationObject]
-    post_no_body: Dict[PathStr, models.OperationObject]
-    put: Dict[PathStr, models.OperationObject]
-    patch: Dict[PathStr, models.OperationObject]
-    delete_no_body: Dict[PathStr, models.OperationObject]
+    get: dict[PathStr, models.OperationObject]
+    post: dict[PathStr, models.OperationObject]
+    post_no_body: dict[PathStr, models.OperationObject]
+    put: dict[PathStr, models.OperationObject]
+    patch: dict[PathStr, models.OperationObject]
+    delete_no_body: dict[PathStr, models.OperationObject]
 
 
 def prepare_operations(document: models.Document) -> PreparedOperations:
@@ -117,7 +115,7 @@ def prepare_operations(document: models.Document) -> PreparedOperations:
     return prepared_operations
 
 
-def iterresponsemap(responses: models.ResponsesObject) -> List[Tuple[str, str]]:
+def iterresponsemap(responses: models.ResponsesObject) -> list[Tuple[str, str]]:
     mapping = []
 
     for code, response in responses.patterned.items():
@@ -226,7 +224,7 @@ def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document]
     if document:
         schema = document.schemas.get(schema.id, schema)
 
-    representation = 'Dict'
+    representation = 'dict'
 
     if schema.type in primitive_type_mapping:
         if schema.enum:
@@ -259,10 +257,10 @@ def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document]
                 items.append(primitives_items_str)
 
             items_str = ', '.join(items)
-            representation = f'List[Union[{items_str}]]'
+            representation = f'list[Union[{items_str}]]'
         else:
             item = j2_typerepr(schema.items)  # type: ignore
-            representation = f'List[{item}]'
+            representation = f'list[{item}]'
 
     elif schema.type == models.Type.any_of:
         representation = classname(schema.id)

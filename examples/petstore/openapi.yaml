@@ -849,7 +849,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/User'
-      description: List of user object
+      description: list of user object
   securitySchemes:
     petstore_auth:
       type: oauth2

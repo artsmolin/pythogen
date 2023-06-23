@@ -1,6 +1,5 @@
 import re
 from typing import Any
-from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.references import RefResolver
@@ -8,12 +7,12 @@ from pythogen.parsers.schemas import SchemaParser
 
 
 class ParameterParser:
-    def __init__(self, ref_resolver: RefResolver, schema_parser: SchemaParser, openapi_data: Dict[str, Any]) -> None:
+    def __init__(self, ref_resolver: RefResolver, schema_parser: SchemaParser, openapi_data: dict[str, Any]) -> None:
         self._openapi_data = openapi_data
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
 
-    def parse_collections(self) -> Dict[str, models.ParameterObject]:
+    def parse_collections(self) -> dict[str, models.ParameterObject]:
         parameters = self._openapi_data["components"].get('parameters', {})
         result = {}
         for parameter_id, parameter_data in parameters.items():
@@ -28,7 +27,7 @@ class ParameterParser:
         resolved_ref = self._ref_resolver.resolve(ref)
         return self.parse_item(id_, resolved_ref.ref_data)
 
-    def parse_item(self, id_: str, data: Dict[str, Any]) -> models.ParameterObject:
+    def parse_item(self, id_: str, data: dict[str, Any]) -> models.ParameterObject:
         schema_data = data['schema']
         if schema_data.get('$ref', None):
             resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])

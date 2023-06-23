@@ -219,7 +219,7 @@ paths:
     get:
       tags:
         - test
-      summary: Get List objects
+      summary: Get list objects
       operationId: get_list_objects
       responses:
         '200':

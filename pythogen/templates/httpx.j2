@@ -23,10 +23,10 @@ try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-from typing import List
+
 from typing import Tuple
 from typing import Any
-from typing import Dict
+
 from typing import Optional
 from typing import Union
 from typing import Callable
@@ -100,8 +100,8 @@ class RequestBox:
     client_name: str
     method: str
     url: str
-    params: Dict[str, Any]
-    headers: Dict[str, Any]
+    params: dict[str, Any]
+    headers: dict[str, Any]
     content: Any
 
 
@@ -112,7 +112,7 @@ class ResponseBox:
 
 class BaseLogsIntegration(abc.ABC):
     @abc.abstractmethod
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]: ...
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]: ...
 
     @abc.abstractmethod
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
@@ -122,7 +122,7 @@ class BaseLogsIntegration(abc.ABC):
 
 
 class DefaultLogsIntegration(BaseLogsIntegration):
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {'props': {'data': kwargs}}
 
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
@@ -257,7 +257,7 @@ class {{ name }}:
         {%- else %}
         client: Optional[httpx.AsyncClient] = None,
         {%- endif %}
-        headers: Optional[Dict[str, str]] = None,
+        headers: Optional[dict[str, str]] = None,
         {%- if metrics %}
         metrics_integration: Optional[BaseMetricsIntegration] = None,
         {%- endif %}
@@ -316,7 +316,7 @@ class {{ name }}:
     def _get_url(self, path: str) -> str:
         return f'{self.base_url}{path}'
 
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {'extra': {'props': {'data': kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
@@ -339,7 +339,7 @@ class {{ name }}:
             ),
         )
 
-    def _parse_any_of(self, item: Dict[str, Any], schema_classes: List[Any]) -> Any:
+    def _parse_any_of(self, item: dict[str, Any], schema_classes: list[Any]) -> Any:
         for schema_class in schema_classes:
             try:
                 return schema_class.parse_obj(item)

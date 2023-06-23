@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Dict
 
 from pythogen import models
 from pythogen.parsers.operations import OperationParser
@@ -47,22 +46,22 @@ class PathParser:
         ref_resolver: RefResolver,
         schema_parser: SchemaParser,
         operation_parser: OperationParser,
-        openapi_data: Dict[str, Any],
+        openapi_data: dict[str, Any],
     ) -> None:
         self._openapi_data = openapi_data
         self._ref_resolver = ref_resolver
         self._schema_parser = schema_parser
         self._operation_parser = operation_parser
 
-    def parse_collection(self) -> Dict[str, models.PathItemObject]:
+    def parse_collection(self) -> dict[str, models.PathItemObject]:
         """Спарсить спецификацию всех ручек из OpenAPI-спеки"""
-        parsed_paths: Dict[str, models.PathItemObject] = {}
+        parsed_paths: dict[str, models.PathItemObject] = {}
         paths = self._openapi_data.get('paths', {})
         for path_str, path_item_data in paths.items():
             parsed_paths[path_str] = self.parse_item(path_str, path_item_data)
         return parsed_paths
 
-    def parse_item(self, path_str: str, path_data: Dict[str, Any]) -> models.PathItemObject:
+    def parse_item(self, path_str: str, path_data: dict[str, Any]) -> models.PathItemObject:
         """Спарсить спецификацию ручки"""
         operations = {}
 
