@@ -19,6 +19,7 @@ from datetime import datetime
 from datetime import date
 
 from httpx import Timeout
+
 try:
     from typing import Literal
 except ImportError:
@@ -69,18 +70,21 @@ class ResponseBox:
 
 class BaseLogsIntegration(abc.ABC):
     @abc.abstractmethod
-    def log_extra(self, **kwargs: Any) -> Dict[str, Any]: ...
+    def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
+        ...
 
     @abc.abstractmethod
-    def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        ...
 
     @abc.abstractmethod
-    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        ...
 
 
 class DefaultLogsIntegration(BaseLogsIntegration):
     def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
-        return {'props': {'data': kwargs}}
+        return {"props": {"data": kwargs}}
 
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
         msg = f"request error"
@@ -117,6 +121,7 @@ class DefaultLogsIntegration(BaseLogsIntegration):
         else:
             return logging.INFO
 
+
 FileContent = Union[IO[str], IO[bytes], str, bytes]
 FileTypes = Union[
     # file (or text)
@@ -143,10 +148,10 @@ class BaseObjectResp(BaseModel):
     @validator("string_data", pre=True)
     def check(cls, v: str) -> str:
         type_hints = get_type_hints(cls)
-        string_data_values: Tuple[str] = type_hints["string_data"].__dict__['__args__']
+        string_data_values: Tuple[str] = type_hints["string_data"].__dict__["__args__"]
 
         if v not in string_data_values:
-            raise ValueError(f'invalid string_data for {cls}')
+            raise ValueError(f"invalid string_data for {cls}")
 
         return v
 
@@ -155,9 +160,10 @@ class PostObjectWithRequestBodyAnyOfRequestBody(BaseModel):
     """
     None
     """
+
     __root__: Union[
-        'Data',
-        'PostObjectData',
+        "Data",
+        "PostObjectData",
     ]
 
 
@@ -255,9 +261,10 @@ class AnimalObj(BaseModel):
     """
     None
     """
+
     __root__: Union[
-        'Cat',
-        'Dog',
+        "Cat",
+        "Dog",
     ]
 
 
@@ -265,9 +272,10 @@ class AnyOfChildObj(BaseModel):
     """
     None
     """
+
     __root__: Union[
-        'GetObjectResp',
-        'Cat',
+        "GetObjectResp",
+        "Cat",
     ]
 
 
@@ -292,7 +300,9 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     # required ---
 
     # optional ---
-    string_data: Optional[str] = Field(description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
+    string_data: Optional[str] = Field(
+        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+    )
     integer_data: Optional[int] = None
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
@@ -306,10 +316,20 @@ class TestSafetyKey(BaseModel):
     # required ---
 
     # optional ---
-    for_: Optional[str] = Field(description="reserved word, expecting \"for_\"", alias="for")
-    class_: Optional[str] = Field(description="reserved word, expecting \"class_\"", alias="class")
-    with_dot_and_hyphens: Optional[int] = Field(description="invalid identifier, expecting \"with_dot_and_hyphens\"", alias="33with.dot-and-hyphens&*")
-    old_feature_priority: Optional[int] = Field(description="__safety_key__(old_feature_priority) invalid identifier, expecting \"old_feature_priority\"", alias="34with.dot-and-hyphens&*")
+    for_: Optional[str] = Field(
+        description='reserved word, expecting "for_"', alias="for"
+    )
+    class_: Optional[str] = Field(
+        description='reserved word, expecting "class_"', alias="class"
+    )
+    with_dot_and_hyphens: Optional[int] = Field(
+        description='invalid identifier, expecting "with_dot_and_hyphens"',
+        alias="33with.dot-and-hyphens&*",
+    )
+    old_feature_priority: Optional[int] = Field(
+        description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
+        alias="34with.dot-and-hyphens&*",
+    )
 
     class Config:
         # Обращение по имени поля, даже если есть алиас.
@@ -416,7 +436,9 @@ class PostObjectData(BaseModel):
     integer_data: int
     array_data: List[str]
     boolean_data: bool
-    event_data: Dict = Field(description="__safety_key__(event_data)", alias="event-data")
+    event_data: Dict = Field(
+        description="__safety_key__(event_data)", alias="event-data"
+    )
 
     # optional ---
     date: Optional[date] = None
@@ -458,7 +480,9 @@ class GetObjectResp(BaseModel):
     # required ---
 
     # optional ---
-    string_data: Optional[str] = Field(description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
+    string_data: Optional[str] = Field(
+        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+    )
     integer_data: Optional[int] = None
     array_data: Optional[List[str]] = None
     boolean_data: Optional[bool] = None
@@ -512,10 +536,10 @@ class Client:
         self.headers = headers or {}
         self.logs_integration = logs_integration
         self.client_name = client_name
-        
-        if set(['X-API-KEY', 'X-API-SECRET']) != set(self.headers):
+
+        if set(["X-API-KEY", "X-API-SECRET"]) != set(self.headers):
             raise RequiredHeaders("Headers ['X-API-KEY', 'X-API-SECRET'] is required")
-    
+
     async def get_object_no_ref_schema(
         self,
         object_id: str,
@@ -525,13 +549,13 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetObjectNoRefSchemaResponse200]:
-        url = self._get_url(f'/objects/no-ref-schema/{object_id}')
+        url = self._get_url(f"/objects/no-ref-schema/{object_id}")
 
         params = {
-            'from': from_,
+            "from": from_,
         }
         if return_error is not None:
-            params['return_error'] = return_error
+            params["return_error"] = return_error
 
         headers_ = self.headers.copy()
 
@@ -541,14 +565,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -564,7 +590,7 @@ class Client:
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
-    
+
     async def get_object(
         self,
         object_id: str,
@@ -574,13 +600,13 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[UnknownError, GetObjectResp]:
-        url = self._get_url(f'/objects/{object_id}')
+        url = self._get_url(f"/objects/{object_id}")
 
         params = {
-            'from': from_,
+            "from": from_,
         }
         if return_error is not None:
-            params['return_error'] = return_error
+            params["return_error"] = return_error
 
         headers_ = self.headers.copy()
 
@@ -590,14 +616,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -625,17 +653,16 @@ class Client:
                 self.logs_integration.log_error(req, resp)
 
             return UnknownError.parse_obj(response.json())
-    
+
     async def get_object_with_inline_array(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[List[GetObjectWithInlineArrayResponse200Item]]:
-        url = self._get_url(f'/object-with-array-response')
+        url = self._get_url(f"/object-with-array-response")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -645,14 +672,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -667,18 +696,20 @@ class Client:
         )
 
         if response.status_code == 200:
-            return [GetObjectWithInlineArrayResponse200Item.parse_obj(item) for item in response.json()]
-    
+            return [
+                GetObjectWithInlineArrayResponse200Item.parse_obj(item)
+                for item in response.json()
+            ]
+
     async def get_object_with_inline_array(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetObjectWithInlineArrayResponse200]:
-        url = self._get_url(f'/object-with-inline-array')
+        url = self._get_url(f"/object-with-inline-array")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -688,14 +719,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -711,17 +744,16 @@ class Client:
 
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
-    
+
     async def get_list_objects(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[List[GetObjectResp]]:
-        url = self._get_url(f'/objects')
+        url = self._get_url(f"/objects")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -731,14 +763,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -754,17 +788,16 @@ class Client:
 
         if response.status_code == 200:
             return [GetObjectResp.parse_obj(item) for item in response.json()]
-    
+
     async def get_text(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetTextResponse200]:
-        url = self._get_url(f'/text')
+        url = self._get_url(f"/text")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -774,14 +807,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -797,17 +832,16 @@ class Client:
 
         if response.status_code == 200:
             return GetTextResponse200(text=response.text)
-    
+
     async def get_text_as_integer(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetTextAsIntegerResponse200]:
-        url = self._get_url(f'/text_as_integer')
+        url = self._get_url(f"/text_as_integer")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -817,14 +851,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -840,17 +876,16 @@ class Client:
 
         if response.status_code == 200:
             return GetTextAsIntegerResponse200(text=response.text)
-    
+
     async def get_empty(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
-        url = self._get_url(f'/empty')
+        url = self._get_url(f"/empty")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -860,14 +895,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -883,17 +920,16 @@ class Client:
 
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
-    
+
     async def get_binary(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[GetBinaryResponse200]:
-        url = self._get_url(f'/binary')
+        url = self._get_url(f"/binary")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -903,14 +939,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -926,17 +964,16 @@ class Client:
 
         if response.status_code == 200:
             return GetBinaryResponse200(content=response.content)
-    
+
     async def get_allof(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[AllOfResp]:
-        url = self._get_url(f'/allof')
+        url = self._get_url(f"/allof")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -946,14 +983,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -969,7 +1008,7 @@ class Client:
 
         if response.status_code == 200:
             return AllOfResp.parse_obj(response.json())
-    
+
     async def get_object_slow(
         self,
         object_id: str,
@@ -978,12 +1017,11 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[UnknownError, GetObjectResp]:
-        url = self._get_url(f'/slow/objects/{object_id}')
+        url = self._get_url(f"/slow/objects/{object_id}")
 
-        params = {
-        }
+        params = {}
         if return_error is not None:
-            params['return_error'] = return_error
+            params["return_error"] = return_error
 
         headers_ = self.headers.copy()
 
@@ -993,14 +1031,16 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "get", url, headers=headers_, params=params, content=content, auth=auth_
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1028,17 +1068,16 @@ class Client:
                 self.logs_integration.log_error(req, resp)
 
             return UnknownError.parse_obj(response.json())
-    
+
     async def post_object_without_body(
         self,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
-        url = self._get_url(f'/post-without-body')
+        url = self._get_url(f"/post-without-body")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1048,14 +1087,21 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("post", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "post",
+                url,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1071,7 +1117,7 @@ class Client:
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
-    
+
     async def post_object(
         self,
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
@@ -1079,10 +1125,9 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
-        url = self._get_url(f'/objects')
+        url = self._get_url(f"/objects")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1092,21 +1137,29 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1122,7 +1175,7 @@ class Client:
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
-    
+
     async def post_form_object(
         self,
         body: Optional[Union[PostObjectData, Dict[str, Any]]] = None,
@@ -1130,10 +1183,9 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
-        url = self._get_url(f'/objects-form-data')
+        url = self._get_url(f"/objects-form-data")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1143,22 +1195,30 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
-        headers_.update({'Content-Type': 'application/x-www-form-urlencoded'})
+
+        headers_.update({"Content-Type": "application/x-www-form-urlencoded"})
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "post",
+                url,
+                data=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1174,19 +1234,20 @@ class Client:
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
-    
+
     async def post_multipart_form_data(
         self,
         body: Optional[Union[PostFile, Dict[str, Any]]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
-        files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
+        files: Optional[
+            Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]
+        ] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
-        url = self._get_url(f'/multipart-form-data')
+        url = self._get_url(f"/multipart-form-data")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1196,25 +1257,34 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostFile):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
+
         # Content-Type=multipart/form-data doesn't work, because header MUST contain boundaries
         # let library do it for us
         headers_.pop("Content-Type", None)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("post", url, data=json, headers=headers_, params=params, content=content, auth=auth_, files=files)
+            response = await self.client.request(
+                "post",
+                url,
+                data=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+                files=files,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1230,18 +1300,19 @@ class Client:
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
-    
+
     async def request_body_anyof(
         self,
-        body: Optional[Union[PostObjectWithRequestBodyAnyOfRequestBody, Dict[str, Any]]] = None,
+        body: Optional[
+            Union[PostObjectWithRequestBodyAnyOfRequestBody, Dict[str, Any]]
+        ] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PostObjectResp]:
-        url = self._get_url(f'/request-body-anyof')
+        url = self._get_url(f"/request-body-anyof")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1251,21 +1322,29 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectWithRequestBodyAnyOfRequestBody):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("post", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1281,7 +1360,7 @@ class Client:
 
         if response.status_code == 200:
             return PostObjectResp.parse_obj(response.json())
-    
+
     async def patch_object(
         self,
         object_id: str,
@@ -1290,10 +1369,9 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PatchObjectResp]:
-        url = self._get_url(f'/objects/{object_id}')
+        url = self._get_url(f"/objects/{object_id}")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1303,21 +1381,29 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PatchObjectData):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("patch", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "patch",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="patch",
@@ -1333,7 +1419,7 @@ class Client:
 
         if response.status_code == 200:
             return PatchObjectResp.parse_obj(response.json())
-    
+
     async def put_object(
         self,
         object_id: str,
@@ -1342,10 +1428,9 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PutObjectResp]:
-        url = self._get_url(f'/objects/{object_id}')
+        url = self._get_url(f"/objects/{object_id}")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1355,21 +1440,29 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "put",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="put",
@@ -1385,7 +1478,7 @@ class Client:
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
-    
+
     async def put_object_slow(
         self,
         object_id: str,
@@ -1394,10 +1487,9 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[PutObjectResp]:
-        url = self._get_url(f'/slow/objects/{object_id}')
+        url = self._get_url(f"/slow/objects/{object_id}")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1407,21 +1499,29 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
             json = body.dict(by_alias=True)
         else:
             json = None
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("put", url, json=json, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "put",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="put",
@@ -1437,7 +1537,7 @@ class Client:
 
         if response.status_code == 200:
             return PutObjectResp.parse_obj(response.json())
-    
+
     async def delete_object(
         self,
         object_id: str,
@@ -1445,10 +1545,9 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[DeleteObjectResp]:
-        url = self._get_url(f'/objects/{object_id}')
+        url = self._get_url(f"/objects/{object_id}")
 
-        params = {
-        }
+        params = {}
 
         headers_ = self.headers.copy()
 
@@ -1458,14 +1557,21 @@ class Client:
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
-        
+
         if headers:
             headers_ = headers
         try:
-            response = await self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = await self.client.request(
+                "delete",
+                url,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
-        
+
         req = RequestBox(
             client_name=self.client_name,
             method="delete",
@@ -1481,18 +1587,19 @@ class Client:
 
         if response.status_code == 200:
             return DeleteObjectResp.parse_obj(response.json())
-    
-    
+
     async def close(self) -> None:
         await self.client.aclose()
 
     def _get_url(self, path: str) -> str:
-        return f'{self.base_url}{path}'
+        return f"{self.base_url}{path}"
 
     def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
-        return {'extra': {'props': {'data': kwargs}}}
+        return {"extra": {"props": {"data": kwargs}}}
 
-    def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
+    def log_error(
+        self, client_name: str, method, url: str, params, content, headers
+    ) -> None:
         msg = f"request error"
         msg += f" | client={client_name}"
         msg += f" | method={method}"
@@ -1519,8 +1626,7 @@ class Client:
             except:
                 continue
 
-        raise Exception("Can't parse \"{item}\"")
-
+        raise Exception('Can\'t parse "{item}"')
 
 
 PostObjectWithRequestBodyAnyOfRequestBody.update_forward_refs()

@@ -2,8 +2,6 @@
 Responsible for rendering/generating client code from data
 that was parsed from an OpenAPI file.
 """
-
-
 import logging
 from dataclasses import dataclass
 from typing import Dict
@@ -13,6 +11,7 @@ from typing import Optional
 from typing import Tuple
 from typing import TypeVar
 
+import black
 import inflection
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -59,7 +58,7 @@ def render_client(
 
     prepared_operations = prepare_operations(document)
 
-    rendered_client = template.render(
+    raw_rendered_client = template.render(
         document=document,
         name=name,
         version=document.info.version,
@@ -75,6 +74,7 @@ def render_client(
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
         required_headers=required_headers,
     )
+    rendered_client = black.format_str(raw_rendered_client, mode=black.FileMode())
     with open(output_path, 'w') as output_file:
         output_file.write(rendered_client)
 

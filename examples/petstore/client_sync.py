@@ -76,7 +76,7 @@ class BaseLogsIntegration(abc.ABC):
 
 class DefaultLogsIntegration(BaseLogsIntegration):
     def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
-        return {'props': {'data': kwargs}}
+        return {"props": {"data": kwargs}}
 
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
         msg = f"request error"
@@ -202,8 +202,8 @@ class AddanewpetortagtothestoreRequestBody(BaseModel):
     """
 
     __root__: Union[
-        'Pet',
-        'Tag',
+        "Pet",
+        "Tag",
     ]
 
 
@@ -213,8 +213,8 @@ class AddanewpetortagtothestoreResponse200(BaseModel):
     """
 
     __root__: Union[
-        'Pet',
-        'Tag',
+        "Pet",
+        "Tag",
     ]
 
 
@@ -268,7 +268,7 @@ class Pet(BaseModel):
     id: Optional[int] = None
     category: Optional[Category] = None
     tags: Optional[List[Tag]] = None
-    status: Optional[Literal['available', 'pending', 'sold']] = Field(description="pet status in the store")
+    status: Optional[Literal["available", "pending", "sold"]] = Field(description="pet status in the store")
 
 
 class User(BaseModel):
@@ -328,7 +328,7 @@ class Order(BaseModel):
     petId: Optional[int] = None
     quantity: Optional[int] = None
     shipDate: Optional[datetime] = None
-    status: Optional[Literal['placed', 'approved', 'delivered']] = Field(description="Order Status")
+    status: Optional[Literal["placed", "approved", "delivered"]] = Field(description="Order Status")
     complete: Optional[bool] = None
 
 
@@ -355,16 +355,16 @@ class Client:
 
     def findPetsByStatus(
         self,
-        status: Optional[Literal['available', 'pending', 'sold']] = None,
+        status: Optional[Literal["available", "pending", "sold"]] = None,
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[List[Pet], EmptyBody]:
-        url = self._get_url(f'/pet/findByStatus')
+        url = self._get_url(f"/pet/findByStatus")
 
         params = {}
         if status is not None:
-            params['status'] = status
+            params["status"] = status
 
         headers_ = self.headers.copy()
 
@@ -416,11 +416,11 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[List[Pet], EmptyBody]:
-        url = self._get_url(f'/pet/findByTags')
+        url = self._get_url(f"/pet/findByTags")
 
         params = {}
         if tags is not None:
-            params['tags'] = tags
+            params["tags"] = tags
 
         headers_ = self.headers.copy()
 
@@ -472,7 +472,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[EmptyBody, Pet]:
-        url = self._get_url(f'/pet/{petId}')
+        url = self._get_url(f"/pet/{petId}")
 
         params = {}
 
@@ -536,7 +536,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[ReturnspetinventoriesbystatusResponse200]:
-        url = self._get_url(f'/store/inventory')
+        url = self._get_url(f"/store/inventory")
 
         params = {}
 
@@ -578,8 +578,8 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Order]:
-        url = self._get_url(f'/store/order/{orderId}')
+    ) -> Union[Order, EmptyBody]:
+        url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
 
@@ -644,14 +644,14 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[EmptyBody, LogsuserintothesystemResponse200]:
-        url = self._get_url(f'/user/login')
+    ) -> Union[LogsuserintothesystemResponse200, EmptyBody]:
+        url = self._get_url(f"/user/login")
 
         params = {}
         if username is not None:
-            params['username'] = username
+            params["username"] = username
         if password is not None:
-            params['password'] = password
+            params["password"] = password
 
         headers_ = self.headers.copy()
 
@@ -702,7 +702,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> None:
-        url = self._get_url(f'/user/logout')
+        url = self._get_url(f"/user/logout")
 
         params = {}
 
@@ -741,8 +741,8 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[EmptyBody, User]:
-        url = self._get_url(f'/user/{username}')
+    ) -> Union[User, EmptyBody]:
+        url = self._get_url(f"/user/{username}")
 
         params = {}
 
@@ -807,7 +807,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[EmptyBody, Pet]:
-        url = self._get_url(f'/pet')
+        url = self._get_url(f"/pet")
 
         params = {}
 
@@ -831,7 +831,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -869,8 +875,8 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[EmptyBody, AddanewpetortagtothestoreResponse200]:
-        url = self._get_url(f'/pet_or_tag')
+    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
+        url = self._get_url(f"/pet_or_tag")
 
         params = {}
 
@@ -894,7 +900,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -935,13 +947,13 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
-        url = self._get_url(f'/pet/{petId}')
+        url = self._get_url(f"/pet/{petId}")
 
         params = {}
         if name is not None:
-            params['name'] = name
+            params["name"] = name
         if status is not None:
-            params['status'] = status
+            params["status"] = status
 
         headers_ = self.headers.copy()
 
@@ -955,7 +967,14 @@ class Client:
         if headers:
             headers_ = headers
         try:
-            response = self.client.request("post", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = self.client.request(
+                "post",
+                url,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
 
@@ -992,11 +1011,11 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[ApiResponse]:
-        url = self._get_url(f'/pet/{petId}/uploadImage')
+        url = self._get_url(f"/pet/{petId}/uploadImage")
 
         params = {}
         if additional_metadata is not None:
-            params['additionalMetadata'] = additional_metadata
+            params["additionalMetadata"] = additional_metadata
 
         headers_ = self.headers.copy()
 
@@ -1018,7 +1037,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -1045,8 +1070,8 @@ class Client:
         auth: Optional[BasicAuth] = None,
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Order]:
-        url = self._get_url(f'/store/order')
+    ) -> Union[Order, EmptyBody]:
+        url = self._get_url(f"/store/order")
 
         params = {}
 
@@ -1070,7 +1095,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -1109,7 +1140,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> None:
-        url = self._get_url(f'/user')
+        url = self._get_url(f"/user")
 
         params = {}
 
@@ -1133,7 +1164,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -1158,7 +1195,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[User]:
-        url = self._get_url(f'/user/createWithList')
+        url = self._get_url(f"/user/createWithList")
 
         params = {}
 
@@ -1182,7 +1219,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "post", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "post",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -1210,7 +1253,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Union[EmptyBody, Pet]:
-        url = self._get_url(f'/pet')
+        url = self._get_url(f"/pet")
 
         params = {}
 
@@ -1234,7 +1277,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "put", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "put",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -1296,7 +1345,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> None:
-        url = self._get_url(f'/user/{username}')
+        url = self._get_url(f"/user/{username}")
 
         params = {}
 
@@ -1320,7 +1369,13 @@ class Client:
             headers_ = headers
         try:
             response = self.client.request(
-                "put", url, json=json, headers=headers_, params=params, content=content, auth=auth_
+                "put",
+                url,
+                json=json,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
             )
         except Exception as exc:
             raise exc
@@ -1346,13 +1401,13 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
-        url = self._get_url(f'/pet/{petId}')
+        url = self._get_url(f"/pet/{petId}")
 
         params = {}
 
         headers_ = self.headers.copy()
         if api_key is not None:
-            headers_['api_key'] = api_key
+            headers_["api_key"] = api_key
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -1364,7 +1419,14 @@ class Client:
         if headers:
             headers_ = headers
         try:
-            response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = self.client.request(
+                "delete",
+                url,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
 
@@ -1399,7 +1461,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
-        url = self._get_url(f'/store/order/{orderId}')
+        url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
 
@@ -1415,7 +1477,14 @@ class Client:
         if headers:
             headers_ = headers
         try:
-            response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = self.client.request(
+                "delete",
+                url,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
 
@@ -1461,7 +1530,7 @@ class Client:
         content: Optional[Union[str, bytes]] = None,
         headers: Optional[Dict[str, Any]] = None,
     ) -> Optional[EmptyBody]:
-        url = self._get_url(f'/user/{username}')
+        url = self._get_url(f"/user/{username}")
 
         params = {}
 
@@ -1477,7 +1546,14 @@ class Client:
         if headers:
             headers_ = headers
         try:
-            response = self.client.request("delete", url, headers=headers_, params=params, content=content, auth=auth_)
+            response = self.client.request(
+                "delete",
+                url,
+                headers=headers_,
+                params=params,
+                content=content,
+                auth=auth_,
+            )
         except Exception as exc:
             raise exc
 
@@ -1520,10 +1596,10 @@ class Client:
         self.client.close()
 
     def _get_url(self, path: str) -> str:
-        return f'{self.base_url}{path}'
+        return f"{self.base_url}{path}"
 
     def log_extra(self, **kwargs: Any) -> Dict[str, Any]:
-        return {'extra': {'props': {'data': kwargs}}}
+        return {"extra": {"props": {"data": kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
         msg = f"request error"
@@ -1552,7 +1628,7 @@ class Client:
             except:
                 continue
 
-        raise Exception("Can't parse \"{item}\"")
+        raise Exception('Can\'t parse "{item}"')
 
 
 LogsuserintothesystemResponse200.update_forward_refs()
