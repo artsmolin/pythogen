@@ -1,5 +1,3 @@
-[← README.md](/README.md)
-
 Asynchronous client
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py

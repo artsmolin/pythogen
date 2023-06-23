@@ -1,5 +1,3 @@
-[← README.md](/README.md)
-
 # Metrics
 Pythogen is capable of generating a base class to integrate metrics into the client. To do this, use the `--metrics` flag when generating the client. The `BaseMetricsIntegration` and `DefaultMetricsIntegration` classes will be generated.
 

@@ -1,5 +1,3 @@
-[← README.md](/README.md)
-
 # Development
 - Activate environment
   ```shell

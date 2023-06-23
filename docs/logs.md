@@ -1,5 +1,3 @@
-[← README.md](/README.md)
-
 # Logs
 Logging takes place using integration. By default, an instance of class `DefaultLogsIntegration` is used. To set your own logic, you can create your own class that satisfies the base class `BaseLogsIntegration` and pass it to the instance during client initialization.
 

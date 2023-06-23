@@ -22,28 +22,40 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
   <img src="docs/images/example.png">
 </p>
 
-## Features
-- [Discriminator](/docs/discriminator.md)
-- [Metrics](/docs/metrics.md)
-- [Logs](/docs/logs.md)
-- [Required Headers](/docs/headers.md)
-- [Sync/async clients](/docs/sync_async.md)
-- [Client as python-package](/docs/client_as_pkg.md)
+## Help
+See [documentation](/docs/main.md) for more details.
 
 ## Examples
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
 
-## Installing the library and generating clients
-By Docker
-```shell
-docker pull artsmolin/pythogen
-docker run -v ./path/to/input:/opt/path/to/input -v ./path/to/output:/opt/path/to/output artsmolin/pythogen path/to/input/openapi.yaml path/to/output/client.py
-```
-or directly
+## Installation
+### Pip
 ```shell
 pip install pythogen
+```
+### Docker
+```shell
+docker pull artsmolin/pythogen
+```
+
+## Generation client
+### Pip
+```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
+### Docker
+```shell
+docker run \
+-v ./path/to/input:/opt/path/to/input \
+-v ./path/to/output:/opt/path/to/output \
+artsmolin/pythogen \
+path/to/input/openapi.yaml \
+path/to/output/client.py
+```
+Where
+- `./path/to/input` — path to the directory with openapi.yaml;
+- `./path/to/output` — the path to the directory where the generated client will be saved;
+
 ## Usage client
 ```python
 from petstore.client_async import Client
@@ -53,5 +65,3 @@ from petstore.client_async import EmptyBody
 client = Client(base_url="http://your.base.url")
 pets: list[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
 ```
-
-[Development](/docs/development.md)
