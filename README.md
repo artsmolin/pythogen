@@ -38,7 +38,7 @@ pip install pythogen
 docker pull artsmolin/pythogen
 ```
 
-## Generation client
+## Generation
 - `path/to/input` — path to the directory with openapi.yaml;
 - `path/to/output` — the path to the directory where the generated client will be saved;
 ### Pip
@@ -55,7 +55,7 @@ path/to/input/openapi.yaml \
 path/to/output/client.py
 ```
 
-## Usage client
+## Usage
 ```python
 from petstore.client_async import Client
 from petstore.client_async import Pet
