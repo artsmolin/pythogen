@@ -28,7 +28,6 @@ except ImportError:
 from typing import Tuple
 from typing import Any
 
-from typing import Optional
 from typing import Union
 from typing import Callable
 from typing import get_type_hints
@@ -127,9 +126,9 @@ FileTypes = Union[
     # file (or text)
     FileContent,
     # (filename, file (or text))
-    Tuple[Optional[str], FileContent],
+    tuple[str | None, FileContent],
     # (filename, file (or text), content_type)
-    Tuple[Optional[str], FileContent, Optional[str]],
+    tuple[str | None, FileContent, str | None],
 ]
 
 
@@ -175,8 +174,8 @@ class AllOfRefObj(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[str] = None
-    data: Optional[int] = None
+    id: str | None = None
+    data: int | None = None
 
 
 class GetBinaryResponse200(BaseModel):
@@ -187,7 +186,7 @@ class GetBinaryResponse200(BaseModel):
     # required ---
 
     # optional ---
-    content: Optional[bytes] = None
+    content: bytes | None = None
 
 
 class GetTextAsIntegerResponse200(BaseModel):
@@ -198,7 +197,7 @@ class GetTextAsIntegerResponse200(BaseModel):
     # required ---
 
     # optional ---
-    text: Optional[int] = None
+    text: int | None = None
 
 
 class GetTextResponse200(BaseModel):
@@ -209,7 +208,7 @@ class GetTextResponse200(BaseModel):
     # required ---
 
     # optional ---
-    text: Optional[str] = None
+    text: str | None = None
 
 
 class GetlistobjectsResponse200(BaseModel):
@@ -242,7 +241,7 @@ class GetObjectWithInlineArrayResponse200(BaseModel):
     # required ---
 
     # optional ---
-    rewards: Optional[list[RewardsListItem]] = None
+    rewards: list[RewardsListItem] | None = None
 
 
 class GetObjectWithInlineArrayResponse200Item(BaseModel):
@@ -287,9 +286,9 @@ class TierObj(BaseModel):
     # required ---
 
     # optional ---
-    code: Optional[str] = None
-    name: Optional[str] = None
-    priority: Optional[int] = None
+    code: str | None = None
+    name: str | None = None
+    priority: int | None = None
 
 
 class GetObjectNoRefSchemaResponse200(BaseModel):
@@ -300,12 +299,12 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     # required ---
 
     # optional ---
-    string_data: Optional[str] = Field(
+    string_data: str | None = Field(
         description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
     )
-    integer_data: Optional[int] = None
-    array_data: Optional[list[str]] = None
-    boolean_data: Optional[bool] = None
+    integer_data: int | None = None
+    array_data: list[str] | None = None
+    boolean_data: bool | None = None
 
 
 class TestSafetyKey(BaseModel):
@@ -316,17 +315,15 @@ class TestSafetyKey(BaseModel):
     # required ---
 
     # optional ---
-    for_: Optional[str] = Field(
-        description='reserved word, expecting "for_"', alias="for"
-    )
-    class_: Optional[str] = Field(
+    for_: str | None = Field(description='reserved word, expecting "for_"', alias="for")
+    class_: str | None = Field(
         description='reserved word, expecting "class_"', alias="class"
     )
-    with_dot_and_hyphens: Optional[int] = Field(
+    with_dot_and_hyphens: int | None = Field(
         description='invalid identifier, expecting "with_dot_and_hyphens"',
         alias="33with.dot-and-hyphens&*",
     )
-    old_feature_priority: Optional[int] = Field(
+    old_feature_priority: int | None = Field(
         description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
         alias="34with.dot-and-hyphens&*",
     )
@@ -344,7 +341,7 @@ class UnknownError(BaseModel):
     # required ---
 
     # optional ---
-    code: Optional[str] = None
+    code: str | None = None
 
 
 class DeleteObjectResp(BaseModel):
@@ -355,7 +352,7 @@ class DeleteObjectResp(BaseModel):
     # required ---
 
     # optional ---
-    status: Optional[str] = None
+    status: str | None = None
 
 
 class PutObjectResp(BaseModel):
@@ -366,7 +363,7 @@ class PutObjectResp(BaseModel):
     # required ---
 
     # optional ---
-    status: Optional[str] = None
+    status: str | None = None
 
 
 class PatchObjectResp(BaseModel):
@@ -377,7 +374,7 @@ class PatchObjectResp(BaseModel):
     # required ---
 
     # optional ---
-    status: Optional[str] = None
+    status: str | None = None
 
 
 class PostObjectResp(BaseModel):
@@ -388,7 +385,7 @@ class PostObjectResp(BaseModel):
     # required ---
 
     # optional ---
-    status: Optional[str] = None
+    status: str | None = None
 
 
 class PostFile(BaseModel):
@@ -441,9 +438,9 @@ class PostObjectData(BaseModel):
     )
 
     # optional ---
-    date: Optional[date] = None
-    datetime: Optional[datetime] = None
-    url: Optional[HttpUrl] = None
+    date: date | None = None
+    datetime: datetime | None = None
+    url: HttpUrl | None = None
 
     class Config:
         # Обращение по имени поля, даже если есть алиас.
@@ -458,7 +455,7 @@ class Dog(BaseModel):
     # required ---
 
     # optional ---
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class Cat(BaseModel):
@@ -469,7 +466,7 @@ class Cat(BaseModel):
     # required ---
 
     # optional ---
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class GetObjectResp(BaseModel):
@@ -480,17 +477,17 @@ class GetObjectResp(BaseModel):
     # required ---
 
     # optional ---
-    string_data: Optional[str] = Field(
+    string_data: str | None = Field(
         description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
     )
-    integer_data: Optional[int] = None
-    array_data: Optional[list[str]] = None
-    boolean_data: Optional[bool] = None
-    tier: Optional[TierObj] = None
-    anyOfChild: Optional[AnyOfChildObj] = None
-    child: Optional[GetObjectResp] = None
-    childs: Optional[list[GetObjectResp]] = None
-    animal: Optional[AnimalObj] = None
+    integer_data: int | None = None
+    array_data: list[str] | None = None
+    boolean_data: bool | None = None
+    tier: TierObj | None = None
+    anyOfChild: AnyOfChildObj | None = None
+    child: GetObjectResp | None = None
+    childs: list[GetObjectResp] | None = None
+    animal: AnimalObj | None = None
 
 
 class Data(BaseModel):
@@ -501,8 +498,8 @@ class Data(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[str] = None
-    data: Optional[int] = None
+    id: str | None = None
+    data: int | None = None
 
 
 class AllOfResp(BaseModel):
@@ -513,7 +510,7 @@ class AllOfResp(BaseModel):
     # required ---
 
     # optional ---
-    all_of: Optional[AllOfRefObj] = None
+    all_of: AllOfRefObj | None = None
 
 
 class BasicAuth(BaseModel):
@@ -527,9 +524,9 @@ class Client:
         base_url: str,
         timeout: int = 5,
         client_name: str = "",
-        client: Optional[httpx.AsyncClient] = None,
-        headers: Optional[dict[str, str]] = None,
-        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
+        client: httpx.AsyncClient | None = None,
+        headers: dict[str, str] | None = None,
+        logs_integration: BaseLogsIntegration | None = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
@@ -544,11 +541,11 @@ class Client:
         self,
         object_id: str,
         from_: str,
-        return_error: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[GetObjectNoRefSchemaResponse200]:
+        return_error: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetObjectNoRefSchemaResponse200 | None:
         url = self._get_url(f"/objects/no-ref-schema/{object_id}")
 
         params = {
@@ -595,11 +592,11 @@ class Client:
         self,
         object_id: str,
         from_: str,
-        return_error: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+        return_error: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -656,10 +653,10 @@ class Client:
 
     async def get_object_with_inline_array(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[list[GetObjectWithInlineArrayResponse200Item]]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> list[GetObjectWithInlineArrayResponse200Item] | None:
         url = self._get_url(f"/object-with-array-response")
 
         params = {}
@@ -703,10 +700,10 @@ class Client:
 
     async def get_object_with_inline_array(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[GetObjectWithInlineArrayResponse200]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetObjectWithInlineArrayResponse200 | None:
         url = self._get_url(f"/object-with-inline-array")
 
         params = {}
@@ -747,10 +744,10 @@ class Client:
 
     async def get_list_objects(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[list[GetObjectResp]]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> list[GetObjectResp] | None:
         url = self._get_url(f"/objects")
 
         params = {}
@@ -791,10 +788,10 @@ class Client:
 
     async def get_text(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[GetTextResponse200]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetTextResponse200 | None:
         url = self._get_url(f"/text")
 
         params = {}
@@ -835,10 +832,10 @@ class Client:
 
     async def get_text_as_integer(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[GetTextAsIntegerResponse200]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetTextAsIntegerResponse200 | None:
         url = self._get_url(f"/text_as_integer")
 
         params = {}
@@ -879,10 +876,10 @@ class Client:
 
     async def get_empty(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[EmptyBody]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | None:
         url = self._get_url(f"/empty")
 
         params = {}
@@ -923,10 +920,10 @@ class Client:
 
     async def get_binary(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[GetBinaryResponse200]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetBinaryResponse200 | None:
         url = self._get_url(f"/binary")
 
         params = {}
@@ -967,10 +964,10 @@ class Client:
 
     async def get_allof(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[AllOfResp]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> AllOfResp | None:
         url = self._get_url(f"/allof")
 
         params = {}
@@ -1012,11 +1009,11 @@ class Client:
     async def get_object_slow(
         self,
         object_id: str,
-        return_error: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[GetObjectResp, UnknownError]:
+        return_error: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1071,10 +1068,10 @@ class Client:
 
     async def post_object_without_body(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PostObjectResp]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PostObjectResp | None:
         url = self._get_url(f"/post-without-body")
 
         params = {}
@@ -1120,11 +1117,11 @@ class Client:
 
     async def post_object(
         self,
-        body: Optional[Union[PostObjectData, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PostObjectResp]:
+        body: PostObjectData | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PostObjectResp | None:
         url = self._get_url(f"/objects")
 
         params = {}
@@ -1178,11 +1175,11 @@ class Client:
 
     async def post_form_object(
         self,
-        body: Optional[Union[PostObjectData, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PostObjectResp]:
+        body: PostObjectData | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PostObjectResp | None:
         url = self._get_url(f"/objects-form-data")
 
         params = {}
@@ -1237,14 +1234,12 @@ class Client:
 
     async def post_multipart_form_data(
         self,
-        body: Optional[Union[PostFile, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        files: Optional[
-            Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]
-        ] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PostObjectResp]:
+        body: PostFile | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PostObjectResp | None:
         url = self._get_url(f"/multipart-form-data")
 
         params = {}
@@ -1303,13 +1298,11 @@ class Client:
 
     async def request_body_anyof(
         self,
-        body: Optional[
-            Union[PostObjectWithRequestBodyAnyOfRequestBody, dict[str, Any]]
-        ] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PostObjectResp]:
+        body: PostObjectWithRequestBodyAnyOfRequestBody | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PostObjectResp | None:
         url = self._get_url(f"/request-body-anyof")
 
         params = {}
@@ -1364,11 +1357,11 @@ class Client:
     async def patch_object(
         self,
         object_id: str,
-        body: Optional[Union[PatchObjectData, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PatchObjectResp]:
+        body: PatchObjectData | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PatchObjectResp | None:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {}
@@ -1423,11 +1416,11 @@ class Client:
     async def put_object(
         self,
         object_id: str,
-        body: Optional[Union[PutObjectData, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PutObjectResp]:
+        body: PutObjectData | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PutObjectResp | None:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {}
@@ -1482,11 +1475,11 @@ class Client:
     async def put_object_slow(
         self,
         object_id: str,
-        body: Optional[Union[PutObjectData, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[PutObjectResp]:
+        body: PutObjectData | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> PutObjectResp | None:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1541,10 +1534,10 @@ class Client:
     async def delete_object(
         self,
         object_id: str,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[DeleteObjectResp]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> DeleteObjectResp | None:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {}

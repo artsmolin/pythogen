@@ -27,7 +27,6 @@ except ImportError:
 from typing import Tuple
 from typing import Any
 
-from typing import Optional
 from typing import Union
 from typing import Callable
 from typing import get_type_hints
@@ -60,8 +59,8 @@ except AttributeError:
 class BaseMetricsIntegration(abc.ABC):
     def __init__(
         self,
-        client_response_time_histogram: Optional[Histogram] = None,
-        client_non_http_errors_counter: Optional[Counter] = None,
+        client_response_time_histogram: Histogram | None = None,
+        client_non_http_errors_counter: Counter | None = None,
         shadow_path: bool = True,
     ):
         self._client_response_time_histogram = client_response_time_histogram
@@ -165,9 +164,9 @@ FileTypes = Union[
     # file (or text)
     FileContent,
     # (filename, file (or text))
-    Tuple[Optional[str], FileContent],
+    tuple[str | None, FileContent],
     # (filename, file (or text), content_type)
-    Tuple[Optional[str], FileContent, Optional[str]],
+    tuple[str | None, FileContent, str | None],
 ]
 
 
@@ -223,9 +222,9 @@ class {{ classname(model.id) }}(BaseModel):
     # optional ---
     {%- for property in model.optional_properties %}
         {%- if property.schema.description %}
-    {{ property.key }}: Optional[{{ typerepr(property.schema, document) }}] = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
         {%- else %}
-    {{ property.key }}: Optional[{{ typerepr(property.schema, document) }}] = None
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = None
         {%- endif %}
     {%- endfor %}
 
@@ -253,15 +252,15 @@ class {{ name }}:
         timeout: int = 5,
         client_name: str = "{{ name | replace('Client', '') | lower }}",
         {%- if sync %}
-        client: Optional[httpx.Client] = None,
+        client: httpx.Client | None = None,
         {%- else %}
-        client: Optional[httpx.AsyncClient] = None,
+        client: httpx.AsyncClient | None = None,
         {%- endif %}
-        headers: Optional[dict[str, str]] = None,
+        headers: dict[str, str] | None = None,
         {%- if metrics %}
-        metrics_integration: Optional[BaseMetricsIntegration] = None,
+        metrics_integration: BaseMetricsIntegration | None = None,
         {%- endif %}
-        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
+        logs_integration: BaseLogsIntegration | None = DefaultLogsIntegration(),
     ):
         {%- if sync %}
         self.client = client or httpx.Client(timeout=Timeout(timeout))

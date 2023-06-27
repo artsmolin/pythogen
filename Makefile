@@ -24,6 +24,8 @@ clients-for-examples:
 	python pythogen/entrypoint.py examples/petstore/openapi.yaml examples/petstore/client_async.py
 	python pythogen/entrypoint.py examples/petstore/openapi.yaml examples/petstore/client_sync.py --sync
 
+clients: clients-for-tests clients-for-examples
+
 requirements:
 	pip install --upgrade pip
 	poetry install --remove-untracked
@@ -34,8 +36,5 @@ test:
 
 test-clients:
 	docker-compose up -d --build mock_server ;\
-	docker-compose up --build tests ;\
-	test_status_code=$$? ;\
-	# docker-compose logs mock_server;\
-	docker-compose down --remove-orphans ;\
-	exit $$test_status_code
+	TEST_SERVER_URL=http://localhost:8080 python tests/main.py
+	# docker-compose logs mock_server;

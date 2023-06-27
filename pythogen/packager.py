@@ -6,7 +6,6 @@
 
 import dataclasses
 from pathlib import Path
-from typing import Optional
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -24,7 +23,7 @@ def init_package(
     output_path: str,
     client_class_name: str,
     package_version: str,
-    package_authors: Optional[str] = None,
+    package_authors: str | None = None,
 ) -> InitPackageResponse:
     package_name = f"{client_class_name.lower().replace('client', '')}_client"
 
@@ -39,7 +38,7 @@ def init_package(
     return InitPackageResponse(client_output_path=str(sources_path.joinpath(f'{package_name}.py')))
 
 
-def _create_pyproject_file(output_dir: Path, package_name: str, version: str, authors: Optional[str] = None) -> None:
+def _create_pyproject_file(output_dir: Path, package_name: str, version: str, authors: str | None = None) -> None:
     env = Environment(
         loader=FileSystemLoader(settings.TEMPLATES_DIR_PATH),
         extensions=['jinja2.ext.loopcontrols'],

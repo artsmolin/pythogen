@@ -6,7 +6,7 @@
     {%- endif %}
         self,
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and operation.request_body.are_files_required %}
-        files: Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]],
+        files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]],
         {%- endif %}
         {#- path params -#}
         {%- for parameter in operation.path_params %}
@@ -25,26 +25,26 @@
         {%- endif %}
         {%- endfor %}
         {%- if operation.request_body %}
-        body: Optional[Union[{{ typerepr(operation.request_body.schema) }}, dict[str, Any]]] = None,
+        body: {{ typerepr(operation.request_body.schema) }} | dict[str, Any] | None = None,
         {%- endif %}
         {#- optional query params -#}
         {%- for parameter in operation.query_params -%}
         {%- if not parameter.required %}
-        {{ varname(parameter.key) }}: Optional[{{ typerepr(parameter.schema) }}] = None,
+        {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None,
         {%- endif %}
         {%- endfor %}
         {#- optional headers -#}
         {%- for parameter in operation.headers -%}
         {%- if not parameter.required %}
-        {{ varname(parameter.key) }}: Optional[{{ typerepr(parameter.schema) }}] = None,
+        {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None,
         {%- endif %}
         {%- endfor %}
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and not operation.request_body.are_files_required %}
-        files: Optional[Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]] = None,
+        files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
         {%- endif %}
-        headers: Optional[dict[str, Any]] = None,
+        headers: dict[str, Any] | None = None,
     ) -> {{ responserepr(operation.responses) }}:
         url = self._get_url(f'{{ path }}')
 

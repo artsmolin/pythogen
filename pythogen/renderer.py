@@ -5,8 +5,6 @@ that was parsed from an OpenAPI file.
 import logging
 from dataclasses import dataclass
 from typing import Generic
-from typing import Optional
-from typing import Tuple
 from typing import TypeVar
 
 import black
@@ -31,7 +29,7 @@ def render_client(
     name: str,
     sync: bool,
     metrics: bool,
-    required_headers: Optional[list[str]] = None,
+    required_headers: list[str] | None = None,
 ) -> None:
     """Отрисовывает сгенерированный клиент на основе j2-шаблонов
 
@@ -115,7 +113,7 @@ def prepare_operations(document: models.Document) -> PreparedOperations:
     return prepared_operations
 
 
-def iterresponsemap(responses: models.ResponsesObject) -> list[Tuple[str, str]]:
+def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
     mapping = []
 
     for code, response in responses.patterned.items():
@@ -199,13 +197,12 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         return 'None'
 
     elif len(types) == 1:
-        return f'Optional[{types[0]}]'
+        return f'{types[0]} | None'
     else:
-        union_args = ', '.join(types)
-        return f'Union[{union_args}]'
+        return ' | '.join(types)
 
 
-def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document] = None) -> str:
+def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = None) -> str:
     """Represent data type on j2 template"""
     primitive_type_mapping = {
         models.Type.integer: 'int',
@@ -247,8 +244,8 @@ def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document]
                 else:
                     primitive_items.append(primitive_type_mapping[item.type])
 
-            class_items_str = ', '.join([f'{class_item}' for class_item in class_items])
-            primitives_items_str = ', '.join(primitive_items)
+            class_items_str = ' | '.join([f'{class_item}' for class_item in class_items])
+            primitives_items_str = ' | '.join(primitive_items)
 
             items = []
             if class_items_str:
@@ -256,8 +253,8 @@ def j2_typerepr(schema: models.SchemaObject, document: Optional[models.Document]
             if primitives_items_str:
                 items.append(primitives_items_str)
 
-            items_str = ', '.join(items)
-            representation = f'list[Union[{items_str}]]'
+            items_str = ' | '.join(items)
+            representation = f'list[{items_str}]'
         else:
             item = j2_typerepr(schema.items)  # type: ignore
             representation = f'list[{item}]'

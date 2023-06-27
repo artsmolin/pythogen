@@ -8,8 +8,6 @@ import keyword
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
-from typing import Union
 
 
 class HttpMethod(Enum):
@@ -50,9 +48,9 @@ class ContactObject:
     https://swagger.io/specification/#contact-object
     """
 
-    name: Optional[str]
-    url: Optional[str]
-    email: Optional[str]
+    name: str | None
+    url: str | None
+    email: str | None
 
 
 @dataclass
@@ -62,7 +60,7 @@ class LicenseObject:
     """
 
     name: str
-    url: Optional[str]
+    url: str | None
 
 
 @dataclass
@@ -73,10 +71,10 @@ class InfoObject:
 
     title: str
     version: str
-    description: Optional[str] = None
-    termsOfService: Optional[str] = None
-    contact: Optional[ContactObject] = None
-    license: Optional[LicenseObject] = None
+    description: str | None = None
+    termsOfService: str | None = None
+    contact: ContactObject | None = None
+    license: LicenseObject | None = None
 
 
 class Type(Enum):
@@ -94,7 +92,7 @@ class Type(Enum):
 @dataclass
 class SchemaProperty:
     orig_key: str
-    safety_key: Optional[str]
+    safety_key: str | None
     schema: 'SchemaObject'
 
     @property
@@ -130,17 +128,17 @@ class SchemaObject:
     """
 
     id: str
-    title: Optional[str]
-    required: Optional[list[str]]
-    enum: Optional[list[str]]
+    title: str | None
+    required: list[str] | None
+    enum: list[str] | None
     type: Type
-    format: Optional[Format]
-    items: Optional[Union['SchemaObject', list['SchemaObject']]]
+    format: Format | None
+    items: 'SchemaObject' | list['SchemaObject'] | None
     properties: list[SchemaProperty]
-    description: Optional[str] = None
+    description: str | None = None
 
     # Технические поля
-    discriminator_base_class_schema: Optional[DiscriminatorBaseClassSchema] = None
+    discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None
     is_fake: bool = False
 
     @property
@@ -166,8 +164,8 @@ class ParameterObject:
 
     id: str
     orig_key: str
-    safety_key: Optional[str]
-    description: Optional[str]
+    safety_key: str | None
+    description: str | None
     location: ParameterLocation
     required: bool
     schema: SchemaObject
@@ -184,7 +182,7 @@ class RequestBodyObject:
     """
 
     id: str
-    description: Optional[str]
+    description: str | None
     schema: SchemaObject
     required: bool
     is_form_data: bool
@@ -199,10 +197,10 @@ class OperationObject:
     """
 
     method: HttpMethod
-    summary: Optional[str]
-    description: Optional[str]
-    operation_id: Optional[str]
-    request_body: Optional[RequestBodyObject]
+    summary: str | None
+    description: str | None
+    operation_id: str | None
+    request_body: RequestBodyObject | None
     responses: ResponsesObject
     parameters: list[ParameterObject]
     path_str: str
@@ -220,7 +218,7 @@ class OperationObject:
         return [parameter for parameter in self.parameters if parameter.location == ParameterLocation.header]
 
     @property
-    def fn_name(self) -> Optional[str]:
+    def fn_name(self) -> str | None:
         if self.operation_id is not None:
             return self.operation_id.replace('-', '_')
 
@@ -236,8 +234,8 @@ class PathItemObject:
     https://swagger.io/specification/#path-item-object
     """
 
-    summary: Optional[str]
-    description: Optional[str]
+    summary: str | None
+    description: str | None
     operations: dict[HttpMethod, OperationObject]
 
 
@@ -245,7 +243,7 @@ class PathItemObject:
 class ResponseObject:
     id: str
     description: str
-    schema: Optional[SchemaObject]
+    schema: SchemaObject | None
 
 
 @dataclass

@@ -27,8 +27,6 @@ except ImportError:
 import logging
 from typing import IO
 from typing import Any
-from typing import Optional
-from typing import Tuple
 from typing import Union
 
 import httpx
@@ -117,9 +115,9 @@ FileTypes = Union[
     # file (or text)
     FileContent,
     # (filename, file (or text))
-    Tuple[Optional[str], FileContent],
+    tuple[str | None, FileContent],
     # (filename, file (or text), content_type)
-    Tuple[Optional[str], FileContent, Optional[str]],
+    tuple[str | None, FileContent, str | None],
 ]
 
 
@@ -140,7 +138,7 @@ class LogsuserintothesystemResponse200(BaseModel):
     # required ---
 
     # optional ---
-    text: Optional[str] = None
+    text: str | None = None
 
 
 class CreateslistofuserswithgiveninputarrayRequestBody(BaseModel):
@@ -171,7 +169,7 @@ class UploadsanimageRequestBody(BaseModel):
     # required ---
 
     # optional ---
-    content: Optional[bytes] = None
+    content: bytes | None = None
 
 
 class FindsPetsbytagsResponse200(BaseModel):
@@ -224,9 +222,9 @@ class ApiResponse(BaseModel):
     # required ---
 
     # optional ---
-    code: Optional[int] = None
-    type: Optional[str] = None
-    message: Optional[str] = None
+    code: int | None = None
+    type: str | None = None
+    message: str | None = None
 
 
 class Tag(BaseModel):
@@ -237,8 +235,8 @@ class Tag(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[int] = None
-    name: Optional[str] = None
+    id: int | None = None
+    name: str | None = None
 
 
 class Category(BaseModel):
@@ -249,8 +247,8 @@ class Category(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[int] = None
-    name: Optional[str] = None
+    id: int | None = None
+    name: str | None = None
 
 
 class Pet(BaseModel):
@@ -263,10 +261,10 @@ class Pet(BaseModel):
     photoUrls: list[str]
 
     # optional ---
-    id: Optional[int] = None
-    category: Optional[Category] = None
-    tags: Optional[list[Tag]] = None
-    status: Optional[Literal["available", "pending", "sold"]] = Field(description="pet status in the store")
+    id: int | None = None
+    category: Category | None = None
+    tags: list[Tag] | None = None
+    status: Literal["available", "pending", "sold"] | None = Field(description="pet status in the store")
 
 
 class User(BaseModel):
@@ -277,14 +275,14 @@ class User(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[int] = None
-    username: Optional[str] = None
-    firstName: Optional[str] = None
-    lastName: Optional[str] = None
-    email: Optional[str] = None
-    password: Optional[str] = None
-    phone: Optional[str] = None
-    userStatus: Optional[int] = Field(description="User Status")
+    id: int | None = None
+    username: str | None = None
+    firstName: str | None = None
+    lastName: str | None = None
+    email: str | None = None
+    password: str | None = None
+    phone: str | None = None
+    userStatus: int | None = Field(description="User Status")
 
 
 class Address(BaseModel):
@@ -295,10 +293,10 @@ class Address(BaseModel):
     # required ---
 
     # optional ---
-    street: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    zip: Optional[str] = None
+    street: str | None = None
+    city: str | None = None
+    state: str | None = None
+    zip: str | None = None
 
 
 class Customer(BaseModel):
@@ -309,9 +307,9 @@ class Customer(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[int] = None
-    username: Optional[str] = None
-    address: Optional[list[Address]] = None
+    id: int | None = None
+    username: str | None = None
+    address: list[Address] | None = None
 
 
 class Order(BaseModel):
@@ -322,12 +320,12 @@ class Order(BaseModel):
     # required ---
 
     # optional ---
-    id: Optional[int] = None
-    petId: Optional[int] = None
-    quantity: Optional[int] = None
-    shipDate: Optional[datetime] = None
-    status: Optional[Literal["placed", "approved", "delivered"]] = Field(description="Order Status")
-    complete: Optional[bool] = None
+    id: int | None = None
+    petId: int | None = None
+    quantity: int | None = None
+    shipDate: datetime | None = None
+    status: Literal["placed", "approved", "delivered"] | None = Field(description="Order Status")
+    complete: bool | None = None
 
 
 class BasicAuth(BaseModel):
@@ -341,9 +339,9 @@ class Client:
         base_url: str,
         timeout: int = 5,
         client_name: str = "",
-        client: Optional[httpx.AsyncClient] = None,
-        headers: Optional[dict[str, str]] = None,
-        logs_integration: Optional[BaseLogsIntegration] = DefaultLogsIntegration(),
+        client: httpx.AsyncClient | None = None,
+        headers: dict[str, str] | None = None,
+        logs_integration: BaseLogsIntegration | None = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
@@ -353,11 +351,11 @@ class Client:
 
     async def findPetsByStatus(
         self,
-        status: Optional[Literal["available", "pending", "sold"]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, list[Pet]]:
+        status: Literal["available", "pending", "sold"] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -411,11 +409,11 @@ class Client:
 
     async def findPetsByTags(
         self,
-        tags: Optional[list[str]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, list[Pet]]:
+        tags: list[str] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -470,10 +468,10 @@ class Client:
     async def getPetById(
         self,
         petId: int,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Pet]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -536,10 +534,10 @@ class Client:
 
     async def getInventory(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[ReturnspetinventoriesbystatusResponse200]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> ReturnspetinventoriesbystatusResponse200 | None:
         url = self._get_url(f"/store/inventory")
 
         params = {}
@@ -581,10 +579,10 @@ class Client:
     async def getOrderById(
         self,
         orderId: int,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Order]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -647,12 +645,12 @@ class Client:
 
     async def loginUser(
         self,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, LogsuserintothesystemResponse200]:
+        username: str | None = None,
+        password: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> LogsuserintothesystemResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -708,9 +706,9 @@ class Client:
 
     async def logoutUser(
         self,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
     ) -> None:
         url = self._get_url(f"/user/logout")
 
@@ -750,10 +748,10 @@ class Client:
     async def getUserByName(
         self,
         username: str,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, User]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> User | EmptyBody:
         url = self._get_url(f"/user/{username}")
 
         params = {}
@@ -816,11 +814,11 @@ class Client:
 
     async def addPet(
         self,
-        body: Optional[Union[Pet, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Pet]:
+        body: Pet | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -885,11 +883,11 @@ class Client:
 
     async def addPet(
         self,
-        body: Optional[Union[AddanewpetortagtothestoreRequestBody, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[AddanewpetortagtothestoreResponse200, EmptyBody]:
+        body: AddanewpetortagtothestoreRequestBody | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> AddanewpetortagtothestoreResponse200 | EmptyBody:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -955,12 +953,12 @@ class Client:
     async def updatePetWithForm(
         self,
         petId: int,
-        name: Optional[str] = None,
-        status: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[EmptyBody]:
+        name: str | None = None,
+        status: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | None:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -1019,12 +1017,12 @@ class Client:
     async def uploadFile(
         self,
         petId: int,
-        body: Optional[Union[bytes, dict[str, Any]]] = None,
-        additional_metadata: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[ApiResponse]:
+        body: bytes | dict[str, Any] | None = None,
+        additional_metadata: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> ApiResponse | None:
         url = self._get_url(f"/pet/{petId}/uploadImage")
 
         params = {}
@@ -1080,11 +1078,11 @@ class Client:
 
     async def placeOrder(
         self,
-        body: Optional[Union[Order, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Order]:
+        body: Order | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1149,10 +1147,10 @@ class Client:
 
     async def createUser(
         self,
-        body: Optional[Union[User, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
+        body: User | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
     ) -> None:
         url = self._get_url(f"/user")
 
@@ -1204,11 +1202,11 @@ class Client:
 
     async def createUsersWithListInput(
         self,
-        body: Optional[Union[list[User], dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[User]:
+        body: list[User] | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> User | None:
         url = self._get_url(f"/user/createWithList")
 
         params = {}
@@ -1262,11 +1260,11 @@ class Client:
 
     async def updatePet(
         self,
-        body: Optional[Union[Pet, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Union[EmptyBody, Pet]:
+        body: Pet | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -1354,10 +1352,10 @@ class Client:
     async def updateUser(
         self,
         username: str,
-        body: Optional[Union[User, dict[str, Any]]] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
+        body: User | dict[str, Any] | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
     ) -> None:
         url = self._get_url(f"/user/{username}")
 
@@ -1410,11 +1408,11 @@ class Client:
     async def deletePet(
         self,
         petId: int,
-        api_key: Optional[str] = None,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[EmptyBody]:
+        api_key: str | None = None,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | None:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -1471,10 +1469,10 @@ class Client:
     async def deleteOrder(
         self,
         orderId: int,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[EmptyBody]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | None:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -1540,10 +1538,10 @@ class Client:
     async def deleteUser(
         self,
         username: str,
-        auth: Optional[BasicAuth] = None,
-        content: Optional[Union[str, bytes]] = None,
-        headers: Optional[dict[str, Any]] = None,
-    ) -> Optional[EmptyBody]:
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> EmptyBody | None:
         url = self._get_url(f"/user/{username}")
 
         params = {}

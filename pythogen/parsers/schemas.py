@@ -1,8 +1,6 @@
 import re
 from collections import defaultdict
 from typing import Any
-from typing import Optional
-from typing import Union
 
 from pythogen import models
 from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
@@ -138,14 +136,14 @@ class SchemaParser:
         elif 'anyOf' in data:
             data_type = models.Type.any_of
         else:
-            raw_data_type: Optional[str] = data.get('type')
+            raw_data_type: str | None = data.get('type')
             try:
                 data_type = models.Type(raw_data_type)
             except ValueError:
                 raise Exception(f'Unable to parse schema "{id}", unknown type "{raw_data_type}" on "{data}"')
         return data_type
 
-    def _parse_format(self, data: dict[str, Any]) -> Optional[models.Format]:
+    def _parse_format(self, data: dict[str, Any]) -> models.Format | None:
         data_format = data.get('format')
         if data_format:
             try:
@@ -154,7 +152,7 @@ class SchemaParser:
                 raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
         return None
 
-    def _get_description(self, data: dict[str, Any]) -> Optional[str]:
+    def _get_description(self, data: dict[str, Any]) -> str | None:
         description = data.get("description", "")
         if description:
             description = description.replace("\n", "\\n")
@@ -165,7 +163,7 @@ class SchemaParser:
     def _get_discriminator_base_class_schema(
         self,
         data: dict[str, Any],
-    ) -> Optional[models.DiscriminatorBaseClassSchema]:
+    ) -> models.DiscriminatorBaseClassSchema | None:
         description = data.get("description", "")
         if "__discriminator__" not in description:
             return None
@@ -306,7 +304,7 @@ class SchemaParser:
         self,
         parent_schema_id: str,
         data: dict[str, Any],
-    ) -> Union[Optional[models.SchemaObject], list[models.SchemaObject]]:
+    ) -> models.SchemaObject | list[models.SchemaObject] | None:
         items_schema_data = data.get('items')
         if items_schema_data:
             if items_schema_data.get('$ref', None):
