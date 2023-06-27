@@ -25,7 +25,6 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from typing import Tuple
 from typing import Any
 
 from typing import Union
@@ -147,7 +146,7 @@ class BaseObjectResp(BaseModel):
     @validator("string_data", pre=True)
     def check(cls, v: str) -> str:
         type_hints = get_type_hints(cls)
-        string_data_values: Tuple[str] = type_hints["string_data"].__dict__["__args__"]
+        string_data_values: tuple[str] = type_hints["string_data"].__dict__["__args__"]
 
         if v not in string_data_values:
             raise ValueError(f"invalid string_data for {cls}")
@@ -596,7 +595,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1013,7 +1012,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

@@ -24,7 +24,6 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from typing import Tuple
 from typing import Any
 
 from typing import Union
@@ -185,7 +184,7 @@ class {{ schema.name }}(BaseModel):
     @validator("{{ schema.attr }}", pre=True)
     def check(cls, v: str) -> str:
         type_hints = get_type_hints(cls)
-        {{ schema.attr }}_values: Tuple[str] = type_hints["{{ schema.attr }}"].__dict__['__args__']
+        {{ schema.attr }}_values: tuple[str] = type_hints["{{ schema.attr }}"].__dict__['__args__']
 
         if v not in {{ schema.attr }}_values:
             raise ValueError(f'invalid {{ schema.attr }} for {cls}')
