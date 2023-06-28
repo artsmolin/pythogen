@@ -130,7 +130,7 @@ class EmptyBody(BaseModel):
     text: str
 
 
-class LogsuserintothesystemResponse200(BaseModel):
+class LoginuserResponse200(BaseModel):
     """
     None
     """
@@ -141,7 +141,7 @@ class LogsuserintothesystemResponse200(BaseModel):
     text: str | None = None
 
 
-class CreateslistofuserswithgiveninputarrayRequestBody(BaseModel):
+class CreateuserswithlistinputRequestBody(BaseModel):
     """
     None
     """
@@ -151,7 +151,7 @@ class CreateslistofuserswithgiveninputarrayRequestBody(BaseModel):
     # optional ---
 
 
-class ReturnspetinventoriesbystatusResponse200(BaseModel):
+class GetinventoryResponse200(BaseModel):
     """
     None
     """
@@ -161,7 +161,7 @@ class ReturnspetinventoriesbystatusResponse200(BaseModel):
     # optional ---
 
 
-class UploadsanimageRequestBody(BaseModel):
+class UploadfileRequestBody(BaseModel):
     """
     None
     """
@@ -172,7 +172,7 @@ class UploadsanimageRequestBody(BaseModel):
     content: bytes | None = None
 
 
-class FindsPetsbytagsResponse200(BaseModel):
+class FindpetsbytagsResponse200(BaseModel):
     """
     None
     """
@@ -182,7 +182,7 @@ class FindsPetsbytagsResponse200(BaseModel):
     # optional ---
 
 
-class FindsPetsbystatusResponse200(BaseModel):
+class FindpetsbystatusResponse200(BaseModel):
     """
     None
     """
@@ -192,7 +192,7 @@ class FindsPetsbystatusResponse200(BaseModel):
     # optional ---
 
 
-class AddanewpetortagtothestoreRequestBody(BaseModel):
+class AddpetRequestBody(BaseModel):
     """
     None
     """
@@ -203,7 +203,7 @@ class AddanewpetortagtothestoreRequestBody(BaseModel):
     ]
 
 
-class AddanewpetortagtothestoreResponse200(BaseModel):
+class AddpetResponse200(BaseModel):
     """
     None
     """
@@ -531,7 +531,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> ReturnspetinventoriesbystatusResponse200 | None:
+    ) -> GetinventoryResponse200 | None:
         url = self._get_url(f"/store/inventory")
 
         params = {}
@@ -566,7 +566,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return ReturnspetinventoriesbystatusResponse200.parse_obj(response.json())
+            return GetinventoryResponse200.parse_obj(response.json())
 
     def getOrderById(
         self,
@@ -574,7 +574,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -640,7 +640,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> LogsuserintothesystemResponse200 | EmptyBody:
+    ) -> LoginuserResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -679,7 +679,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return LogsuserintothesystemResponse200(text=response.text)
+            return LoginuserResponse200(text=response.text)
 
         if response.status_code == 400:
             if response.content is None:
@@ -737,7 +737,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> User | EmptyBody:
+    ) -> EmptyBody | User:
         url = self._get_url(f"/user/{username}")
 
         params = {}
@@ -867,11 +867,11 @@ class Client:
 
     def addPet(
         self,
-        body: AddanewpetortagtothestoreRequestBody | dict[str, Any] | None = None,
+        body: AddpetRequestBody | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> AddanewpetortagtothestoreResponse200 | EmptyBody:
+    ) -> EmptyBody | AddpetResponse200:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -887,7 +887,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, AddanewpetortagtothestoreRequestBody):
+        elif isinstance(body, AddpetRequestBody):
             json = body.dict(by_alias=True)
         else:
             json = None
@@ -1066,7 +1066,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1627,14 +1627,14 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-LogsuserintothesystemResponse200.update_forward_refs()
-CreateslistofuserswithgiveninputarrayRequestBody.update_forward_refs()
-ReturnspetinventoriesbystatusResponse200.update_forward_refs()
-UploadsanimageRequestBody.update_forward_refs()
-FindsPetsbytagsResponse200.update_forward_refs()
-FindsPetsbystatusResponse200.update_forward_refs()
-AddanewpetortagtothestoreRequestBody.update_forward_refs()
-AddanewpetortagtothestoreResponse200.update_forward_refs()
+LoginuserResponse200.update_forward_refs()
+CreateuserswithlistinputRequestBody.update_forward_refs()
+GetinventoryResponse200.update_forward_refs()
+UploadfileRequestBody.update_forward_refs()
+FindpetsbytagsResponse200.update_forward_refs()
+FindpetsbystatusResponse200.update_forward_refs()
+AddpetRequestBody.update_forward_refs()
+AddpetResponse200.update_forward_refs()
 ApiResponse.update_forward_refs()
 Tag.update_forward_refs()
 Category.update_forward_refs()

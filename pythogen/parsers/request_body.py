@@ -30,7 +30,7 @@ class RequestBodyParser:
             id_ = resolved_ref.ref_id
         else:
             data = request_body_data
-            id_ = f"{operation_data['summary'].replace(' ', '')}RequestBody"
+            id_ = f"{operation_data['operationId'].replace('_', ' ').title().replace(' ', '')}RequestBody"
 
         files_required = False
         content = data.get('content')

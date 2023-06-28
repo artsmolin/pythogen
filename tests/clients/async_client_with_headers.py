@@ -154,7 +154,7 @@ class BaseObjectResp(BaseModel):
         return v
 
 
-class PostObjectWithRequestBodyAnyOfRequestBody(BaseModel):
+class RequestBodyAnyofRequestBody(BaseModel):
     """
     None
     """
@@ -210,7 +210,7 @@ class GetTextResponse200(BaseModel):
     text: str | None = None
 
 
-class GetlistobjectsResponse200(BaseModel):
+class GetListObjectsResponse200(BaseModel):
     """
     None
     """
@@ -1297,7 +1297,7 @@ class Client:
 
     async def request_body_anyof(
         self,
-        body: PostObjectWithRequestBodyAnyOfRequestBody | dict[str, Any] | None = None,
+        body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
@@ -1317,7 +1317,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, PostObjectWithRequestBodyAnyOfRequestBody):
+        elif isinstance(body, RequestBodyAnyofRequestBody):
             json = body.dict(by_alias=True)
         else:
             json = None
@@ -1621,12 +1621,12 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-PostObjectWithRequestBodyAnyOfRequestBody.update_forward_refs()
+RequestBodyAnyofRequestBody.update_forward_refs()
 AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
 GetTextAsIntegerResponse200.update_forward_refs()
 GetTextResponse200.update_forward_refs()
-GetlistobjectsResponse200.update_forward_refs()
+GetListObjectsResponse200.update_forward_refs()
 RewardsListItem.update_forward_refs()
 GetObjectWithInlineArrayResponse200.update_forward_refs()
 GetObjectWithInlineArrayResponse200Item.update_forward_refs()

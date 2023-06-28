@@ -43,7 +43,9 @@ class OperationParser:
                 response_data = resolved_ref.ref_data
                 response_id = resolved_ref.ref_id
             else:
-                response_id = f"{operation_data['summary'].replace(' ', '')}Response{status_code}"
+                response_id = (
+                    f"{operation_data['operationId'].replace('_', ' ').title().replace(' ', '')}Response{status_code}"
+                )
 
             responses[status_code] = self._response_parser.parse_item(response_id, response_data)
 
