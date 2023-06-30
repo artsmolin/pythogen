@@ -13,30 +13,21 @@
 from __future__ import annotations
 
 import abc
+import logging
 from dataclasses import dataclass
-
-import datetime
-
-from httpx import Timeout
-from typing import Literal
-
+from typing import IO
 from typing import Any
-
-from typing import Union
-from typing import Callable
-from typing import get_type_hints
 from typing import Mapping
 from typing import Sequence
-from typing import IO
-from typing import cast
+from typing import Union
+from typing import get_type_hints
+
 import httpx
+from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import Field
-from pydantic import root_validator
-from pydantic import validator
 from pydantic import HttpUrl
-import logging
-from functools import wraps
+from pydantic import validator
 
 
 # backward compatibility for httpx<0.18.2
@@ -587,7 +578,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -631,7 +622,6 @@ class Client:
             return GetObjectResp.parse_obj(response.json())
 
         if response.status_code == 500:
-            method = "get"
             if response.content is None:
                 content = None
             else:
@@ -1004,7 +994,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1046,7 +1036,6 @@ class Client:
             return GetObjectResp.parse_obj(response.json())
 
         if response.status_code == 500:
-            method = "get"
             if response.content is None:
                 content = None
             else:

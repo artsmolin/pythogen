@@ -9,6 +9,7 @@ from typing import TypeVar
 
 import black
 import inflection
+import isort
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
@@ -71,6 +72,13 @@ def render_client(
         required_headers=required_headers,
     )
     rendered_client = black.format_str(rendered_client, mode=black.FileMode())
+    rendered_client = isort.code(
+        rendered_client,
+        force_grid_wrap=2,
+        lines_after_imports=2,
+        force_single_line=True,
+        line_length=120,
+    )
     # rendered_client = autoflake.fix_code(
     #     rendered_client,
     #     remove_all_unused_imports=True,

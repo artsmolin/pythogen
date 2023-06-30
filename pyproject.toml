@@ -38,6 +38,7 @@ rich = "^12.2.0"
 inflection = "^0.5.1"
 black = "^23.3.0"
 autoflake = "^2.2.0"
+isort = "^5.12.0"
 
 [tool.poetry.scripts]
 pythogen = 'pythogen.entrypoint:run'
