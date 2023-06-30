@@ -15,15 +15,10 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 
-from datetime import datetime
-from datetime import date
+import datetime
 
 from httpx import Timeout
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+from typing import Literal
 
 from typing import Any
 
@@ -486,8 +481,8 @@ class PostObjectData(BaseModel):
     )
 
     # optional ---
-    date: date | None = None
-    datetime: datetime | None = None
+    date: datetime.date | None = None
+    datetime: datetime.datetime | None = None
     url: HttpUrl | None = None
 
     class Config:
@@ -673,7 +668,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1252,7 +1247,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

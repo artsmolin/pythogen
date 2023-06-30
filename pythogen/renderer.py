@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import TypeVar
 
-import autoflake
 import black
 import inflection
 from jinja2 import Environment
@@ -55,7 +54,7 @@ def render_client(
 
     prepared_operations = prepare_operations(document)
 
-    raw_rendered_client = template.render(
+    rendered_client = template.render(
         document=document,
         name=name,
         version=document.info.version,
@@ -71,8 +70,12 @@ def render_client(
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
         required_headers=required_headers,
     )
-    formatted_client = black.format_str(raw_rendered_client, mode=black.FileMode())
-    rendered_client = autoflake.fix_code(formatted_client, remove_all_unused_imports=True)
+    rendered_client = black.format_str(rendered_client, mode=black.FileMode())
+    # rendered_client = autoflake.fix_code(
+    #     rendered_client,
+    #     remove_all_unused_imports=True,
+    #     remove_unused_variables=True,
+    # )
     with open(output_path, 'w') as output_file:
         output_file.write(rendered_client)
 
@@ -215,8 +218,8 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = 
     format_mapping = {
         models.Format.binary: 'bytes',
         models.Format.uri: 'HttpUrl',
-        models.Format.date: 'date',
-        models.Format.date_time: 'datetime',
+        models.Format.date: 'datetime.date',
+        models.Format.date_time: 'datetime.datetime',
     }
 
     # TODO: всегда передавать document в функцию

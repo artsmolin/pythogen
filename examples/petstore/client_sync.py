@@ -13,23 +13,16 @@
 from __future__ import annotations
 
 import abc
-from dataclasses import dataclass
-from datetime import datetime
-
-from httpx import Timeout
-
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
+import datetime
 import logging
+from dataclasses import dataclass
 from typing import IO
 from typing import Any
+from typing import Literal
 from typing import Union
 
 import httpx
+from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -323,7 +316,7 @@ class Order(BaseModel):
     id: int | None = None
     petId: int | None = None
     quantity: int | None = None
-    shipDate: datetime | None = None
+    shipDate: datetime.datetime | None = None
     status: Literal["placed", "approved", "delivered"] | None = Field(description="Order Status")
     complete: bool | None = None
 
@@ -467,7 +460,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -574,7 +567,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Order:
+    ) -> Order | EmptyBody:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -737,7 +730,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | User:
+    ) -> User | EmptyBody:
         url = self._get_url(f"/user/{username}")
 
         params = {}
@@ -802,7 +795,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -871,7 +864,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | AddpetResponse200:
+    ) -> AddpetResponse200 | EmptyBody:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -1066,7 +1059,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Order:
+    ) -> Order | EmptyBody:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1248,7 +1241,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}
