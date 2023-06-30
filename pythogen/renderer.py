@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import TypeVar
 
+import autoflake
 import black
 import inflection
 from jinja2 import Environment
@@ -70,7 +71,8 @@ def render_client(
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
         required_headers=required_headers,
     )
-    rendered_client = black.format_str(raw_rendered_client, mode=black.FileMode())
+    formatted_client = black.format_str(raw_rendered_client, mode=black.FileMode())
+    rendered_client = autoflake.fix_code(formatted_client, remove_all_unused_imports=True)
     with open(output_path, 'w') as output_file:
         output_file.write(rendered_client)
 
