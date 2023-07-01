@@ -13,13 +13,18 @@
 from __future__ import annotations
 
 import abc
+import datetime
 import logging
 from dataclasses import dataclass
+from functools import wraps
 from typing import IO
 from typing import Any
+from typing import Callable
+from typing import Literal
 from typing import Mapping
 from typing import Sequence
 from typing import Union
+from typing import cast
 from typing import get_type_hints
 
 import httpx
@@ -29,6 +34,7 @@ from prometheus_client import Histogram
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
+from pydantic import root_validator
 from pydantic import validator
 
 
@@ -659,7 +665,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -721,6 +727,7 @@ class Client:
             return GetObjectResp.parse_obj(response.json())
 
         if response.status_code == 500:
+            method = "get"
             if response.content is None:
                 content = None
             else:
@@ -1237,7 +1244,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1297,6 +1304,7 @@ class Client:
             return GetObjectResp.parse_obj(response.json())
 
         if response.status_code == 500:
+            method = "get"
             if response.content is None:
                 content = None
             else:
