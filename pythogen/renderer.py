@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import TypeVar
 
+import autoflake
 import black
 import inflection
 import isort
@@ -79,11 +80,10 @@ def render_client(
         force_single_line=True,
         line_length=120,
     )
-    # rendered_client = autoflake.fix_code(
-    #     rendered_client,
-    #     remove_all_unused_imports=True,
-    #     remove_unused_variables=True,
-    # )
+    rendered_client = autoflake.fix_code(
+        rendered_client,
+        remove_all_unused_imports=True,
+    )
     with open(output_path, 'w') as output_file:
         output_file.write(rendered_client)
 

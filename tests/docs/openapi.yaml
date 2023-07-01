@@ -536,10 +536,10 @@ components:
           title: Event-Data
           type: object
           description: __safety_key__(event_data)
-        date:
+        date_attr:
           type: string
           format: date
-        datetime:
+        datetime_attr:
           type: string
           format: date-time
         url:

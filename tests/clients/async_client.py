@@ -16,15 +16,11 @@ import abc
 import datetime
 import logging
 from dataclasses import dataclass
-from functools import wraps
 from typing import IO
 from typing import Any
-from typing import Callable
-from typing import Literal
 from typing import Mapping
 from typing import Sequence
 from typing import Union
-from typing import cast
 from typing import get_type_hints
 
 import httpx
@@ -32,7 +28,6 @@ from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
-from pydantic import root_validator
 from pydantic import validator
 
 
@@ -429,8 +424,8 @@ class PostObjectData(BaseModel):
     )
 
     # optional ---
-    date: datetime.date | None = None
-    datetime: datetime.datetime | None = None
+    date_attr: datetime.date | None = None
+    datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
 
     class Config:
