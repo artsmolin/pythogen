@@ -1,6 +1,4 @@
-<h2 align="center">
-  Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i> and <i>pydantic</i>
-</2>
+<h2 align="center">Awesome python HTTP-clients from  OpenAPI</h2>
 
 ---
 
@@ -13,6 +11,8 @@
 [![license](https://img.shields.io/github/license/artsmolin/pythogen.svg)](https://github.com/artsmolin/pythogen/blob/master/LICENSE)
 
 ---
+
+Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i> and <i>pydantic</i>
 
 ## Examples
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
