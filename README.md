@@ -24,7 +24,7 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 </p>
 
 ## Help
-See [documentation](/docs/main.md) for more details.
+See [documentation](https://artsmolin.github.io/pythogen/) for more details.
 
 ## Examples
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
