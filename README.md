@@ -16,11 +16,11 @@ Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
 
 ## Installation
-### Pip
+Pip
 ```shell
 pip install pythogen
 ```
-### Docker
+Docker
 ```shell
 docker pull artsmolin/pythogen
 ```
@@ -28,11 +28,11 @@ docker pull artsmolin/pythogen
 ## Generation
 - `path/to/input` — path to the directory with openapi.yaml;
 - `path/to/output` — the path to the directory where the generated client will be saved;
-### Pip
+Pip
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
-### Docker
+Docker
 ```shell
 docker run \
 -v ./path/to/input:/opt/path/to/input \
