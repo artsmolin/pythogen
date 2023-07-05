@@ -1,10 +1,3 @@
-<div>
-  <p align="center">
-    <img src="docs/images/logo_long.png" height="auto" width="400px">
-  </p>
-  <br/>
-</div>
-
 Generator of python HTTP-clients from OpenApi specification based on [httpx](https://github.com/projectdiscovery/httpx) and [pydantic](https://github.com/pydantic/pydantic).
 
 [![Build Status](https://github.com/artsmolin/pythogen/actions/workflows/main.yml/badge.svg)](https://github.com/artsmolin/pythogen/actions)
@@ -20,7 +13,7 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 ---
 
 <p align="center">
-  <img src="docs/images/example.png">
+  <img src="[docs/images/example.png](https://github.com/artsmolin/pythogen/raw/main/docs/images/example.png)">
 </p>
 
 ## Help
