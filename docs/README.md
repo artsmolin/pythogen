@@ -18,12 +18,13 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 - [Installation](#installation)
 - [Generation](#generation)
 - [Usage](#usage)
-- [Metrics](#metrics)
-- [Required Headers](#required-headers)
-- [Sync/async client](#syncasync-client)
-- [Generate client as python-package](#generate-client-as-python-package)
-- [Logs](#logs)
-- [Discriminator](#discriminator)
+- [Features](#features)
+  - [Metrics](#metrics)
+  - [Required Headers](#required-headers)
+  - [Sync/async client](#syncasync-client)
+  - [Generate client as python-package](#generate-client-as-python-package)
+  - [Logs](#logs)
+  - [Discriminator](#discriminator)
 - [Examples](#examples)
 
 ## Installation
@@ -64,7 +65,8 @@ client = Client(base_url="http://your.base.url")
 pets: list[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
 ```
 
-## Metrics
+## Features
+### Metrics
 Pythogen is capable of generating a base class to integrate metrics into the client. To do this, use the `--metrics` flag when generating the client. The `BaseMetricsIntegration` and `DefaultMetricsIntegration` classes will be generated.
 
 ```python
@@ -109,7 +111,7 @@ client = Client(
 )
 ```
 
-## Required Headers
+### Required Headers
 Pythogen is able to generate a client that will check headers when instantiating. To do this, use the `--headers` flag when generating the client.
 If the required headers are not passed to the client, the `RequiredHeaders` exception will be raised.
 
@@ -128,7 +130,7 @@ client = Client(
 )
 ```
 
-## Sync/async client
+### Sync/async client
 Asynchronous client
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
@@ -139,7 +141,7 @@ Synchronous client
 pythogen path/to/input/openapi.yaml path/to/output/client.py --sync
 ```
 
-## Generate client as python-package
+### Generate client as python-package
 ```shell
 pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0.1 --package-authors="Rick, Morty"
 ```
@@ -147,7 +149,7 @@ pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0
 - `--package-authors` — optional;
 - `path/to/package/output` — path to the directory where package will be saved.
 
-## Logs
+### Logs
 Logging takes place using integration. By default, an instance of class `DefaultLogsIntegration` is used. To set your own logic, you can create your own class that satisfies the base class `BaseLogsIntegration` and pass it to the instance during client initialization.
 
 Usage with custom integration
@@ -172,7 +174,7 @@ client = Client(
 )
 ```
 
-## Discriminator
+### Discriminator
 Pythogen is able to generate a base class in which the logic of the discriminator is implemented by the value of the specified field. To do this, the desired field in the "description" parameter must contain a text
 ```
 __discriminator__(BaseClassName.field)
