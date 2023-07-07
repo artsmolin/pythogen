@@ -28,10 +28,12 @@ from httpx import Timeout
 from prometheus_client import Counter
 from prometheus_client import Histogram
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
+from pydantic import FieldValidationInfo
 from pydantic import HttpUrl
 from pydantic import RootModel
-from pydantic import validator
+from pydantic import field_validator
 
 
 # backward compatibility for httpx<0.18.2
@@ -180,8 +182,8 @@ class EmptyBody(BaseModel):
 class BaseObjectResp(BaseModel):
     string_data: str
 
-    @validator("string_data", pre=True)
-    def check(cls, v: str) -> str:
+    @field_validator("string_data", mode="before")
+    def check(cls, v: str, info: FieldValidationInfo) -> str:
         type_hints = get_type_hints(cls)
         string_data_values: tuple[str] = type_hints["string_data"].__dict__["__args__"]
 
@@ -206,7 +208,9 @@ class AllOfRefObj(BaseModel):
     All Of
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: str | None = None
@@ -218,7 +222,9 @@ class GetBinaryResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     content: bytes | None = None
@@ -229,7 +235,9 @@ class GetTextAsIntegerResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     text: int | None = None
@@ -240,7 +248,9 @@ class GetTextResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     text: str | None = None
@@ -251,9 +261,9 @@ class GetListObjectsResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class RewardsListItem(BaseModel):
@@ -261,11 +271,13 @@ class RewardsListItem(BaseModel):
     None
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     pricePlanCode: str
     quantity: float
-
-    # optional ---
 
 
 class GetObjectWithInlineArrayResponse200(BaseModel):
@@ -273,7 +285,9 @@ class GetObjectWithInlineArrayResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     rewards: list[RewardsListItem] | None = None
@@ -284,11 +298,13 @@ class GetObjectWithInlineArrayResponse200Item(BaseModel):
     None
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     pricePlanCode: str
     quantity: float
-
-    # optional ---
 
 
 class AnimalObj(RootModel):
@@ -316,7 +332,9 @@ class TierObj(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     code: str | None = None
@@ -329,7 +347,9 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     GetObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     string_data: str | None = Field(
@@ -345,7 +365,9 @@ class TestSafetyKey(BaseModel):
     model for testing safety key
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     for_: str | None = Field(description='reserved word, expecting "for_"', alias="for")
@@ -361,17 +383,15 @@ class TestSafetyKey(BaseModel):
         alias="34with.dot-and-hyphens&*",
     )
 
-    class Config:
-        # Обращение по имени поля, даже если есть алиас.
-        populate_by_name = True
-
 
 class UnknownError(BaseModel):
     """
     UnknownError
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     code: str | None = None
@@ -382,7 +402,9 @@ class DeleteObjectResp(BaseModel):
     DeleteObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -393,7 +415,9 @@ class PutObjectResp(BaseModel):
     PutObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -404,7 +428,9 @@ class PatchObjectResp(BaseModel):
     PatchObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -415,7 +441,9 @@ class PostObjectResp(BaseModel):
     PostObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -426,10 +454,12 @@ class PostFile(BaseModel):
     PostFile
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     text: str
-
-    # optional ---
 
 
 class PutObjectData(BaseModel):
@@ -437,11 +467,13 @@ class PutObjectData(BaseModel):
     PutObjectData
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     id: str
     data: int
-
-    # optional ---
 
 
 class PatchObjectData(BaseModel):
@@ -449,17 +481,23 @@ class PatchObjectData(BaseModel):
     PatchObjectData
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     id: str
     data: int
-
-    # optional ---
 
 
 class PostObjectData(BaseModel):
     """
     PostObjectData
     """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # required ---
     string_data: str
@@ -475,17 +513,15 @@ class PostObjectData(BaseModel):
     datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
 
-    class Config:
-        # Обращение по имени поля, даже если есть алиас.
-        populate_by_name = True
-
 
 class Dog(BaseModel):
     """
     Dog
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     name: str | None = None
@@ -496,7 +532,9 @@ class Cat(BaseModel):
     Cat
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     name: str | None = None
@@ -507,7 +545,9 @@ class GetObjectResp(BaseModel):
     GetObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     string_data: str | None = Field(
@@ -528,7 +568,9 @@ class Data(BaseModel):
     Data
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: str | None = None
@@ -540,7 +582,9 @@ class AllOfResp(BaseModel):
     All Of Resp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     all_of: AllOfRefObj | None = None
@@ -658,7 +702,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1237,7 +1281,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

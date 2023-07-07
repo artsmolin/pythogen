@@ -24,6 +24,7 @@ from typing import Union
 import httpx
 from httpx import Timeout
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import RootModel
 
@@ -129,7 +130,9 @@ class LoginuserResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     text: str | None = None
@@ -140,9 +143,9 @@ class CreateuserswithlistinputRequestBody(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class GetinventoryResponse200(BaseModel):
@@ -150,9 +153,9 @@ class GetinventoryResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class UploadfileRequestBody(BaseModel):
@@ -160,7 +163,9 @@ class UploadfileRequestBody(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     content: bytes | None = None
@@ -171,9 +176,9 @@ class FindpetsbytagsResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class FindpetsbystatusResponse200(BaseModel):
@@ -181,9 +186,9 @@ class FindpetsbystatusResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class AddpetRequestBody(RootModel):
@@ -211,7 +216,9 @@ class ApiResponse(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     code: int | None = None
@@ -224,7 +231,9 @@ class Tag(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -236,7 +245,9 @@ class Category(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -247,6 +258,10 @@ class Pet(BaseModel):
     """
     None
     """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # required ---
     name: str
@@ -264,7 +279,9 @@ class User(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -282,7 +299,9 @@ class Address(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     street: str | None = None
@@ -296,7 +315,9 @@ class Customer(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -309,7 +330,9 @@ class Order(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -347,7 +370,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> list[Pet] | EmptyBody:
+    ) -> EmptyBody | list[Pet]:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -403,7 +426,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> list[Pet] | EmptyBody:
+    ) -> EmptyBody | list[Pet]:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -459,7 +482,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -566,7 +589,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -632,7 +655,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> LoginuserResponse200 | EmptyBody:
+    ) -> EmptyBody | LoginuserResponse200:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -729,7 +752,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> User | EmptyBody:
+    ) -> EmptyBody | User:
         url = self._get_url(f"/user/{username}")
 
         params = {}
@@ -794,7 +817,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -863,7 +886,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> AddpetResponse200 | EmptyBody:
+    ) -> EmptyBody | AddpetResponse200:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -1058,7 +1081,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1240,7 +1263,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}
