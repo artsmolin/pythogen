@@ -229,7 +229,7 @@ class {{ classname(model.id) }}(BaseModel):
     {% if model.optional_properties|length > 0 %}# optional ---{% endif %}
     {%- for property in model.optional_properties %}
         {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(None, description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
         {%- else %}
     {{ property.key }}: {{ typerepr(property.schema, document) }} | None = None
         {%- endif %}

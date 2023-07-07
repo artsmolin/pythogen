@@ -353,7 +353,7 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
 
     # optional ---
     string_data: str | None = Field(
-        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+        None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
     )
     integer_data: int | None = None
     array_data: list[str] | None = None
@@ -370,15 +370,19 @@ class TestSafetyKey(BaseModel):
     )
 
     # optional ---
-    for_: str | None = Field(description='reserved word, expecting "for_"', alias="for")
+    for_: str | None = Field(
+        None, description='reserved word, expecting "for_"', alias="for"
+    )
     class_: str | None = Field(
-        description='reserved word, expecting "class_"', alias="class"
+        None, description='reserved word, expecting "class_"', alias="class"
     )
     with_dot_and_hyphens: int | None = Field(
+        None,
         description='invalid identifier, expecting "with_dot_and_hyphens"',
         alias="33with.dot-and-hyphens&*",
     )
     old_feature_priority: int | None = Field(
+        None,
         description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
         alias="34with.dot-and-hyphens&*",
     )
@@ -551,7 +555,7 @@ class GetObjectResp(BaseModel):
 
     # optional ---
     string_data: str | None = Field(
-        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+        None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
     )
     integer_data: int | None = None
     array_data: list[str] | None = None
