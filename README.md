@@ -11,6 +11,9 @@
 ---
 
 Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i> and <i>pydantic</i>
+> Versions **0.1.*** use pydantic **v1.*** and are no longer supported.
+
+> Versions **0.2.*** use pydantic **v2.***.
 
 ## Examples
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)

@@ -40,6 +40,7 @@ from pydantic import Field
 from pydantic import root_validator
 from pydantic import validator
 from pydantic import HttpUrl
+from pydantic import RootModel
 import logging
 from functools import wraps
 
@@ -191,19 +192,26 @@ class {{ schema.name }}(BaseModel):
 
 {%- for model in models %}
 
+{%- if model.type.value == "any_of"  %}
+class {{ classname(model.id) }}(RootModel):
+    root: list[
+    {% set pipe = joiner(" | ") %}
+    {%- for item in model.items %}
+        {{ pipe() }}{{ item.id }}
+    {%- endfor %}
+    ]
 
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
+
+{%- else %}
 class {{ classname(model.id) }}(BaseModel):
     """
     {{ model.title }}
     """
-
-    {%- if model.type.value == "any_of"  %}
-    __root__: Union[
-    {%- for item in model.items %}
-        '{{ item.id }}',
-    {%- endfor %}
-    ]
-    {%- else %}
 
     # required ---
     {%- for property in model.required_properties %}
@@ -227,11 +235,11 @@ class {{ classname(model.id) }}(BaseModel):
 
     class Config:
         # Обращение по имени поля, даже если есть алиас.
-        allow_population_by_field_name = True
+        populate_by_name = True
     {%- break %}
     {%- endfor %}
+{% endif %}
 
-    {%- endif %}
 {%- endfor %}
 
 
@@ -336,7 +344,7 @@ class {{ name }}:
     def _parse_any_of(self, item: dict[str, Any], schema_classes: list[Any]) -> Any:
         for schema_class in schema_classes:
             try:
-                return schema_class.parse_obj(item)
+                return schema_class.model_validate(item)
             except:
                 continue
 
@@ -345,5 +353,5 @@ class {{ name }}:
 
 
 {% for model in models -%}
-{{ classname(model.id) }}.update_forward_refs()
+{{ classname(model.id) }}.model_rebuild()
 {% endfor %}
