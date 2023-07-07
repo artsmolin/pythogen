@@ -136,7 +136,7 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
             continue
 
         if response.schema.type == models.Type.object:
-            mapper = f'{classname(response.schema.id)}.parse_obj(response.json())'
+            mapper = f'{classname(response.schema.id)}.model_validate(response.json())'
             mapping.append((code, mapper))
             continue
 
@@ -161,7 +161,7 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
 
                 if items.type is models.Type.object:
                     items_class_name = classname(items.id)
-                    mapper = f'[{items_class_name}.parse_obj(item) for item in response.json()]'
+                    mapper = f'[{items_class_name}.model_validate(item) for item in response.json()]'
                     mapping.append((code, mapper))
                     continue
 

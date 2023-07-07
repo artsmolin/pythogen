@@ -37,9 +37,11 @@ from prometheus_client import Histogram
 import httpx
 from pydantic import BaseModel
 from pydantic import Field
-from pydantic import root_validator
-from pydantic import validator
+from pydantic import field_validator
+from pydantic import FieldValidationInfo
+from pydantic import ConfigDict
 from pydantic import HttpUrl
+from pydantic import RootModel
 import logging
 from functools import wraps
 
@@ -177,8 +179,8 @@ class EmptyBody(BaseModel):
 class {{ schema.name }}(BaseModel):
     {{ schema.attr }}: str
 
-    @validator("{{ schema.attr }}", pre=True)
-    def check(cls, v: str) -> str:
+    @field_validator("{{ schema.attr }}", mode='before')
+    def check(cls, v: str, info: FieldValidationInfo) -> str:
         type_hints = get_type_hints(cls)
         {{ schema.attr }}_values: tuple[str] = type_hints["{{ schema.attr }}"].__dict__['__args__']
 
@@ -191,21 +193,31 @@ class {{ schema.name }}(BaseModel):
 
 {%- for model in models %}
 
+{%- if model.type.value == "any_of"  %}
+class {{ classname(model.id) }}(RootModel):
+    root: list[
+    {% set pipe = joiner(" | ") %}
+    {%- for item in model.items %}
+        {{ pipe() }}{{ item.id }}
+    {%- endfor %}
+    ]
 
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
+
+{%- else %}
 class {{ classname(model.id) }}(BaseModel):
     """
     {{ model.title }}
     """
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
-    {%- if model.type.value == "any_of"  %}
-    __root__: Union[
-    {%- for item in model.items %}
-        '{{ item.id }}',
-    {%- endfor %}
-    ]
-    {%- else %}
-
-    # required ---
+    {% if model.required_properties|length > 0 %}# required ---{% endif %}
     {%- for property in model.required_properties %}
         {%- if property.schema.description %}
     {{ property.key }}: {{ typerepr(property.schema, document) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
@@ -214,24 +226,20 @@ class {{ classname(model.id) }}(BaseModel):
         {%- endif %}
     {%- endfor %}
 
-    # optional ---
+    {% if model.optional_properties|length > 0 %}# optional ---{% endif %}
     {%- for property in model.optional_properties %}
         {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(None, description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
         {%- else %}
     {{ property.key }}: {{ typerepr(property.schema, document) }} | None = None
         {%- endif %}
     {%- endfor %}
 
     {%- for property in model.required_properties + model.optional_properties if property.safety_key %}
-
-    class Config:
-        # Обращение по имени поля, даже если есть алиас.
-        allow_population_by_field_name = True
     {%- break %}
     {%- endfor %}
+{% endif %}
 
-    {%- endif %}
 {%- endfor %}
 
 
@@ -336,7 +344,7 @@ class {{ name }}:
     def _parse_any_of(self, item: dict[str, Any], schema_classes: list[Any]) -> Any:
         for schema_class in schema_classes:
             try:
-                return schema_class.parse_obj(item)
+                return schema_class.model_validate(item)
             except:
                 continue
 
@@ -345,5 +353,5 @@ class {{ name }}:
 
 
 {% for model in models -%}
-{{ classname(model.id) }}.update_forward_refs()
+{{ classname(model.id) }}.model_rebuild()
 {% endfor %}

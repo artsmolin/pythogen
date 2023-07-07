@@ -87,7 +87,7 @@
         if isinstance(body, dict):
             json = body
         elif isinstance(body, {{typerepr(operation.request_body.schema)}}):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
         {% endif %}

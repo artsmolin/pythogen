@@ -10,6 +10,11 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 [![license](https://img.shields.io/github/license/artsmolin/pythogen.svg)](https://github.com/artsmolin/pythogen/blob/master/LICENSE)
 
 ---
+> Versions **0.1.*** use pydantic **v1.*** and are no longer supported.
+
+> Versions **0.2.*** use pydantic **v2.***.
+
+---
 
 <p align="center">
   <img src="https://github.com/artsmolin/pythogen/raw/main/docs/images/example.png">

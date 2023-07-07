@@ -24,7 +24,9 @@ from typing import Union
 import httpx
 from httpx import Timeout
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
+from pydantic import RootModel
 
 
 # backward compatibility for httpx<0.18.2
@@ -128,7 +130,9 @@ class LoginuserResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     text: str | None = None
@@ -139,9 +143,9 @@ class CreateuserswithlistinputRequestBody(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class GetinventoryResponse200(BaseModel):
@@ -149,9 +153,9 @@ class GetinventoryResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class UploadfileRequestBody(BaseModel):
@@ -159,7 +163,9 @@ class UploadfileRequestBody(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     content: bytes | None = None
@@ -170,9 +176,9 @@ class FindpetsbytagsResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class FindpetsbystatusResponse200(BaseModel):
@@ -180,31 +186,29 @@ class FindpetsbystatusResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
-
-
-class AddpetRequestBody(BaseModel):
-    """
-    None
-    """
-
-    __root__: Union[
-        "Pet",
-        "Tag",
-    ]
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
-class AddpetResponse200(BaseModel):
-    """
-    None
-    """
+class AddpetRequestBody(RootModel):
+    root: list[Pet | Tag]
 
-    __root__: Union[
-        "Pet",
-        "Tag",
-    ]
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
+
+
+class AddpetResponse200(RootModel):
+    root: list[Pet | Tag]
+
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
 
 
 class ApiResponse(BaseModel):
@@ -212,7 +216,9 @@ class ApiResponse(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     code: int | None = None
@@ -225,7 +231,9 @@ class Tag(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -237,7 +245,9 @@ class Category(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -249,6 +259,10 @@ class Pet(BaseModel):
     None
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     name: str
     photoUrls: list[str]
@@ -257,7 +271,7 @@ class Pet(BaseModel):
     id: int | None = None
     category: Category | None = None
     tags: list[Tag] | None = None
-    status: Literal["available", "pending", "sold"] | None = Field(description="pet status in the store")
+    status: Literal["available", "pending", "sold"] | None = Field(None, description="pet status in the store")
 
 
 class User(BaseModel):
@@ -265,7 +279,9 @@ class User(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -275,7 +291,7 @@ class User(BaseModel):
     email: str | None = None
     password: str | None = None
     phone: str | None = None
-    userStatus: int | None = Field(description="User Status")
+    userStatus: int | None = Field(None, description="User Status")
 
 
 class Address(BaseModel):
@@ -283,7 +299,9 @@ class Address(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     street: str | None = None
@@ -297,7 +315,9 @@ class Customer(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
@@ -310,14 +330,16 @@ class Order(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: int | None = None
     petId: int | None = None
     quantity: int | None = None
     shipDate: datetime.datetime | None = None
-    status: Literal["placed", "approved", "delivered"] | None = Field(description="Order Status")
+    status: Literal["placed", "approved", "delivered"] | None = Field(None, description="Order Status")
     complete: bool | None = None
 
 
@@ -348,7 +370,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -385,7 +407,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return [Pet.parse_obj(item) for item in response.json()]
+            return [Pet.model_validate(item) for item in response.json()]
 
         if response.status_code == 400:
             if response.content is None:
@@ -404,7 +426,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -441,7 +463,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return [Pet.parse_obj(item) for item in response.json()]
+            return [Pet.model_validate(item) for item in response.json()]
 
         if response.status_code == 400:
             if response.content is None:
@@ -495,7 +517,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return Pet.parse_obj(response.json())
+            return Pet.model_validate(response.json())
 
         if response.status_code == 400:
             if response.content is None:
@@ -559,7 +581,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetinventoryResponse200.parse_obj(response.json())
+            return GetinventoryResponse200.model_validate(response.json())
 
     def getOrderById(
         self,
@@ -567,7 +589,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Order:
+    ) -> Order | EmptyBody:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -602,7 +624,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return Order.parse_obj(response.json())
+            return Order.model_validate(response.json())
 
         if response.status_code == 400:
             if response.content is None:
@@ -633,7 +655,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> LoginuserResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -765,7 +787,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return User.parse_obj(response.json())
+            return User.model_validate(response.json())
 
         if response.status_code == 400:
             if response.content is None:
@@ -812,7 +834,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, Pet):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -845,7 +867,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return Pet.parse_obj(response.json())
+            return Pet.model_validate(response.json())
 
         if response.status_code == 405:
             if response.content is None:
@@ -864,7 +886,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | AddpetResponse200:
+    ) -> AddpetResponse200 | EmptyBody:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -881,7 +903,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, AddpetRequestBody):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1018,7 +1040,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, bytes):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1051,7 +1073,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return ApiResponse.parse_obj(response.json())
+            return ApiResponse.model_validate(response.json())
 
     def placeOrder(
         self,
@@ -1059,7 +1081,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Order:
+    ) -> Order | EmptyBody:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1076,7 +1098,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, Order):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1109,7 +1131,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return Order.parse_obj(response.json())
+            return Order.model_validate(response.json())
 
         if response.status_code == 405:
             if response.content is None:
@@ -1145,7 +1167,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, User):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1200,7 +1222,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, list[User]):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1233,7 +1255,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return User.parse_obj(response.json())
+            return User.model_validate(response.json())
 
     def updatePet(
         self,
@@ -1258,7 +1280,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, Pet):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1291,7 +1313,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return Pet.parse_obj(response.json())
+            return Pet.model_validate(response.json())
 
         if response.status_code == 400:
             if response.content is None:
@@ -1350,7 +1372,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, User):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1613,26 +1635,26 @@ class Client:
     def _parse_any_of(self, item: dict[str, Any], schema_classes: list[Any]) -> Any:
         for schema_class in schema_classes:
             try:
-                return schema_class.parse_obj(item)
+                return schema_class.model_validate(item)
             except:
                 continue
 
         raise Exception('Can\'t parse "{item}"')
 
 
-LoginuserResponse200.update_forward_refs()
-CreateuserswithlistinputRequestBody.update_forward_refs()
-GetinventoryResponse200.update_forward_refs()
-UploadfileRequestBody.update_forward_refs()
-FindpetsbytagsResponse200.update_forward_refs()
-FindpetsbystatusResponse200.update_forward_refs()
-AddpetRequestBody.update_forward_refs()
-AddpetResponse200.update_forward_refs()
-ApiResponse.update_forward_refs()
-Tag.update_forward_refs()
-Category.update_forward_refs()
-Pet.update_forward_refs()
-User.update_forward_refs()
-Address.update_forward_refs()
-Customer.update_forward_refs()
-Order.update_forward_refs()
+LoginuserResponse200.model_rebuild()
+CreateuserswithlistinputRequestBody.model_rebuild()
+GetinventoryResponse200.model_rebuild()
+UploadfileRequestBody.model_rebuild()
+FindpetsbytagsResponse200.model_rebuild()
+FindpetsbystatusResponse200.model_rebuild()
+AddpetRequestBody.model_rebuild()
+AddpetResponse200.model_rebuild()
+ApiResponse.model_rebuild()
+Tag.model_rebuild()
+Category.model_rebuild()
+Pet.model_rebuild()
+User.model_rebuild()
+Address.model_rebuild()
+Customer.model_rebuild()
+Order.model_rebuild()

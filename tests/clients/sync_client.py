@@ -26,9 +26,12 @@ from typing import get_type_hints
 import httpx
 from httpx import Timeout
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
+from pydantic import FieldValidationInfo
 from pydantic import HttpUrl
-from pydantic import validator
+from pydantic import RootModel
+from pydantic import field_validator
 
 
 # backward compatibility for httpx<0.18.2
@@ -130,8 +133,8 @@ class EmptyBody(BaseModel):
 class BaseObjectResp(BaseModel):
     string_data: str
 
-    @validator("string_data", pre=True)
-    def check(cls, v: str) -> str:
+    @field_validator("string_data", mode="before")
+    def check(cls, v: str, info: FieldValidationInfo) -> str:
         type_hints = get_type_hints(cls)
         string_data_values: tuple[str] = type_hints["string_data"].__dict__["__args__"]
 
@@ -141,15 +144,14 @@ class BaseObjectResp(BaseModel):
         return v
 
 
-class RequestBodyAnyofRequestBody(BaseModel):
-    """
-    None
-    """
+class RequestBodyAnyofRequestBody(RootModel):
+    root: list[Data | PostObjectData]
 
-    __root__: Union[
-        "Data",
-        "PostObjectData",
-    ]
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
 
 
 class AllOfRefObj(BaseModel):
@@ -157,7 +159,9 @@ class AllOfRefObj(BaseModel):
     All Of
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: str | None = None
@@ -169,7 +173,9 @@ class GetBinaryResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     content: bytes | None = None
@@ -180,7 +186,9 @@ class GetTextAsIntegerResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     text: int | None = None
@@ -191,7 +199,9 @@ class GetTextResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     text: str | None = None
@@ -202,9 +212,9 @@ class GetListObjectsResponse200(BaseModel):
     None
     """
 
-    # required ---
-
-    # optional ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
 
 class RewardsListItem(BaseModel):
@@ -212,11 +222,13 @@ class RewardsListItem(BaseModel):
     None
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     pricePlanCode: str
     quantity: float
-
-    # optional ---
 
 
 class GetObjectWithInlineArrayResponse200(BaseModel):
@@ -224,7 +236,9 @@ class GetObjectWithInlineArrayResponse200(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     rewards: list[RewardsListItem] | None = None
@@ -235,33 +249,33 @@ class GetObjectWithInlineArrayResponse200Item(BaseModel):
     None
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     pricePlanCode: str
     quantity: float
 
-    # optional ---
+
+class AnimalObj(RootModel):
+    root: list[Cat | Dog]
+
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
 
 
-class AnimalObj(BaseModel):
-    """
-    None
-    """
+class AnyOfChildObj(RootModel):
+    root: list[GetObjectResp | Cat]
 
-    __root__: Union[
-        "Cat",
-        "Dog",
-    ]
+    def __iter__(self):
+        return iter(self.root)
 
-
-class AnyOfChildObj(BaseModel):
-    """
-    None
-    """
-
-    __root__: Union[
-        "GetObjectResp",
-        "Cat",
-    ]
+    def __getitem__(self, item):
+        return self.root[item]
 
 
 class TierObj(BaseModel):
@@ -269,7 +283,9 @@ class TierObj(BaseModel):
     None
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     code: str | None = None
@@ -282,11 +298,13 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     GetObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     string_data: str | None = Field(
-        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+        None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
     )
     integer_data: int | None = None
     array_data: list[str] | None = None
@@ -298,25 +316,27 @@ class TestSafetyKey(BaseModel):
     model for testing safety key
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
-    for_: str | None = Field(description='reserved word, expecting "for_"', alias="for")
+    for_: str | None = Field(
+        None, description='reserved word, expecting "for_"', alias="for"
+    )
     class_: str | None = Field(
-        description='reserved word, expecting "class_"', alias="class"
+        None, description='reserved word, expecting "class_"', alias="class"
     )
     with_dot_and_hyphens: int | None = Field(
+        None,
         description='invalid identifier, expecting "with_dot_and_hyphens"',
         alias="33with.dot-and-hyphens&*",
     )
     old_feature_priority: int | None = Field(
+        None,
         description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
         alias="34with.dot-and-hyphens&*",
     )
-
-    class Config:
-        # Обращение по имени поля, даже если есть алиас.
-        allow_population_by_field_name = True
 
 
 class UnknownError(BaseModel):
@@ -324,7 +344,9 @@ class UnknownError(BaseModel):
     UnknownError
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     code: str | None = None
@@ -335,7 +357,9 @@ class DeleteObjectResp(BaseModel):
     DeleteObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -346,7 +370,9 @@ class PutObjectResp(BaseModel):
     PutObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -357,7 +383,9 @@ class PatchObjectResp(BaseModel):
     PatchObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -368,7 +396,9 @@ class PostObjectResp(BaseModel):
     PostObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     status: str | None = None
@@ -379,10 +409,12 @@ class PostFile(BaseModel):
     PostFile
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     text: str
-
-    # optional ---
 
 
 class PutObjectData(BaseModel):
@@ -390,11 +422,13 @@ class PutObjectData(BaseModel):
     PutObjectData
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     id: str
     data: int
-
-    # optional ---
 
 
 class PatchObjectData(BaseModel):
@@ -402,17 +436,23 @@ class PatchObjectData(BaseModel):
     PatchObjectData
     """
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     # required ---
     id: str
     data: int
-
-    # optional ---
 
 
 class PostObjectData(BaseModel):
     """
     PostObjectData
     """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # required ---
     string_data: str
@@ -428,17 +468,15 @@ class PostObjectData(BaseModel):
     datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
 
-    class Config:
-        # Обращение по имени поля, даже если есть алиас.
-        allow_population_by_field_name = True
-
 
 class Dog(BaseModel):
     """
     Dog
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     name: str | None = None
@@ -449,7 +487,9 @@ class Cat(BaseModel):
     Cat
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     name: str | None = None
@@ -460,11 +500,13 @@ class GetObjectResp(BaseModel):
     GetObjectResp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     string_data: str | None = Field(
-        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+        None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
     )
     integer_data: int | None = None
     array_data: list[str] | None = None
@@ -481,7 +523,9 @@ class Data(BaseModel):
     Data
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     id: str | None = None
@@ -493,7 +537,9 @@ class AllOfResp(BaseModel):
     All Of Resp
     """
 
-    # required ---
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
 
     # optional ---
     all_of: AllOfRefObj | None = None
@@ -569,7 +615,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetObjectNoRefSchemaResponse200.parse_obj(response.json())
+            return GetObjectNoRefSchemaResponse200.model_validate(response.json())
 
     def get_object(
         self,
@@ -579,7 +625,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -620,7 +666,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetObjectResp.parse_obj(response.json())
+            return GetObjectResp.model_validate(response.json())
 
         if response.status_code == 500:
             method = "get"
@@ -632,7 +678,7 @@ class Client:
             if self.logs_integration:
                 self.logs_integration.log_error(req, resp)
 
-            return UnknownError.parse_obj(response.json())
+            return UnknownError.model_validate(response.json())
 
     def get_object_with_inline_array(
         self,
@@ -677,7 +723,7 @@ class Client:
 
         if response.status_code == 200:
             return [
-                GetObjectWithInlineArrayResponse200Item.parse_obj(item)
+                GetObjectWithInlineArrayResponse200Item.model_validate(item)
                 for item in response.json()
             ]
 
@@ -723,7 +769,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetObjectWithInlineArrayResponse200.parse_obj(response.json())
+            return GetObjectWithInlineArrayResponse200.model_validate(response.json())
 
     def get_list_objects(
         self,
@@ -767,7 +813,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return [GetObjectResp.parse_obj(item) for item in response.json()]
+            return [GetObjectResp.model_validate(item) for item in response.json()]
 
     def get_text(
         self,
@@ -987,7 +1033,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return AllOfResp.parse_obj(response.json())
+            return AllOfResp.model_validate(response.json())
 
     def get_object_slow(
         self,
@@ -996,7 +1042,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1035,7 +1081,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetObjectResp.parse_obj(response.json())
+            return GetObjectResp.model_validate(response.json())
 
         if response.status_code == 500:
             method = "get"
@@ -1047,7 +1093,7 @@ class Client:
             if self.logs_integration:
                 self.logs_integration.log_error(req, resp)
 
-            return UnknownError.parse_obj(response.json())
+            return UnknownError.model_validate(response.json())
 
     def post_object_without_body(
         self,
@@ -1096,7 +1142,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PostObjectResp.parse_obj(response.json())
+            return PostObjectResp.model_validate(response.json())
 
     def post_object(
         self,
@@ -1121,7 +1167,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1154,7 +1200,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PostObjectResp.parse_obj(response.json())
+            return PostObjectResp.model_validate(response.json())
 
     def post_form_object(
         self,
@@ -1179,7 +1225,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1213,7 +1259,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PostObjectResp.parse_obj(response.json())
+            return PostObjectResp.model_validate(response.json())
 
     def post_multipart_form_data(
         self,
@@ -1239,7 +1285,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PostFile):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1277,7 +1323,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PostObjectResp.parse_obj(response.json())
+            return PostObjectResp.model_validate(response.json())
 
     def request_body_anyof(
         self,
@@ -1302,7 +1348,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, RequestBodyAnyofRequestBody):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1335,7 +1381,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PostObjectResp.parse_obj(response.json())
+            return PostObjectResp.model_validate(response.json())
 
     def patch_object(
         self,
@@ -1361,7 +1407,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PatchObjectData):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1394,7 +1440,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PatchObjectResp.parse_obj(response.json())
+            return PatchObjectResp.model_validate(response.json())
 
     def put_object(
         self,
@@ -1420,7 +1466,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1453,7 +1499,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PutObjectResp.parse_obj(response.json())
+            return PutObjectResp.model_validate(response.json())
 
     def put_object_slow(
         self,
@@ -1479,7 +1525,7 @@ class Client:
         if isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
-            json = body.dict(by_alias=True)
+            json = body.model_dump(by_alias=True)
         else:
             json = None
 
@@ -1512,7 +1558,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return PutObjectResp.parse_obj(response.json())
+            return PutObjectResp.model_validate(response.json())
 
     def delete_object(
         self,
@@ -1562,7 +1608,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return DeleteObjectResp.parse_obj(response.json())
+            return DeleteObjectResp.model_validate(response.json())
 
     def close(self) -> None:
         self.client.close()
@@ -1598,38 +1644,38 @@ class Client:
     def _parse_any_of(self, item: dict[str, Any], schema_classes: list[Any]) -> Any:
         for schema_class in schema_classes:
             try:
-                return schema_class.parse_obj(item)
+                return schema_class.model_validate(item)
             except:
                 continue
 
         raise Exception('Can\'t parse "{item}"')
 
 
-RequestBodyAnyofRequestBody.update_forward_refs()
-AllOfRefObj.update_forward_refs()
-GetBinaryResponse200.update_forward_refs()
-GetTextAsIntegerResponse200.update_forward_refs()
-GetTextResponse200.update_forward_refs()
-GetListObjectsResponse200.update_forward_refs()
-RewardsListItem.update_forward_refs()
-GetObjectWithInlineArrayResponse200.update_forward_refs()
-GetObjectWithInlineArrayResponse200Item.update_forward_refs()
-AnimalObj.update_forward_refs()
-AnyOfChildObj.update_forward_refs()
-TierObj.update_forward_refs()
-GetObjectNoRefSchemaResponse200.update_forward_refs()
-TestSafetyKey.update_forward_refs()
-UnknownError.update_forward_refs()
-DeleteObjectResp.update_forward_refs()
-PutObjectResp.update_forward_refs()
-PatchObjectResp.update_forward_refs()
-PostObjectResp.update_forward_refs()
-PostFile.update_forward_refs()
-PutObjectData.update_forward_refs()
-PatchObjectData.update_forward_refs()
-PostObjectData.update_forward_refs()
-Dog.update_forward_refs()
-Cat.update_forward_refs()
-GetObjectResp.update_forward_refs()
-Data.update_forward_refs()
-AllOfResp.update_forward_refs()
+RequestBodyAnyofRequestBody.model_rebuild()
+AllOfRefObj.model_rebuild()
+GetBinaryResponse200.model_rebuild()
+GetTextAsIntegerResponse200.model_rebuild()
+GetTextResponse200.model_rebuild()
+GetListObjectsResponse200.model_rebuild()
+RewardsListItem.model_rebuild()
+GetObjectWithInlineArrayResponse200.model_rebuild()
+GetObjectWithInlineArrayResponse200Item.model_rebuild()
+AnimalObj.model_rebuild()
+AnyOfChildObj.model_rebuild()
+TierObj.model_rebuild()
+GetObjectNoRefSchemaResponse200.model_rebuild()
+TestSafetyKey.model_rebuild()
+UnknownError.model_rebuild()
+DeleteObjectResp.model_rebuild()
+PutObjectResp.model_rebuild()
+PatchObjectResp.model_rebuild()
+PostObjectResp.model_rebuild()
+PostFile.model_rebuild()
+PutObjectData.model_rebuild()
+PatchObjectData.model_rebuild()
+PostObjectData.model_rebuild()
+Dog.model_rebuild()
+Cat.model_rebuild()
+GetObjectResp.model_rebuild()
+Data.model_rebuild()
+AllOfResp.model_rebuild()
