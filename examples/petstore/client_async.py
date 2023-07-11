@@ -902,7 +902,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | AddpetResponse200:
+    ) -> AddpetResponse200 | EmptyBody:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}

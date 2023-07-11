@@ -16,6 +16,8 @@ import abc
 import datetime
 import logging
 from dataclasses import dataclass
+from enum import Enum
+from enum import IntEnum
 from typing import IO
 from typing import Any
 from typing import Mapping
@@ -123,6 +125,31 @@ FileTypes = Union[
 
 class RequiredHeaders(Exception):
     ...
+
+
+class StringEnum(str, Enum):
+    """
+    StringEnum
+    """
+
+    FIRST = "first"
+    SECOND = "second"
+
+    def __str__(self) -> Any:
+        return self.value
+
+
+class IntegerEnum(IntEnum):
+    """
+    IntegerEnum
+    """
+
+    _1 = 1
+    _2 = 2
+    _3 = 3
+    _4 = 4
+    _5 = 5
+    _6 = 6
 
 
 class EmptyBody(BaseModel):
@@ -467,6 +494,8 @@ class PostObjectData(BaseModel):
     date_attr: datetime.date | None = None
     datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
+    int_enum: IntegerEnum | None = Field(description="An enumeration.")
+    str_enum: StringEnum | None = Field(description="An enumeration.")
 
 
 class Dog(BaseModel):

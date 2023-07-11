@@ -39,6 +39,8 @@ def test_httpx_sync_client():
         boolean_data=True,
         array_data=['1', '2', '3'],
         event_data={'event': 'delivered'},
+        int_enum=sync_client.IntegerEnum._1,
+        str_enum=sync_client.StringEnum.FIRST,
     )
     response = httpx_sync_client.post_object(data)
     assert isinstance(response, sync_client.PostObjectResp)
@@ -100,6 +102,8 @@ async def test_httpx_async_client():
         boolean_data=True,
         array_data=['1', '2', '3'],
         event_data={'event': 'delivered'},
+        int_enum=async_client.IntegerEnum._1,
+        str_enum=async_client.StringEnum.FIRST,
     )
     response = await httpx_async_client.post_object(data)
     assert isinstance(response, async_client.PostObjectResp)
