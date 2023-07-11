@@ -17,6 +17,9 @@ from dataclasses import dataclass
 
 import datetime
 
+from enum import Enum
+from enum import IntEnum
+
 from httpx import Timeout
 from typing import Literal
 
@@ -170,6 +173,29 @@ FileTypes = Union[
 class RequiredHeaders(Exception):
     ...
 
+
+{%- for enum_class in enums %}
+{%- if enum_class.type.value == "integer"  %}
+class {{ classname(enum_class.id) }}(IntEnum):
+    """
+    {{ enum_class.title }}
+    """
+    {%- for val in enum_class.enum %}
+    _{{ val }} = {{ val }}
+    {%- endfor %}
+{%- else %}
+class {{ classname(enum_class.id) }}(str, Enum):
+    """
+    {{ enum_class.title }}
+    """
+    {%- for val in enum_class.enum %}
+    {{ val.upper() }} = "{{ val }}"
+    {%- endfor %}
+
+    def __str__(self) -> Any:
+        return self.value
+{%- endif %}
+{%- endfor %}
 
 class EmptyBody(BaseModel):
     status_code: int

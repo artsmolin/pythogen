@@ -60,6 +60,7 @@ def render_client(
         document=document,
         name=name,
         version=document.info.version,
+        enums=document.sorted_enums,
         models=document.sorted_schemas,
         get=prepared_operations.get,
         post=prepared_operations.post,
@@ -237,8 +238,10 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = 
     representation = 'dict'
 
     if schema.type in primitive_type_mapping:
-        if schema.enum:
+        if schema.enum and schema.id == '<inline+SchemaObject>':
             representation = f'Literal{schema.enum}'
+        elif schema.enum:
+            representation = schema.id
         elif schema.format in format_mapping:
             representation = format_mapping[schema.format]  # type: ignore
         else:

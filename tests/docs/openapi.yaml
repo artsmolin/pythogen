@@ -545,6 +545,22 @@ components:
         url:
           type: string
           format: uri
+        int_enum: 
+          $ref: '#/components/schemas/IntegerEnum'
+        str_enum: 
+          $ref: '#/components/schemas/StringEnum'
+      additionalProperties: false
+    IntegerEnum:
+      description: An enumeration.
+      enum: [1, 2, 3, 4, 5, 6]
+      title: IntegerEnum
+      type: integer
+      additionalProperties: false
+    StringEnum:
+      description: An enumeration.
+      enum: [first, second]
+      title: StringEnum
+      type: string
       additionalProperties: false
     PatchObjectData:
       title: PatchObjectData

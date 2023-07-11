@@ -370,7 +370,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -428,7 +428,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -486,7 +486,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -597,7 +597,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Order:
+    ) -> Order | EmptyBody:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -665,7 +665,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> LoginuserResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -833,7 +833,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -902,7 +902,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | AddpetResponse200:
+    ) -> AddpetResponse200 | EmptyBody:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -1097,7 +1097,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Order:
+    ) -> Order | EmptyBody:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1279,7 +1279,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
