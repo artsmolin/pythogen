@@ -494,8 +494,8 @@ class PostObjectData(BaseModel):
     date_attr: datetime.date | None = None
     datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
-    int_enum: IntegerEnum | None = Field(description="An enumeration.")
-    str_enum: StringEnum | None = Field(description="An enumeration.")
+    int_enum: IntegerEnum | None = Field(None, description="An enumeration.")
+    str_enum: StringEnum | None = Field(None, description="An enumeration.")
 
 
 class Dog(BaseModel):
