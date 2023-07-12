@@ -32,6 +32,7 @@ from typing import Mapping
 from typing import Sequence
 from typing import IO
 from typing import cast
+from typing import Protocol
 
 {%- if metrics %}
 from prometheus_client import Counter
@@ -55,7 +56,7 @@ except AttributeError:
     DEFAULT_AUTH = None
 
 {%- if metrics %}
-class BaseMetricsIntegration(abc.ABC):
+class MetricsIntegration(Protocol):
     def __init__(
         self,
         client_response_time_histogram: Histogram | None = None,
@@ -66,14 +67,14 @@ class BaseMetricsIntegration(abc.ABC):
         self._client_non_http_errors_counter = client_non_http_errors_counter
         self.shadow_path = shadow_path
 
-    @abc.abstractmethod
-    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None: ...
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
+        ...
 
-    @abc.abstractmethod
-    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None: ...
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
+        ...
 
 
-class DefaultMetricsIntegration(BaseMetricsIntegration):
+class DefaultMetricsIntegration:
     def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
         self._client_non_http_errors_counter.labels(
             client_name=client_name,
@@ -108,18 +109,18 @@ class ResponseBox:
     status_code: int
 
 
-class BaseLogsIntegration(abc.ABC):
-    @abc.abstractmethod
-    def log_extra(self, **kwargs: Any) -> dict[str, Any]: ...
+class LogsIntegration(Protocol):
+    def log_extra(self, **kwargs: Any) -> dict[str, Any]:
+        ...
 
-    @abc.abstractmethod
-    def log_error(self, req: RequestBox, resp: ResponseBox) -> None: ...
+    def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
+        ...
 
-    @abc.abstractmethod
-    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int: ...
+    def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
+        ...
 
 
-class DefaultLogsIntegration(BaseLogsIntegration):
+class DefaultLogsIntegration:
     def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {'props': {'data': kwargs}}
 
@@ -272,9 +273,9 @@ class {{ name }}:
         {%- endif %}
         headers: dict[str, str] | None = None,
         {%- if metrics %}
-        metrics_integration: BaseMetricsIntegration | None = None,
+        metrics_integration: MetricsIntegration | None = None,
         {%- endif %}
-        logs_integration: BaseLogsIntegration | None = DefaultLogsIntegration(),
+        logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
         {%- if sync %}
         self.client = client or httpx.Client(timeout=Timeout(timeout))

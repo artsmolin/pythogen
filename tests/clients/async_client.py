@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-import abc
 import datetime
 import logging
 from dataclasses import dataclass
@@ -21,6 +20,7 @@ from enum import IntEnum
 from typing import IO
 from typing import Any
 from typing import Mapping
+from typing import Protocol
 from typing import Sequence
 from typing import Union
 from typing import get_type_hints
@@ -57,21 +57,18 @@ class ResponseBox:
     status_code: int
 
 
-class BaseLogsIntegration(abc.ABC):
-    @abc.abstractmethod
+class LogsIntegration(Protocol):
     def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         ...
 
-    @abc.abstractmethod
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
         ...
 
-    @abc.abstractmethod
     def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         ...
 
 
-class DefaultLogsIntegration(BaseLogsIntegration):
+class DefaultLogsIntegration:
     def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {"props": {"data": kwargs}}
 
@@ -557,7 +554,7 @@ class Client:
         client_name: str = "",
         client: httpx.AsyncClient | None = None,
         headers: dict[str, str] | None = None,
-        logs_integration: BaseLogsIntegration | None = DefaultLogsIntegration(),
+        logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
@@ -624,7 +621,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1041,7 +1038,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

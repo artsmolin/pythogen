@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-import abc
 import datetime
 import logging
 from dataclasses import dataclass
@@ -21,6 +20,7 @@ from enum import IntEnum
 from typing import IO
 from typing import Any
 from typing import Mapping
+from typing import Protocol
 from typing import Sequence
 from typing import Union
 from typing import get_type_hints
@@ -44,7 +44,7 @@ except AttributeError:
     DEFAULT_AUTH = None
 
 
-class BaseMetricsIntegration(abc.ABC):
+class MetricsIntegration(Protocol):
     def __init__(
         self,
         client_response_time_histogram: Histogram | None = None,
@@ -55,20 +55,18 @@ class BaseMetricsIntegration(abc.ABC):
         self._client_non_http_errors_counter = client_non_http_errors_counter
         self.shadow_path = shadow_path
 
-    @abc.abstractmethod
     def on_request_error(
         self, client_name: str, error: Exception, http_method: str, http_target: str
     ) -> None:
         ...
 
-    @abc.abstractmethod
     def on_request_success(
         self, client_name: str, response, http_method: str, http_target: str
     ) -> None:
         ...
 
 
-class DefaultMetricsIntegration(BaseMetricsIntegration):
+class DefaultMetricsIntegration:
     def on_request_error(
         self, client_name: str, error: Exception, http_method: str, http_target: str
     ) -> None:
@@ -106,21 +104,18 @@ class ResponseBox:
     status_code: int
 
 
-class BaseLogsIntegration(abc.ABC):
-    @abc.abstractmethod
+class LogsIntegration(Protocol):
     def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         ...
 
-    @abc.abstractmethod
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
         ...
 
-    @abc.abstractmethod
     def get_log_error_level(self, req: RequestBox, resp: ResponseBox) -> int:
         ...
 
 
-class DefaultLogsIntegration(BaseLogsIntegration):
+class DefaultLogsIntegration:
     def log_extra(self, **kwargs: Any) -> dict[str, Any]:
         return {"props": {"data": kwargs}}
 
@@ -606,8 +601,8 @@ class Client:
         client_name: str = "",
         client: httpx.AsyncClient | None = None,
         headers: dict[str, str] | None = None,
-        metrics_integration: BaseMetricsIntegration | None = None,
-        logs_integration: BaseLogsIntegration | None = DefaultLogsIntegration(),
+        metrics_integration: MetricsIntegration | None = None,
+        logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.AsyncClient(timeout=Timeout(timeout))
         self.base_url = base_url
@@ -705,7 +700,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1284,7 +1279,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

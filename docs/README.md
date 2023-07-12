@@ -20,9 +20,10 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
   <img src="https://github.com/artsmolin/pythogen/raw/main/docs/images/example.png">
 </p>
 
-- [Installation](#installation)
-- [Generation](#generation)
-- [Usage](#usage)
+- [Overview](#overview)
+  - [Installation](#installation)
+  - [Generation](#generation)
+  - [Usage](#usage)
 - [Features](#features)
   - [Metrics](#metrics)
   - [Required Headers](#required-headers)
@@ -32,25 +33,26 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
   - [Discriminator](#discriminator)
 - [Examples](#examples)
 
-## Installation
-Pip
+## Overview
+### Installation
+You can install the library
 ```shell
 pip install pythogen
 ```
-Docker
+or use Docker
 ```shell
 docker pull artsmolin/pythogen
 ```
 
-## Generation
+### Generation
 - `path/to/input` — path to the directory with openapi.yaml;
 - `path/to/output` — the path to the directory where the generated client will be saved;
 
-Pip
+Generate a client using the installed library
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
-Docker
+or via docker Docker
 ```shell
 docker run \
 -v ./path/to/input:/opt/path/to/input \
@@ -60,7 +62,8 @@ path/to/input/openapi.yaml \
 path/to/output/client.py
 ```
 
-## Usage
+### Usage
+Use the generated [client](/examples/petstore/client_async.py). Below is an example of using a client generated for [Petstore OpenAPI](/examples/petstore/openapi.yaml).
 ```python
 from petstore.client_async import Client
 from petstore.client_async import Pet
@@ -72,7 +75,7 @@ pets: list[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
 
 ## Features
 ### Metrics
-Pythogen is capable of generating a base class to integrate metrics into the client. To do this, use the `--metrics` flag when generating the client. The `BaseMetricsIntegration` and `DefaultMetricsIntegration` classes will be generated.
+Pythogen is capable of generating a base class to integrate metrics into the client. To do this, use the `--metrics` flag when generating the client. The `DefaultMetricsIntegration` class will be generated. You can use it, or create your own class that satisfies the `MetricsIntegration` protocol and pass it to the instance during client initialization.
 
 ```python
 from prometheus_client import Counter
@@ -155,7 +158,7 @@ pythogen path/to/input/openapi.yaml path/to/package/output --package-version=0.0
 - `path/to/package/output` — path to the directory where package will be saved.
 
 ### Logs
-Logging takes place using integration. By default, an instance of class `DefaultLogsIntegration` is used. To set your own logic, you can create your own class that satisfies the base class `BaseLogsIntegration` and pass it to the instance during client initialization.
+Logging takes place using integration. By default, an instance of class `DefaultLogsIntegration` is used. To set your own logic, you can create your own class that satisfies the `LogsIntegration` protocol and pass it to the instance during client initialization.
 
 Usage with custom integration
 ```python
