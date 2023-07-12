@@ -34,7 +34,6 @@ from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import FieldValidationInfo
 from pydantic import HttpUrl
-from pydantic import RootModel
 from pydantic import field_validator
 
 
@@ -220,16 +219,6 @@ class BaseObjectResp(BaseModel):
         return v
 
 
-class RequestBodyAnyofRequestBody(RootModel):
-    root: list[Data | PostObjectData]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
-
-
 class AllOfRefObj(BaseModel):
     """
     All Of
@@ -332,26 +321,6 @@ class GetObjectWithInlineArrayResponse200Item(BaseModel):
     # required ---
     pricePlanCode: str
     quantity: float
-
-
-class AnimalObj(RootModel):
-    root: list[Cat | Dog]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
-
-
-class AnyOfChildObj(RootModel):
-    root: list[GetObjectResp | Cat]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
 
 
 class TierObj(BaseModel):
@@ -540,6 +509,7 @@ class PostObjectData(BaseModel):
     )
 
     # optional ---
+    optional_anyof_string_data: str | None = None
     date_attr: datetime.date | None = None
     datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
@@ -590,10 +560,10 @@ class GetObjectResp(BaseModel):
     array_data: list[str] | None = None
     boolean_data: bool | None = None
     tier: TierObj | None = None
-    anyOfChild: AnyOfChildObj | None = None
+    anyOfChild: GetObjectResp | Cat | None = None
     child: GetObjectResp | None = None
     childs: list[GetObjectResp] | None = None
-    animal: AnimalObj | None = None
+    animal: Cat | Dog | None = None
 
 
 class Data(BaseModel):
@@ -735,7 +705,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1314,7 +1284,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1689,7 +1659,7 @@ class Client:
 
     async def request_body_anyof(
         self,
-        body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
+        body: Data | PostObjectData | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
@@ -1709,7 +1679,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, RequestBodyAnyofRequestBody):
+        elif isinstance(body, Data | PostObjectData):
             json = body.model_dump(by_alias=True)
         else:
             json = None
@@ -2103,7 +2073,6 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-RequestBodyAnyofRequestBody.model_rebuild()
 AllOfRefObj.model_rebuild()
 GetBinaryResponse200.model_rebuild()
 GetTextAsIntegerResponse200.model_rebuild()
@@ -2112,8 +2081,6 @@ GetListObjectsResponse200.model_rebuild()
 RewardsListItem.model_rebuild()
 GetObjectWithInlineArrayResponse200.model_rebuild()
 GetObjectWithInlineArrayResponse200Item.model_rebuild()
-AnimalObj.model_rebuild()
-AnyOfChildObj.model_rebuild()
 TierObj.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
 TestSafetyKey.model_rebuild()

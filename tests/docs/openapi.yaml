@@ -1,4 +1,4 @@
-openapi: 3.0.2
+openapi: 3.1.0
 info:
   title: test server
   version: 0.1.0
@@ -518,6 +518,10 @@ components:
         - event-data
       type: object
       properties:
+        optional_anyof_string_data:
+          anyOf:
+          - {type: string}
+          - {type: 'null'}
         string_data:
           title: String Data
           type: string

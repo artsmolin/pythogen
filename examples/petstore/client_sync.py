@@ -26,7 +26,6 @@ from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import RootModel
 
 
 # backward compatibility for httpx<0.18.2
@@ -191,26 +190,6 @@ class FindpetsbystatusResponse200(BaseModel):
     )
 
 
-class AddpetRequestBody(RootModel):
-    root: list[Pet | Tag]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
-
-
-class AddpetResponse200(RootModel):
-    root: list[Pet | Tag]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
-
-
 class ApiResponse(BaseModel):
     """
     None
@@ -370,7 +349,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -426,7 +405,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -482,7 +461,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -655,7 +634,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> LoginuserResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -817,7 +796,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -882,11 +861,11 @@ class Client:
 
     def addPet(
         self,
-        body: AddpetRequestBody | dict[str, Any] | None = None,
+        body: Pet | Tag | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | AddpetResponse200:
+    ) -> Pet | Tag | EmptyBody:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -902,7 +881,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, AddpetRequestBody):
+        elif isinstance(body, Pet | Tag):
             json = body.model_dump(by_alias=True)
         else:
             json = None
@@ -1263,7 +1242,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -1648,8 +1627,6 @@ GetinventoryResponse200.model_rebuild()
 UploadfileRequestBody.model_rebuild()
 FindpetsbytagsResponse200.model_rebuild()
 FindpetsbystatusResponse200.model_rebuild()
-AddpetRequestBody.model_rebuild()
-AddpetResponse200.model_rebuild()
 ApiResponse.model_rebuild()
 Tag.model_rebuild()
 Category.model_rebuild()

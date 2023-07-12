@@ -7,7 +7,7 @@ from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
 from pythogen.parsers.references import RefResolver
 
 
-PRIMITIVE_TYPES = ('string', 'number', 'integer', 'boolean')
+PRIMITIVE_TYPES = ('string', 'number', 'integer', 'boolean', 'null')
 
 
 class SchemaParser:

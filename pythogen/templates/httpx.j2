@@ -44,7 +44,6 @@ from pydantic import field_validator
 from pydantic import FieldValidationInfo
 from pydantic import ConfigDict
 from pydantic import HttpUrl
-from pydantic import RootModel
 import logging
 from functools import wraps
 
@@ -220,20 +219,6 @@ class {{ schema.name }}(BaseModel):
 {%- for model in models %}
 
 {%- if model.type.value == "any_of"  %}
-class {{ classname(model.id) }}(RootModel):
-    root: list[
-    {% set pipe = joiner(" | ") %}
-    {%- for item in model.items %}
-        {{ pipe() }}{{ item.id }}
-    {%- endfor %}
-    ]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
-
 {%- else %}
 class {{ classname(model.id) }}(BaseModel):
     """
@@ -378,6 +363,9 @@ class {{ name }}:
 
 
 
-{% for model in models -%}
+{% for model in models %}
+{%- if model.type.value != "any_of" %}
 {{ classname(model.id) }}.model_rebuild()
+{%- else %}
+{%- endif -%}
 {% endfor %}

@@ -84,6 +84,7 @@ class Type(Enum):
     boolean = 'boolean'
     array = 'array'
     object = 'object'
+    null = 'null'
 
     # TODO: refactor
     any_of = 'any_of'

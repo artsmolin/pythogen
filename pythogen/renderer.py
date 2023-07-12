@@ -223,6 +223,7 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = 
         models.Type.number: 'float',
         models.Type.boolean: 'bool',
         models.Type.string: 'str',
+        models.Type.null: 'None',
     }
     format_mapping = {
         models.Format.binary: 'bytes',
@@ -275,8 +276,16 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = 
             item = j2_typerepr(schema.items)  # type: ignore
             representation = f'list[{item}]'
 
-    elif schema.type == models.Type.any_of:
-        representation = classname(schema.id)
+    elif schema.type is models.Type.any_of:
+        items = []
+        for item in schema.items:  # type: ignore
+            if item.id:
+                items.append(classname(item.id))
+            else:
+                if item.type is models.Type.null and not item.required:
+                    continue
+                items.append(primitive_type_mapping[item.type])
+        representation = ' | '.join(items)
 
     return representation
 
