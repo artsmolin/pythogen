@@ -576,7 +576,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -644,7 +644,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> LoginuserResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -745,7 +745,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> User | EmptyBody:
+    ) -> EmptyBody | User:
         url = self._get_url(f"/user/{username}")
 
         params = {}
@@ -1076,7 +1076,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order")
 
         params = {}

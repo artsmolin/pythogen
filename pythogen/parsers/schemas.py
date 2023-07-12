@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import defaultdict
 from typing import Any
@@ -5,6 +6,9 @@ from typing import Any
 from pythogen import models
 from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
 from pythogen.parsers.references import RefResolver
+
+
+logger = logging.getLogger(__name__)
 
 
 PRIMITIVE_TYPES = ('string', 'number', 'integer', 'boolean', 'null')
@@ -381,10 +385,31 @@ class SchemaParser:
                             required=None,
                         )
                     )
+                elif models.Type(any_ref_any_type) is models.Type.object:
+                    additional_roperties = any_ref_item.get('additionalProperties', False)
+                    if additional_roperties:
+                        item_schema_id = f'{parent_schema_id}Item'
+                        items.append(
+                            models.SchemaObject(
+                                id=item_schema_id,
+                                type=models.Type.object,
+                                enum=None,
+                                properties=[],
+                                title=None,
+                                format=None,
+                                items=None,
+                                required=None,
+                                additional_roperties=True,
+                            )
+                        )
+                elif models.Type(any_ref_any_type) is models.Type.array:
+                    schema_id = f'<inline+{models.SchemaObject.__name__}>'
+                    schema = self.parse_item(schema_id, any_ref_item)
+                    items.append(schema)
                 else:
-                    items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
-                    schema = self.parse_item(items_schema_id, items_schema_data)  # type: ignore
-                    self._inline_schema_aggregator.add(items_schema_id, schema)
+                    schema_id = f'<inline+{models.SchemaObject.__name__}>'
+                    schema = self.parse_item(schema_id, any_ref_item)  # type: ignore
+                    self._inline_schema_aggregator.add(schema_id, schema)
             return items
 
         return None

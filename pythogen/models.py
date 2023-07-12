@@ -137,6 +137,7 @@ class SchemaObject:
     items: 'SchemaObject' | list['SchemaObject'] | None
     properties: list[SchemaProperty]
     description: str | None = None
+    additional_roperties: bool = False
 
     # Технические поля
     discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None

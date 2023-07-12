@@ -218,76 +218,55 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
 
 def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = None) -> str:
     """Represent data type on j2 template"""
-    primitive_type_mapping = {
-        models.Type.integer: 'int',
-        models.Type.number: 'float',
-        models.Type.boolean: 'bool',
-        models.Type.string: 'str',
-        models.Type.null: 'None',
-    }
-    format_mapping = {
-        models.Format.binary: 'bytes',
-        models.Format.uri: 'HttpUrl',
-        models.Format.date: 'datetime.date',
-        models.Format.date_time: 'datetime.datetime',
-    }
-
     # TODO: всегда передавать document в функцию
     if document:
         schema = document.schemas.get(schema.id, schema)
 
     representation = 'dict'
 
-    if schema.type in primitive_type_mapping:
-        if schema.enum and schema.id == '<inline+SchemaObject>':
-            representation = f'Literal{schema.enum}'
-        elif schema.enum:
-            representation = schema.id
-        elif schema.format in format_mapping:
-            representation = format_mapping[schema.format]  # type: ignore
+    if schema.type in PRIMITIVE_TYPE_MAPPING:
+        if schema.enum:
+            if schema.id == '<inline+SchemaObject>':
+                representation = f'Literal{schema.enum}'
+            else:
+                representation = classname(schema.id)
+        elif schema.format in FORMAT_MAPPING:
+            representation = FORMAT_MAPPING[schema.format]  # type: ignore
         else:
-            representation = primitive_type_mapping[schema.type]
+            representation = PRIMITIVE_TYPE_MAPPING[schema.type]
 
     elif schema.type == models.Type.object and schema.id != '<inline+SchemaObject>':
         representation = classname(schema.id)
 
     elif schema.type == models.Type.array and schema.items:
         if schema.items.type is models.Type.any_of:  # type: ignore
-            class_items = []
-            primitive_items = []
-            for item in schema.items.items:  # type: ignore
-                if item.id:
-                    class_items.append(classname(item.id))
-                else:
-                    primitive_items.append(primitive_type_mapping[item.type])
-
-            class_items_str = ' | '.join([f'{class_item}' for class_item in class_items])
-            primitives_items_str = ' | '.join(primitive_items)
-
-            items = []
-            if class_items_str:
-                items.append(class_items_str)
-            if primitives_items_str:
-                items.append(primitives_items_str)
-
-            items_str = ' | '.join(items)
-            representation = f'list[{items_str}]'
+            list_items_repr = _repr_any_of_schema(schema.items.items)  # type: ignore
+            representation = f'list[{list_items_repr}]'
         else:
             item = j2_typerepr(schema.items)  # type: ignore
             representation = f'list[{item}]'
 
     elif schema.type is models.Type.any_of:
-        items = []
-        for item in schema.items:  # type: ignore
-            if item.id:
-                items.append(classname(item.id))
-            else:
-                if item.type is models.Type.null and not item.required:
-                    continue
-                items.append(primitive_type_mapping[item.type])
-        representation = ' | '.join(items)
+        representation = _repr_any_of_schema(schema.items)  # type: ignore
 
     return representation
+
+
+def _repr_any_of_schema(any_of_items: list[models.SchemaObject]) -> str:
+    items = []
+    for item in any_of_items:
+        if item.additional_roperties:
+            items.append('dict[Any, Any]')
+        elif item.type is models.Type.array and item.items:
+            repr = j2_typerepr(item)
+            items.append(repr)
+        elif item.id:
+            items.append(classname(item.id))
+        else:
+            if item.type is models.Type.null and not item.required:
+                continue
+            items.append(PRIMITIVE_TYPE_MAPPING[item.type])
+    return ' | '.join(items)
 
 
 def varname(value: str) -> str:
@@ -297,3 +276,19 @@ def varname(value: str) -> str:
 def classname(value: str) -> str:
     value = value.replace('.', '')
     return inflection.camelize(value)
+
+
+PRIMITIVE_TYPE_MAPPING = {
+    models.Type.integer: 'int',
+    models.Type.number: 'float',
+    models.Type.boolean: 'bool',
+    models.Type.string: 'str',
+    models.Type.null: 'None',
+}
+
+FORMAT_MAPPING = {
+    models.Format.binary: 'bytes',
+    models.Format.uri: 'HttpUrl',
+    models.Format.date: 'datetime.date',
+    models.Format.date_time: 'datetime.datetime',
+}
