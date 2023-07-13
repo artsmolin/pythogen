@@ -463,6 +463,7 @@ class PostObjectData(BaseModel):
     url: HttpUrl | None = None
     int_enum: IntegerEnum | None = Field(None, description="An enumeration.")
     str_enum: StringEnum | None = Field(None, description="An enumeration.")
+    int_enum_or_null: IntegerEnum | None = None
 
 
 class Dog(BaseModel):
@@ -621,7 +622,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1038,7 +1039,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

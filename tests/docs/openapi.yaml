@@ -553,6 +553,10 @@ components:
           $ref: '#/components/schemas/IntegerEnum'
         str_enum: 
           $ref: '#/components/schemas/StringEnum'
+        int_enum_or_null:
+          anyOf:
+            - {'$ref': '#/components/schemas/IntegerEnum'}
+            - {'type': 'null'}
       additionalProperties: false
     IntegerEnum:
       description: An enumeration.

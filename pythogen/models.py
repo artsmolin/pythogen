@@ -262,7 +262,7 @@ class Document:
 
     discriminator_base_class_schemas: list[DiscriminatorBaseClassSchema]
 
-    def _build_sorted_schemas(self, keys):
+    def _build_sorted_schemas(self, keys: list[str], exclude_enums: bool = False):
         sorted: list[str] = []
         key_for_processing = set(keys)
         while keys:
@@ -289,17 +289,21 @@ class Document:
         for key in sorted:
             if self.schemas[key] not in sorted_schemas:
                 sorted_schemas.append(self.schemas[key])
+
+        if exclude_enums:
+            sorted_schemas = [s for s in sorted_schemas if s.enum is None]
+
         return sorted_schemas
 
     @property
     def sorted_schemas(self) -> list[SchemaObject]:
-        schema_keys = list(filter(lambda x: self.schemas[x].enum is None, self.schemas.keys()))
-        return self._build_sorted_schemas(schema_keys)
+        keys = [key for key, schema in self.schemas.items() if schema.enum is None]
+        return self._build_sorted_schemas(keys, exclude_enums=True)
 
     @property
     def sorted_enums(self) -> list[SchemaObject]:
-        enum_keys = list(filter(lambda x: self.schemas[x].enum is not None, self.schemas.keys()))
-        return self._build_sorted_schemas(enum_keys)
+        keys = [key for key, schema in self.schemas.items() if schema.enum is not None]
+        return self._build_sorted_schemas(keys)
 
 
 @dataclass
