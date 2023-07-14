@@ -1,3 +1,5 @@
+.PHONY: tests
+
 clean:
 	@rm -rf build dist .eggs *.egg-info
 	@rm -rf .coverage coverage.xml htmlcov report.xml .tox
@@ -31,7 +33,7 @@ requirements:
 	poetry install --remove-untracked
 	make install-pre-commit
 
-test:
+tests:
 	pytest --cov=pythogen tests/ -sq -v
 
 test-clients:

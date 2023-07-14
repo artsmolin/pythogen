@@ -296,27 +296,27 @@ class {{ name }}:
 
     {#-  get items begin  #}
     {% with items=get.items(), method='get'%}
-    {%- include 'client/httpx-method.j2' %}
+    {%- include 'method.j2' %}
     {%- endwith %}
     {#-  get items end  #}
     {#-  post items begin  #}
     {%- with items=post.items(), method='post'%}
-    {%- include 'client/httpx-method.j2' %}
+    {%- include 'method.j2' %}
     {%- endwith %}
     {#-  post items end  #}
     {#-  patch items begin  #}
     {%- with items=patch.items(), method='patch'%}
-    {%- include 'client/httpx-method.j2' %}
+    {%- include 'method.j2' %}
     {%- endwith %}
     {#-  patch items end  #}
     {#-  put items begin  #}
     {%- with items=put.items(), method='put'%}
-    {%- include 'client/httpx-method.j2' %}
+    {%- include 'method.j2' %}
     {%- endwith %}
     {#-  put items end  #}
     {#-  delete_no_body items begin  #}
     {%- with items=delete_no_body.items(), method='delete', body=False %}
-    {%- include 'client/httpx-method.j2' %}
+    {%- include 'method.j2' %}
     {%- endwith %}
     {#-  delete_no_body items end  #}
     {% if sync %}

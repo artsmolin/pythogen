@@ -103,7 +103,7 @@
             headers_ = headers
 
 {%- with req_body=operation.request_body -%}
-{% include 'client/httpx-request-metrics.j2' %}
+{% include 'request-metrics.j2' %}
 {%- endwith %}
         req = RequestBox(
             client_name=self.client_name,
