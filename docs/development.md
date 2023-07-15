@@ -6,6 +6,6 @@
   source .venv/bin/activate
   make requirements
   ```
-- Make changes
-- Execute `make clients-for-tests && make test-clients`
-- Execute `make clients-for-examples`
+- Make your changes
+- Execute `make clients`
+- Execute `make tests`
