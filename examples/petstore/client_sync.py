@@ -346,7 +346,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByStatus")
 
         params = {}
@@ -402,7 +402,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | list[Pet]:
+    ) -> list[Pet] | EmptyBody:
         url = self._get_url(f"/pet/findByTags")
 
         params = {}
@@ -458,7 +458,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -631,7 +631,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> LoginuserResponse200 | EmptyBody:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -728,7 +728,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> User | EmptyBody:
+    ) -> EmptyBody | User:
         url = self._get_url(f"/user/{username}")
 
         params = {}
@@ -793,7 +793,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -1239,7 +1239,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet:
+    ) -> Pet | EmptyBody:
         url = self._get_url(f"/pet")
 
         params = {}

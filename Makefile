@@ -14,19 +14,19 @@ install-pre-commit:
 format: install-pre-commit clean
 	pre-commit run --all-files
 
-clients-for-tests:
+clients:
+	# async clients for tests
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client.py
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client_with_metrics.py --metrics
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/async_client_with_headers.py --headers X-API-KEY,X-API-SECRET
 
+	# sync clients for tests
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
 	python pythogen/entrypoint.py tests/docs/openapi.yaml tests/clients/sync_client_with_metrics.py --sync --metrics
 
-clients-for-examples:
+	# clients for examles
 	python pythogen/entrypoint.py examples/petstore/openapi.yaml examples/petstore/client_async.py
 	python pythogen/entrypoint.py examples/petstore/openapi.yaml examples/petstore/client_sync.py --sync
-
-clients: clients-for-tests clients-for-examples
 
 requirements:
 	pip install --upgrade pip
