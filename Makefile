@@ -34,9 +34,5 @@ requirements:
 	make install-pre-commit
 
 tests:
+	docker-compose up -d --build mock_server && \
 	pytest --cov=pythogen tests/ -sq -v
-
-test-clients:
-	docker-compose up -d --build mock_server ;\
-	TEST_SERVER_URL=http://localhost:8080 python tests/main.py
-	# docker-compose logs mock_server;

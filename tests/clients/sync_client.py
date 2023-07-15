@@ -304,7 +304,7 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     boolean_data: bool | None = None
 
 
-class TestSafetyKey(BaseModel):
+class SafetyKeyForTesting(BaseModel):
     """
     model for testing safety key
     """
@@ -622,7 +622,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -1039,7 +1039,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> GetObjectResp | UnknownError:
+    ) -> UnknownError | GetObjectResp:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1658,7 +1658,7 @@ GetObjectWithInlineArrayResponse200.model_rebuild()
 GetObjectWithInlineArrayResponse200Item.model_rebuild()
 TierObj.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
-TestSafetyKey.model_rebuild()
+SafetyKeyForTesting.model_rebuild()
 UnknownError.model_rebuild()
 DeleteObjectResp.model_rebuild()
 PutObjectResp.model_rebuild()

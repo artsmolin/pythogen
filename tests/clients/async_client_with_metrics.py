@@ -351,7 +351,7 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     boolean_data: bool | None = None
 
 
-class TestSafetyKey(BaseModel):
+class SafetyKeyForTesting(BaseModel):
     """
     model for testing safety key
     """
@@ -2079,7 +2079,7 @@ GetObjectWithInlineArrayResponse200.model_rebuild()
 GetObjectWithInlineArrayResponse200Item.model_rebuild()
 TierObj.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
-TestSafetyKey.model_rebuild()
+SafetyKeyForTesting.model_rebuild()
 UnknownError.model_rebuild()
 DeleteObjectResp.model_rebuild()
 PutObjectResp.model_rebuild()

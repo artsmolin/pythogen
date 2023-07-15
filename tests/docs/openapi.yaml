@@ -651,7 +651,7 @@ components:
           type: string
           default: unknown_error
       additionalProperties: false
-    TestSafetyKey:
+    SafetyKeyForTesting:
       title: model for testing safety key
       type: object
       properties:

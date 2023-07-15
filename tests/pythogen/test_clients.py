@@ -1,8 +1,7 @@
-import asyncio
-import inspect
 import io
 import logging
-import os
+
+import pytest
 
 from clients import async_client
 from clients import sync_client
@@ -14,7 +13,7 @@ console = Console()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('TEST')
 
-TEST_SERVER_URL: str = os.getenv('TEST_SERVER_URL', 'http://host.docker.internal:8080')
+TEST_SERVER_URL = "http://localhost:8080"
 
 
 def _get_httpx_sync_client():
@@ -88,6 +87,7 @@ def test_httpx_sync_client():
     httpx_sync_client.close()
 
 
+@pytest.mark.asyncio
 async def test_httpx_async_client():
     httpx_async_client = _get_httpx_async_client()
     response = await httpx_async_client.get_object(object_id='123', return_error='', from_='')
@@ -144,37 +144,3 @@ async def test_httpx_async_client():
     assert isinstance(response, async_client.PostObjectResp)
 
     await httpx_async_client.close()
-
-
-if __name__ == '__main__':
-    mapping = {
-        'sync': {
-            'fn': test_httpx_sync_client,
-            'ok': False,
-        },
-        'async': {
-            'fn': test_httpx_async_client,
-            'ok': False,
-        },
-    }
-    
-    for test_name, test_data in mapping.items():
-        try:
-            fn = test_data['fn']
-            if inspect.iscoroutinefunction(fn):
-                asyncio.run(fn())
-            else:
-                fn()
-            test_data['ok'] = True
-        except AssertionError as exc:
-            logging.error(exc, exc_info=True)
-    
-    console.print('\n\ntest clients results')
-    for test_name, test_data in mapping.items():
-        console.print(f'  - {test_name}', end=' ')
-        if test_data['ok']:
-            console.print('ok', style='green')
-        else:
-            console.print('error', style='red')
-    
-    
