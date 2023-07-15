@@ -42,7 +42,9 @@ def render_client(
     document
         Спаршенный в python-объекты OpenApi-файл
     """
-    env = Environment(loader=FileSystemLoader(settings.TEMPLATES_DIR_PATH), extensions=['jinja2.ext.loopcontrols'])
+    env = Environment(
+        loader=FileSystemLoader(settings.HTTP_CLIENT_TEMPLATES_DIR_PATH), extensions=['jinja2.ext.loopcontrols']
+    )
     template = env.get_template(
         settings.CLIENT_TEMPLATE_NAME,
         globals={

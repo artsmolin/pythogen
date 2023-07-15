@@ -40,10 +40,10 @@ def init_package(
 
 def _create_pyproject_file(output_dir: Path, package_name: str, version: str, authors: str | None = None) -> None:
     env = Environment(
-        loader=FileSystemLoader(settings.TEMPLATES_DIR_PATH),
+        loader=FileSystemLoader(settings.HTTP_PACKAGE_TEMPLATES_DIR_PATH),
         extensions=['jinja2.ext.loopcontrols'],
     )
-    template = env.get_template('package/pyproject-toml.j2')
+    template = env.get_template('pyproject-toml.j2')
 
     pyproject_path = output_dir.joinpath('pyproject.toml')
 
@@ -59,10 +59,10 @@ def _create_pyproject_file(output_dir: Path, package_name: str, version: str, au
 
 def _create_init_file(output_dir: Path, module_name: str) -> None:
     env = Environment(
-        loader=FileSystemLoader(settings.TEMPLATES_DIR_PATH),
+        loader=FileSystemLoader(settings.HTTP_PACKAGE_TEMPLATES_DIR_PATH),
         extensions=['jinja2.ext.loopcontrols'],
     )
-    template = env.get_template('package/init-py.j2')
+    template = env.get_template('init-py.j2')
 
     init_path = output_dir.joinpath('__init__.py')
 
