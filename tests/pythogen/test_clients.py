@@ -14,7 +14,7 @@ console = Console()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('TEST')
 
-TEST_SERVER_URL: str = os.getenv('TEST_SERVER_URL', 'http://host.docker.internal:8080')
+TEST_SERVER_URL = "http://localhost:8080"
 
 
 def _get_httpx_sync_client():

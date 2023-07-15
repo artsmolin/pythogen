@@ -35,4 +35,4 @@ requirements:
 
 tests:
 	docker-compose up -d --build mock_server && \
-	TEST_SERVER_URL=http://localhost:8080 pytest --cov=pythogen tests/ -sq -v
+	pytest --cov=pythogen tests/ -sq -v

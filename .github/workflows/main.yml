@@ -37,7 +37,7 @@ jobs:
         poetry install
     - name: Run pytest
       run: |
-        poetry run pytest .
+        docker-compose up -d --build mock_server && poetry run pytest .
 
   coverage:
     name: coverage
