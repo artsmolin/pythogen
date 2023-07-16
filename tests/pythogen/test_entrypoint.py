@@ -3,7 +3,7 @@ import pytest
 from typer.testing import CliRunner
 from contextlib import contextmanager
 
-from pythogen import entrypoint
+from pythogen import main
 
 runner = CliRunner()
 
@@ -26,11 +26,11 @@ def temp_files():
 
 @pytest.mark.usefixtures("temp_files")
 def test_entrypoint_gen_http_client() -> None:
-    result = runner.invoke(entrypoint.app, [OPENAPI_PATH, ASYNC_CLIENT_PATH])
+    result = runner.invoke(main.app, [OPENAPI_PATH, ASYNC_CLIENT_PATH])
     assert result.exit_code == 0
 
 
 @pytest.mark.usefixtures("temp_files")
 def test_entrypoint_gen_http_client_pkg() -> None:
-    result = runner.invoke(entrypoint.app, [OPENAPI_PATH, ASYNC_CLIENT_PKG_PATH, "--package-version", "0.0.1"])
+    result = runner.invoke(main.app, [OPENAPI_PATH, ASYNC_CLIENT_PKG_PATH, "--package-version", "0.0.1"])
     assert result.exit_code == 0

@@ -458,7 +458,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -631,7 +631,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> LoginuserResponse200 | EmptyBody:
+    ) -> EmptyBody | LoginuserResponse200:
         url = self._get_url(f"/user/login")
 
         params = {}
@@ -793,7 +793,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -862,7 +862,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | Tag | EmptyBody:
+    ) -> EmptyBody | Pet | Tag:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -1239,7 +1239,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}

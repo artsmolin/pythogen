@@ -14,4 +14,4 @@ COPY --from=builder /usr/local /usr/local/
 COPY ./pythogen       /opt/pythogen
 ENV PYTHONPATH "${PYTHONPATH}:/opt"
 WORKDIR /opt
-ENTRYPOINT ["python", "pythogen/entrypoint.py"]
+ENTRYPOINT ["python", "pythogen/main.py"]
