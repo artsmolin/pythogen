@@ -55,26 +55,28 @@ try:
 except AttributeError:
     DEFAULT_AUTH = None
 
-{%- if metrics %}
-class MetricsIntegration(Protocol):
-    def __init__(
-        self,
-        client_response_time_histogram: Histogram | None = None,
-        client_non_http_errors_counter: Counter | None = None,
-        shadow_path: bool = True,
-    ):
-        self._client_response_time_histogram = client_response_time_histogram
-        self._client_non_http_errors_counter = client_non_http_errors_counter
-        self.shadow_path = shadow_path
 
+class MetricsIntegration(Protocol):
     def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
         ...
 
     def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
         ...
 
+    def shadow_path(self) -> bool:
+        ...
 
+
+{%- if metrics %}
 class DefaultMetricsIntegration:
+    def __init__(
+        self,
+        client_response_time_histogram: Histogram | None = None,
+        client_non_http_errors_counter: Counter | None = None,
+    ):
+        self._client_response_time_histogram = client_response_time_histogram
+        self._client_non_http_errors_counter = client_non_http_errors_counter
+
     def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
         self._client_non_http_errors_counter.labels(
             client_name=client_name,
@@ -91,6 +93,9 @@ class DefaultMetricsIntegration:
             http_target=http_target,
             http_status_code=response.status_code,
         ).observe(response.elapsed.total_seconds())
+
+    def shadow_path(self) -> bool:
+        return True
 {%- endif %}
 
 
@@ -272,9 +277,7 @@ class {{ name }}:
         client: httpx.AsyncClient | None = None,
         {%- endif %}
         headers: dict[str, str] | None = None,
-        {%- if metrics %}
         metrics_integration: MetricsIntegration | None = None,
-        {%- endif %}
         logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
         {%- if sync %}
@@ -284,9 +287,7 @@ class {{ name }}:
         {%- endif %}
         self.base_url = base_url
         self.headers = headers or {}
-        {%- if metrics %}
-        self.metrics_integration=metrics_integration
-        {%- endif %}
+        self.metrics_integration = metrics_integration
         self.logs_integration = logs_integration
         self.client_name = client_name
         {% if required_headers %}

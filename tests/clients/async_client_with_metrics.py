@@ -45,16 +45,6 @@ except AttributeError:
 
 
 class MetricsIntegration(Protocol):
-    def __init__(
-        self,
-        client_response_time_histogram: Histogram | None = None,
-        client_non_http_errors_counter: Counter | None = None,
-        shadow_path: bool = True,
-    ):
-        self._client_response_time_histogram = client_response_time_histogram
-        self._client_non_http_errors_counter = client_non_http_errors_counter
-        self.shadow_path = shadow_path
-
     def on_request_error(
         self, client_name: str, error: Exception, http_method: str, http_target: str
     ) -> None:
@@ -65,8 +55,19 @@ class MetricsIntegration(Protocol):
     ) -> None:
         ...
 
+    def shadow_path(self) -> bool:
+        ...
+
 
 class DefaultMetricsIntegration:
+    def __init__(
+        self,
+        client_response_time_histogram: Histogram | None = None,
+        client_non_http_errors_counter: Counter | None = None,
+    ):
+        self._client_response_time_histogram = client_response_time_histogram
+        self._client_non_http_errors_counter = client_non_http_errors_counter
+
     def on_request_error(
         self, client_name: str, error: Exception, http_method: str, http_target: str
     ) -> None:
@@ -87,6 +88,9 @@ class DefaultMetricsIntegration:
             http_target=http_target,
             http_status_code=response.status_code,
         ).observe(response.elapsed.total_seconds())
+
+    def shadow_path(self) -> bool:
+        return True
 
 
 @dataclass
@@ -646,37 +650,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name,
-                        exc,
-                        "get",
-                        "/objects/no-ref-schema/:object_id",
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects/no-ref-schema/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name,
-                        exc,
-                        "get",
-                        f"/objects/no-ref-schema/{object_id}",
-                    )
+                    metrics_path = f"/objects/no-ref-schema/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name,
-                    response,
-                    "get",
-                    "/objects/no-ref-schema/:object_id",
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects/no-ref-schema/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name,
-                    response,
-                    "get",
-                    f"/objects/no-ref-schema/{object_id}",
-                )
+                metrics_path = f"/objects/no-ref-schema/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -701,7 +692,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -727,25 +718,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/objects/:object_id"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/objects/{object_id}"
-                    )
+                    metrics_path = f"/objects/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/objects/:object_id"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/objects/{object_id}"
-                )
+                metrics_path = f"/objects/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -801,25 +791,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/object-with-array-response"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/object-with-array-response"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/object-with-array-response"
-                    )
+                    metrics_path = f"/object-with-array-response"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/object-with-array-response"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/object-with-array-response"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/object-with-array-response"
-                )
+                metrics_path = f"/object-with-array-response"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -866,25 +855,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/object-with-inline-array"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/object-with-inline-array"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/object-with-inline-array"
-                    )
+                    metrics_path = f"/object-with-inline-array"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/object-with-inline-array"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/object-with-inline-array"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/object-with-inline-array"
-                )
+                metrics_path = f"/object-with-inline-array"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -928,25 +916,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/objects"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/objects"
-                    )
+                    metrics_path = f"/objects"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/objects"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/objects"
-                )
+                metrics_path = f"/objects"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -990,25 +977,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/text"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/text"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/text"
-                    )
+                    metrics_path = f"/text"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/text"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/text"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/text"
-                )
+                metrics_path = f"/text"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1052,25 +1038,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/text_as_integer"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/text_as_integer"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/text_as_integer"
-                    )
+                    metrics_path = f"/text_as_integer"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/text_as_integer"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/text_as_integer"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/text_as_integer"
-                )
+                metrics_path = f"/text_as_integer"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1114,25 +1099,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/empty"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/empty"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/empty"
-                    )
+                    metrics_path = f"/empty"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/empty"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/empty"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/empty"
-                )
+                metrics_path = f"/empty"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1176,25 +1160,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/binary"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/binary"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/binary"
-                    )
+                    metrics_path = f"/binary"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/binary"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/binary"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/binary"
-                )
+                metrics_path = f"/binary"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1238,25 +1221,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/allof"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/allof"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/allof"
-                    )
+                    metrics_path = f"/allof"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/allof"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/allof"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/allof"
-                )
+                metrics_path = f"/allof"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1280,7 +1262,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}
@@ -1304,25 +1286,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", "/slow/objects/:object_id"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/slow/objects/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "get", f"/slow/objects/{object_id}"
-                    )
+                    metrics_path = f"/slow/objects/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "get", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", "/slow/objects/:object_id"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/slow/objects/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "get", f"/slow/objects/{object_id}"
-                )
+                metrics_path = f"/slow/objects/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "get", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -1383,25 +1364,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", "/post-without-body"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/post-without-body"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", f"/post-without-body"
-                    )
+                    metrics_path = f"/post-without-body"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "post", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", "/post-without-body"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/post-without-body"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", f"/post-without-body"
-                )
+                metrics_path = f"/post-without-body"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "post", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1459,25 +1439,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", "/objects"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", f"/objects"
-                    )
+                    metrics_path = f"/objects"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "post", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", "/objects"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", f"/objects"
-                )
+                metrics_path = f"/objects"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "post", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1536,25 +1515,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", "/objects-form-data"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects-form-data"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", f"/objects-form-data"
-                    )
+                    metrics_path = f"/objects-form-data"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "post", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", "/objects-form-data"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects-form-data"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", f"/objects-form-data"
-                )
+                metrics_path = f"/objects-form-data"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "post", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1618,25 +1596,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", "/multipart-form-data"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/multipart-form-data"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", f"/multipart-form-data"
-                    )
+                    metrics_path = f"/multipart-form-data"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "post", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", "/multipart-form-data"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/multipart-form-data"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", f"/multipart-form-data"
-                )
+                metrics_path = f"/multipart-form-data"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "post", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1694,25 +1671,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", "/request-body-anyof"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/request-body-anyof"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "post", f"/request-body-anyof"
-                    )
+                    metrics_path = f"/request-body-anyof"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "post", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", "/request-body-anyof"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/request-body-anyof"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "post", f"/request-body-anyof"
-                )
+                metrics_path = f"/request-body-anyof"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "post", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1771,25 +1747,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "patch", "/objects/:object_id"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "patch", f"/objects/{object_id}"
-                    )
+                    metrics_path = f"/objects/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "patch", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "patch", "/objects/:object_id"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "patch", f"/objects/{object_id}"
-                )
+                metrics_path = f"/objects/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "patch", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="patch",
@@ -1848,25 +1823,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "put", "/objects/:object_id"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "put", f"/objects/{object_id}"
-                    )
+                    metrics_path = f"/objects/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "put", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "put", "/objects/:object_id"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "put", f"/objects/{object_id}"
-                )
+                metrics_path = f"/objects/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "put", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="put",
@@ -1925,25 +1899,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "put", "/slow/objects/:object_id"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/slow/objects/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "put", f"/slow/objects/{object_id}"
-                    )
+                    metrics_path = f"/slow/objects/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "put", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "put", "/slow/objects/:object_id"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/slow/objects/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "put", f"/slow/objects/{object_id}"
-                )
+                metrics_path = f"/slow/objects/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "put", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="put",
@@ -1993,25 +1966,24 @@ class Client:
             )
         except Exception as exc:
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "delete", "/objects/:object_id"
-                    )
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/objects/:object_id"
                 else:
-                    self.metrics_integration.on_request_error(
-                        self.client_name, exc, "delete", f"/objects/{object_id}"
-                    )
+                    metrics_path = f"/objects/{object_id}"
+                self.metrics_integration.on_request_error(
+                    self.client_name, exc, "delete", metrics_path
+                )
+
             raise exc
 
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "delete", "/objects/:object_id"
-                )
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/objects/:object_id"
             else:
-                self.metrics_integration.on_request_success(
-                    self.client_name, response, "delete", f"/objects/{object_id}"
-                )
+                metrics_path = f"/objects/{object_id}"
+            self.metrics_integration.on_request_success(
+                self.client_name, response, "delete", metrics_path
+            )
         req = RequestBox(
             client_name=self.client_name,
             method="delete",

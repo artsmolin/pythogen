@@ -2,14 +2,13 @@
         try:
             response = {% if not sync %}await {% endif %}self.client.request("{{ method }}", url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, content=content, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
         except Exception as exc:
-            {%- if metrics %}
             if self.metrics_integration:
-                if self.metrics_integration.shadow_path:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "{{ path | replace('{', ':') | replace('}', '') }}"
                 else:
-                    self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", f"{{ path }}")
+                    metrics_path = f"{{ path }}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", metrics_path)
 
-            {%- endif %}
             raise exc
         {#
             https://www.python-httpx.org/api/#response
@@ -17,10 +16,9 @@
             and calling close() on the corresponding response received for that request.
             total_seconds() to correctly get the total elapsed seconds.
         #}
-        {%- if metrics %}
         if self.metrics_integration:
-            if self.metrics_integration.shadow_path:
-                self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}", "{{ path | replace('{', ':') | replace('}', '') }}")
+            if self.metrics_integration.shadow_path():
+                metrics_path = "{{ path | replace('{', ':') | replace('}', '') }}"
             else:
-                self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}",  f"{{ path }}")
-        {%- endif %}
+                metrics_path = f"{{ path }}"
+            self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}",  metrics_path)

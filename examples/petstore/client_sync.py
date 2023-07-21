@@ -35,6 +35,17 @@ except AttributeError:
     DEFAULT_AUTH = None
 
 
+class MetricsIntegration(Protocol):
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
+        ...
+
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
+        ...
+
+    def shadow_path(self) -> bool:
+        ...
+
+
 @dataclass
 class RequestBox:
     client_name: str
@@ -332,11 +343,13 @@ class Client:
         client_name: str = "",
         client: httpx.Client | None = None,
         headers: dict[str, str] | None = None,
+        metrics_integration: MetricsIntegration | None = None,
         logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
+        self.metrics_integration = metrics_integration
         self.logs_integration = logs_integration
         self.client_name = client_name
 
@@ -367,8 +380,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet/findByStatus"
+                else:
+                    metrics_path = f"/pet/findByStatus"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet/findByStatus"
+            else:
+                metrics_path = f"/pet/findByStatus"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -423,8 +449,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet/findByTags"
+                else:
+                    metrics_path = f"/pet/findByTags"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet/findByTags"
+            else:
+                metrics_path = f"/pet/findByTags"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -477,8 +516,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet/:petId"
+                else:
+                    metrics_path = f"/pet/{petId}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet/:petId"
+            else:
+                metrics_path = f"/pet/{petId}"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -541,8 +593,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/store/inventory"
+                else:
+                    metrics_path = f"/store/inventory"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/store/inventory"
+            else:
+                metrics_path = f"/store/inventory"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -584,8 +649,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/store/order/:orderId"
+                else:
+                    metrics_path = f"/store/order/{orderId}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/store/order/:orderId"
+            else:
+                metrics_path = f"/store/order/{orderId}"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -654,8 +732,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user/login"
+                else:
+                    metrics_path = f"/user/login"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user/login"
+            else:
+                metrics_path = f"/user/login"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -707,8 +798,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user/logout"
+                else:
+                    metrics_path = f"/user/logout"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user/logout"
+            else:
+                metrics_path = f"/user/logout"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -747,8 +851,21 @@ class Client:
         try:
             response = self.client.request("get", url, headers=headers_, params=params, content=content, auth=auth_)
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user/:username"
+                else:
+                    metrics_path = f"/user/{username}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user/:username"
+            else:
+                metrics_path = f"/user/{username}"
+            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="get",
@@ -827,8 +944,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet"
+                else:
+                    metrics_path = f"/pet"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet"
+            else:
+                metrics_path = f"/pet"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -896,8 +1026,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet_or_tag"
+                else:
+                    metrics_path = f"/pet_or_tag"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet_or_tag"
+            else:
+                metrics_path = f"/pet_or_tag"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -963,8 +1106,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet/:petId"
+                else:
+                    metrics_path = f"/pet/{petId}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet/:petId"
+            else:
+                metrics_path = f"/pet/{petId}"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1033,8 +1189,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet/:petId/uploadImage"
+                else:
+                    metrics_path = f"/pet/{petId}/uploadImage"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet/:petId/uploadImage"
+            else:
+                metrics_path = f"/pet/{petId}/uploadImage"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1091,8 +1260,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/store/order"
+                else:
+                    metrics_path = f"/store/order"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/store/order"
+            else:
+                metrics_path = f"/store/order"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1160,8 +1342,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user"
+                else:
+                    metrics_path = f"/user"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user"
+            else:
+                metrics_path = f"/user"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1215,8 +1410,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user/createWithList"
+                else:
+                    metrics_path = f"/user/createWithList"
+                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user/createWithList"
+            else:
+                metrics_path = f"/user/createWithList"
+            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="post",
@@ -1273,8 +1481,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet"
+                else:
+                    metrics_path = f"/pet"
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet"
+            else:
+                metrics_path = f"/pet"
+            self.metrics_integration.on_request_success(self.client_name, response, "put", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="put",
@@ -1365,8 +1586,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user/:username"
+                else:
+                    metrics_path = f"/user/{username}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "put", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user/:username"
+            else:
+                metrics_path = f"/user/{username}"
+            self.metrics_integration.on_request_success(self.client_name, response, "put", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="put",
@@ -1415,8 +1649,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/pet/:petId"
+                else:
+                    metrics_path = f"/pet/{petId}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/pet/:petId"
+            else:
+                metrics_path = f"/pet/{petId}"
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="delete",
@@ -1473,8 +1720,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/store/order/:orderId"
+                else:
+                    metrics_path = f"/store/order/{orderId}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/store/order/:orderId"
+            else:
+                metrics_path = f"/store/order/{orderId}"
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="delete",
@@ -1542,8 +1802,21 @@ class Client:
                 auth=auth_,
             )
         except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/user/:username"
+                else:
+                    metrics_path = f"/user/{username}"
+                self.metrics_integration.on_request_error(self.client_name, exc, "delete", metrics_path)
+
             raise exc
 
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/user/:username"
+            else:
+                metrics_path = f"/user/{username}"
+            self.metrics_integration.on_request_success(self.client_name, response, "delete", metrics_path)
         req = RequestBox(
             client_name=self.client_name,
             method="delete",
