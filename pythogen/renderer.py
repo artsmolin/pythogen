@@ -74,6 +74,7 @@ def render_client(
         metrics=metrics,
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
         required_headers=required_headers,
+        operations=prepared_operations.all(),
     )
     rendered_client = black.format_str(rendered_client, mode=black.FileMode())
     rendered_client = isort.code(
@@ -99,6 +100,9 @@ class PreparedOperations(Generic[PathStr]):
     put: dict[PathStr, models.OperationObject]
     patch: dict[PathStr, models.OperationObject]
     delete_no_body: dict[PathStr, models.OperationObject]
+
+    def all(self) -> dict[PathStr, models.OperationObject]:
+        return self.get | self.post | self.post_no_body | self.put | self.patch | self.delete_no_body
 
 
 def prepare_operations(document: models.Document) -> PreparedOperations:

@@ -176,29 +176,21 @@ class EmptyBody(BaseModel):
     text: str
 
 
-class GetObjectNoRefSchemaQueryParams(BaseModel):
-    from_: str
-    return_error: str | None = None
-
-
-class GetObjectQueryParams(BaseModel):
-    from_: str
-    return_error: str | None = None
-
-
-class GetObjectSlowQueryParams(BaseModel):
-    return_error: str | None = None
-
-
 class GetObjectNoRefSchemaPathParams(BaseModel):
     object_id: str
 
 
-class GetObjectPathParams(BaseModel):
+class GetObjectNoRefSchemaQueryParams(BaseModel):
+    from_: str
+
+    return_error: str | None = None
+
+
+class DeleteObjectPathParams(BaseModel):
     object_id: str
 
 
-class GetObjectSlowPathParams(BaseModel):
+class PutObjectSlowPathParams(BaseModel):
     object_id: str
 
 

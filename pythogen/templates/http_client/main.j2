@@ -207,8 +207,7 @@ class EmptyBody(BaseModel):
     text: str
 
 
-{% include 'query_params_schemas.j2' %}
-{% include 'path_params_schemas.j2' %}
+{% include 'operation_params_schemas.j2' %}
 
 {% for schema in discriminator_base_class_schemas %}
 class {{ schema.name }}(BaseModel):

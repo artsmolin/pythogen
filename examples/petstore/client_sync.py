@@ -152,21 +152,29 @@ class FindPetsByTagsQueryParams(BaseModel):
     tags: list[str] | None = None
 
 
+class DeletePetPathParams(BaseModel):
+    petId: int
+
+
+class DeleteOrderPathParams(BaseModel):
+    orderId: int
+
+
 class LoginUserQueryParams(BaseModel):
     username: str | None = None
     password: str | None = None
 
 
-class GetPetByIdPathParams(BaseModel):
+class DeleteUserPathParams(BaseModel):
+    username: str
+
+
+class UploadFilePathParams(BaseModel):
     petId: int
 
 
-class GetOrderByIdPathParams(BaseModel):
-    orderId: int
-
-
-class GetUserByNamePathParams(BaseModel):
-    username: str
+class UploadFileQueryParams(BaseModel):
+    additional_metadata: str | None = None
 
 
 class LoginuserResponse200(BaseModel):

@@ -1,0 +1,44 @@
+{% for path, operation in operations.items() %}
+
+{# Path Parameters #}
+{# ------------------------------------------------------------------------- #}
+{% if operation.path_params %}
+class {{ classname(operation.fn_name) }}PathParams(BaseModel):
+
+    {# required #}
+    {%- for parameter in operation.path_params %}
+    {%- if parameter.required %}
+    {{ parameter.key }}: {{ typerepr(parameter.schema) }}
+    {%- endif %}
+    {%- endfor %}
+
+    {# optional #}
+    {%- for parameter in operation.path_params -%}
+    {%- if not parameter.required %}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None
+    {%- endif %}
+    {%- endfor %}
+{% endif %}
+
+
+{# Query Parameters #}
+{# ------------------------------------------------------------------------- #}
+{% if operation.query_params %}
+class {{ classname(operation.fn_name) }}QueryParams(BaseModel):
+
+    {# required #}
+    {%- for parameter in operation.query_params -%}
+    {%- if parameter.required %}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }}
+    {%- endif %}
+    {%- endfor %}
+
+    {# optional #}
+    {%- for parameter in operation.query_params -%}
+    {%- if not parameter.required %}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None
+    {%- endif %}
+    {%- endfor %}
+{%- endif %}
+
+{% endfor %}
