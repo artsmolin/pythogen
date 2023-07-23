@@ -207,7 +207,7 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         else:
             types.append(j2_typerepr(response.schema))
 
-    types = list(set(types))
+    types = sorted(list(set(types)))
 
     if not types:
         return 'None'

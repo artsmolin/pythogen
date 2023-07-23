@@ -36,10 +36,22 @@ except AttributeError:
 
 
 class MetricsIntegration(Protocol):
-    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
+    def on_request_error(
+        self,
+        client_name: str,
+        error: Exception,
+        http_method: str,
+        http_target: str,
+    ) -> None:
         ...
 
-    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
+    def on_request_success(
+        self,
+        client_name: str,
+        response,
+        http_method: str,
+        http_target: str,
+    ) -> None:
         ...
 
     def shadow_path(self) -> bool:
@@ -130,6 +142,31 @@ class RequiredHeaders(Exception):
 class EmptyBody(BaseModel):
     status_code: int
     text: str
+
+
+class FindPetsByStatusQueryParams(BaseModel):
+    status: Literal["available", "pending", "sold"] | None = None
+
+
+class FindPetsByTagsQueryParams(BaseModel):
+    tags: list[str] | None = None
+
+
+class LoginUserQueryParams(BaseModel):
+    username: str | None = None
+    password: str | None = None
+
+
+class GetPetByIdPathParams(BaseModel):
+    petId: int
+
+
+class GetOrderByIdPathParams(BaseModel):
+    orderId: int
+
+
+class GetUserByNamePathParams(BaseModel):
+    username: str
 
 
 class LoginuserResponse200(BaseModel):
@@ -501,7 +538,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet/{petId}")
 
         params = {}
@@ -638,7 +675,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order/{orderId}")
 
         params = {}
@@ -926,7 +963,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}
@@ -1008,7 +1045,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | Tag | EmptyBody:
+    ) -> EmptyBody | Pet | Tag:
         url = self._get_url(f"/pet_or_tag")
 
         params = {}
@@ -1242,7 +1279,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Order | EmptyBody:
+    ) -> EmptyBody | Order:
         url = self._get_url(f"/store/order")
 
         params = {}
@@ -1463,7 +1500,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> Pet | EmptyBody:
+    ) -> EmptyBody | Pet:
         url = self._get_url(f"/pet")
 
         params = {}

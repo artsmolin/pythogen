@@ -44,12 +44,20 @@ except AttributeError:
 
 class MetricsIntegration(Protocol):
     def on_request_error(
-        self, client_name: str, error: Exception, http_method: str, http_target: str
+        self,
+        client_name: str,
+        error: Exception,
+        http_method: str,
+        http_target: str,
     ) -> None:
         ...
 
     def on_request_success(
-        self, client_name: str, response, http_method: str, http_target: str
+        self,
+        client_name: str,
+        response,
+        http_method: str,
+        http_target: str,
     ) -> None:
         ...
 
@@ -166,6 +174,32 @@ class IntegerEnum(IntEnum):
 class EmptyBody(BaseModel):
     status_code: int
     text: str
+
+
+class GetObjectNoRefSchemaQueryParams(BaseModel):
+    from_: str
+    return_error: str | None = None
+
+
+class GetObjectQueryParams(BaseModel):
+    from_: str
+    return_error: str | None = None
+
+
+class GetObjectSlowQueryParams(BaseModel):
+    return_error: str | None = None
+
+
+class GetObjectNoRefSchemaPathParams(BaseModel):
+    object_id: str
+
+
+class GetObjectPathParams(BaseModel):
+    object_id: str
+
+
+class GetObjectSlowPathParams(BaseModel):
+    object_id: str
 
 
 class BaseObjectResp(BaseModel):

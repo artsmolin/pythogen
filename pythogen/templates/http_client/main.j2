@@ -57,10 +57,10 @@ except AttributeError:
 
 
 class MetricsIntegration(Protocol):
-    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str) -> None:
+    def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str,) -> None:
         ...
 
-    def on_request_success(self, client_name: str, response, http_method: str, http_target: str) -> None:
+    def on_request_success(self, client_name: str, response, http_method: str, http_target: str,) -> None:
         ...
 
     def shadow_path(self) -> bool:
@@ -205,6 +205,10 @@ class {{ classname(enum_class.id) }}(str, Enum):
 class EmptyBody(BaseModel):
     status_code: int
     text: str
+
+
+{% include 'query_params_schemas.j2' %}
+{% include 'path_params_schemas.j2' %}
 
 {% for schema in discriminator_base_class_schemas %}
 class {{ schema.name }}(BaseModel):

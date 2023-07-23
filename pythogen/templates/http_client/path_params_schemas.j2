@@ -1,0 +1,16 @@
+{% for path, operation in get.items() %}
+{% if operation.path_params %}
+class {{ classname(operation.fn_name) }}PathParams(BaseModel):
+    {%- for parameter in operation.path_params %}
+    {%- if parameter.required %}
+    {{ parameter.key }}: {{ typerepr(parameter.schema) }}
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for parameter in operation.path_params -%}
+    {%- if not parameter.required %}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None
+    {%- endif %}
+    {%- endfor %}
+{% endif %}
+{% endfor %}
