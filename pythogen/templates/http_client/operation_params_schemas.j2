@@ -1,21 +1,25 @@
-{% for path, operation in operations.items() %}
+{% for operation in operations %}
 
 {# Path Parameters #}
 {# ------------------------------------------------------------------------- #}
 {% if operation.path_params %}
 class {{ classname(operation.fn_name) }}PathParams(BaseModel):
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     {# required #}
     {%- for parameter in operation.path_params %}
     {%- if parameter.required %}
-    {{ parameter.key }}: {{ typerepr(parameter.schema) }}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 
     {# optional #}
     {%- for parameter in operation.path_params -%}
     {%- if not parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 {% endif %}
@@ -26,17 +30,45 @@ class {{ classname(operation.fn_name) }}PathParams(BaseModel):
 {% if operation.query_params %}
 class {{ classname(operation.fn_name) }}QueryParams(BaseModel):
 
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
     {# required #}
     {%- for parameter in operation.query_params -%}
     {%- if parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 
     {# optional #}
     {%- for parameter in operation.query_params -%}
     {%- if not parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = {{ parameterfield(parameter) }}
+    {%- endif %}
+    {%- endfor %}
+{%- endif %}
+
+{# Header Parameters #}
+{# ------------------------------------------------------------------------- #}
+{% if operation.headers %}
+class {{ classname(operation.fn_name) }}Headers(BaseModel):
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    {# required #}
+    {%- for header in operation.headers -%}
+    {%- if header.required %}
+    {{ varname(header.key) }}: {{ typerepr(header.schema) }} = {{ parameterfield(header) }}
+    {%- endif %}
+    {%- endfor %}
+
+    {# optional #}
+    {%- for header in operation.headers -%}
+    {%- if not header.required %}
+    {{ varname(header.key) }}: {{ typerepr(header.schema) }} | None = {{ parameterfield(header) }}
     {%- endif %}
     {%- endfor %}
 {%- endif %}

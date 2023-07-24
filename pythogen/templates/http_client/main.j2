@@ -237,7 +237,6 @@ class {{ classname(model.id) }}(BaseModel):
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
 
-    {% if model.required_properties|length > 0 %}# required ---{% endif %}
     {%- for property in model.required_properties %}
         {%- if property.schema.description %}
     {{ property.key }}: {{ typerepr(property.schema, document) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
@@ -246,7 +245,6 @@ class {{ classname(model.id) }}(BaseModel):
         {%- endif %}
     {%- endfor %}
 
-    {% if model.optional_properties|length > 0 %}# optional ---{% endif %}
     {%- for property in model.optional_properties %}
         {%- if property.schema.description %}
     {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(None, description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})

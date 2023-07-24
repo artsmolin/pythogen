@@ -145,36 +145,125 @@ class EmptyBody(BaseModel):
 
 
 class FindPetsByStatusQueryParams(BaseModel):
-    status: Literal["available", "pending", "sold"] | None = None
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    status: Literal["available", "pending", "sold"] | None = Field(None, alias="status")
 
 
 class FindPetsByTagsQueryParams(BaseModel):
-    tags: list[str] | None = None
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    tags: list[str] | None = Field(None, alias="tags")
 
 
-class DeletePetPathParams(BaseModel):
-    petId: int
+class GetPetByIdPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    pet_id: int = Field(alias="petId")
 
 
-class DeleteOrderPathParams(BaseModel):
-    orderId: int
+class GetOrderByIdPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    order_id: int = Field(alias="orderId")
 
 
 class LoginUserQueryParams(BaseModel):
-    username: str | None = None
-    password: str | None = None
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    username: str | None = Field(None, alias="username")
+    password: str | None = Field(None, alias="password")
 
 
-class DeleteUserPathParams(BaseModel):
-    username: str
+class GetUserByNamePathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    username: str = Field(alias="username")
+
+
+class UpdatePetWithFormPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    pet_id: int = Field(alias="petId")
+
+
+class UpdatePetWithFormQueryParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    name: str | None = Field(None, alias="name")
+    status: str | None = Field(None, alias="status")
 
 
 class UploadFilePathParams(BaseModel):
-    petId: int
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    pet_id: int = Field(alias="petId")
 
 
 class UploadFileQueryParams(BaseModel):
-    additional_metadata: str | None = None
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    additional_metadata: str | None = Field(None, alias="additionalMetadata")
+
+
+class UpdateUserPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    username: str = Field(alias="username")
+
+
+class DeletePetPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    pet_id: int = Field(alias="petId")
+
+
+class DeletePetHeaders(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    api_key: str | None = Field(None, alias="api_key")
+
+
+class DeleteOrderPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    order_id: int = Field(alias="orderId")
+
+
+class DeleteUserPathParams(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    username: str = Field(alias="username")
 
 
 class LoginuserResponse200(BaseModel):
@@ -185,8 +274,6 @@ class LoginuserResponse200(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     text: str | None = None
 
 
@@ -218,8 +305,6 @@ class UploadfileRequestBody(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     content: bytes | None = None
 
 
@@ -251,8 +336,6 @@ class ApiResponse(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     code: int | None = None
     type: str | None = None
     message: str | None = None
@@ -266,8 +349,6 @@ class Tag(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     id: int | None = None
     name: str | None = None
 
@@ -280,8 +361,6 @@ class Category(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     id: int | None = None
     name: str | None = None
 
@@ -294,12 +373,8 @@ class Pet(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # required ---
     name: str
     photoUrls: list[str]
-
-    # optional ---
     id: int | None = None
     category: Category | None = None
     tags: list[Tag] | None = None
@@ -314,8 +389,6 @@ class User(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     id: int | None = None
     username: str | None = None
     firstName: str | None = None
@@ -334,8 +407,6 @@ class Address(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     street: str | None = None
     city: str | None = None
     state: str | None = None
@@ -350,8 +421,6 @@ class Customer(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     id: int | None = None
     username: str | None = None
     address: list[Address] | None = None
@@ -365,8 +434,6 @@ class Order(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-    # optional ---
     id: int | None = None
     petId: int | None = None
     quantity: int | None = None
@@ -400,16 +467,20 @@ class Client:
 
     async def findPetsByStatus(
         self,
-        status: Literal["available", "pending", "sold"] | None = None,
+        query_params: FindPetsByStatusQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | list[Pet]:
-        url = self._get_url(f"/pet/findByStatus")
+        method = "get"
 
-        params = {}
-        if status is not None:
-            params["status"] = status
+        path = "/pet/findByStatus"
+
+        url = f"{self.base_url}{path}"
+
+        if isinstance(query_params, FindPetsByStatusQueryParams):
+            params = query_params.model_dump(by_alias=True, exclude_none=True)
+        else:
+            params = query_params
 
         headers_ = self.headers.copy()
 
@@ -420,19 +491,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet/findByStatus"
                 else:
-                    metrics_path = f"/pet/findByStatus"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -440,11 +509,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet/findByStatus"
             else:
-                metrics_path = f"/pet/findByStatus"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -471,16 +541,20 @@ class Client:
 
     async def findPetsByTags(
         self,
-        tags: list[str] | None = None,
+        query_params: FindPetsByTagsQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | list[Pet]:
-        url = self._get_url(f"/pet/findByTags")
+        method = "get"
 
-        params = {}
-        if tags is not None:
-            params["tags"] = tags
+        path = "/pet/findByTags"
+
+        url = f"{self.base_url}{path}"
+
+        if isinstance(query_params, FindPetsByTagsQueryParams):
+            params = query_params.model_dump(by_alias=True, exclude_none=True)
+        else:
+            params = query_params
 
         headers_ = self.headers.copy()
 
@@ -491,19 +565,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet/findByTags"
                 else:
-                    metrics_path = f"/pet/findByTags"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -511,11 +583,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet/findByTags"
             else:
-                metrics_path = f"/pet/findByTags"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -542,14 +615,20 @@ class Client:
 
     async def getPetById(
         self,
-        petId: int,
+        path_params: GetPetByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | Pet:
-        url = self._get_url(f"/pet/{petId}")
+        method = "get"
 
-        params = {}
+        if isinstance(path_params, GetPetByIdPathParams):
+            path = "/pet/{petId}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/pet/{petId}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -560,19 +639,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet/:petId"
                 else:
-                    metrics_path = f"/pet/{petId}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -580,11 +657,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet/:petId"
             else:
-                metrics_path = f"/pet/{petId}"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -624,11 +702,14 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> GetinventoryResponse200 | None:
-        url = self._get_url(f"/store/inventory")
+        method = "get"
 
-        params = {}
+        path = "/store/inventory"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -639,19 +720,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/store/inventory"
                 else:
-                    metrics_path = f"/store/inventory"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -659,11 +738,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/store/inventory"
             else:
-                metrics_path = f"/store/inventory"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -679,14 +759,20 @@ class Client:
 
     async def getOrderById(
         self,
-        orderId: int,
+        path_params: GetOrderByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | Order:
-        url = self._get_url(f"/store/order/{orderId}")
+        method = "get"
 
-        params = {}
+        if isinstance(path_params, GetOrderByIdPathParams):
+            path = "/store/order/{orderId}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/store/order/{orderId}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -697,19 +783,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/store/order/:orderId"
                 else:
-                    metrics_path = f"/store/order/{orderId}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -717,11 +801,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/store/order/:orderId"
             else:
-                metrics_path = f"/store/order/{orderId}"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -759,19 +844,20 @@ class Client:
 
     async def loginUser(
         self,
-        username: str | None = None,
-        password: str | None = None,
+        query_params: LoginUserQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | LoginuserResponse200:
-        url = self._get_url(f"/user/login")
+        method = "get"
 
-        params = {}
-        if username is not None:
-            params["username"] = username
-        if password is not None:
-            params["password"] = password
+        path = "/user/login"
+
+        url = f"{self.base_url}{path}"
+
+        if isinstance(query_params, LoginUserQueryParams):
+            params = query_params.model_dump(by_alias=True, exclude_none=True)
+        else:
+            params = query_params
 
         headers_ = self.headers.copy()
 
@@ -782,19 +868,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user/login"
                 else:
-                    metrics_path = f"/user/login"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -802,11 +886,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user/login"
             else:
-                metrics_path = f"/user/login"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -835,11 +920,14 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> None:
-        url = self._get_url(f"/user/logout")
+        method = "get"
 
-        params = {}
+        path = "/user/logout"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -850,19 +938,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user/logout"
                 else:
-                    metrics_path = f"/user/logout"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -870,11 +956,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user/logout"
             else:
-                metrics_path = f"/user/logout"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -887,14 +974,20 @@ class Client:
 
     async def getUserByName(
         self,
-        username: str,
+        path_params: GetUserByNamePathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | User:
-        url = self._get_url(f"/user/{username}")
+        method = "get"
 
-        params = {}
+        if isinstance(path_params, GetUserByNamePathParams):
+            path = "/user/{username}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/user/{username}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -905,19 +998,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "get", url, headers=headers_, params=params, content=content, auth=auth_
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user/:username"
                 else:
-                    metrics_path = f"/user/{username}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "get", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -925,11 +1016,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user/:username"
             else:
-                metrics_path = f"/user/{username}"
-            self.metrics_integration.on_request_success(self.client_name, response, "get", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="get",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -967,14 +1059,17 @@ class Client:
 
     async def addPet(
         self,
-        body: Pet | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: Pet | dict[str, Any] | None = None,
     ) -> EmptyBody | Pet:
-        url = self._get_url(f"/pet")
+        method = "post"
 
-        params = {}
+        path = "/pet"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -992,25 +1087,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet"
                 else:
-                    metrics_path = f"/pet"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1018,11 +1105,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet"
             else:
-                metrics_path = f"/pet"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1049,14 +1137,17 @@ class Client:
 
     async def addPet(
         self,
-        body: Pet | Tag | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: Pet | Tag | dict[str, Any] | None = None,
     ) -> EmptyBody | Pet | Tag:
-        url = self._get_url(f"/pet_or_tag")
+        method = "post"
 
-        params = {}
+        path = "/pet_or_tag"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1074,25 +1165,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet_or_tag"
                 else:
-                    metrics_path = f"/pet_or_tag"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1100,11 +1183,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet_or_tag"
             else:
-                metrics_path = f"/pet_or_tag"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1131,20 +1215,24 @@ class Client:
 
     async def updatePetWithForm(
         self,
-        petId: int,
-        name: str | None = None,
-        status: str | None = None,
+        path_params: UpdatePetWithFormPathParams | dict[str, Any],
+        query_params: UpdatePetWithFormQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | None:
-        url = self._get_url(f"/pet/{petId}")
+        method = "post"
 
-        params = {}
-        if name is not None:
-            params["name"] = name
-        if status is not None:
-            params["status"] = status
+        if isinstance(path_params, UpdatePetWithFormPathParams):
+            path = "/pet/{petId}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/pet/{petId}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        if isinstance(query_params, UpdatePetWithFormQueryParams):
+            params = query_params.model_dump(by_alias=True, exclude_none=True)
+        else:
+            params = query_params
 
         headers_ = self.headers.copy()
 
@@ -1155,24 +1243,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet/:petId"
                 else:
-                    metrics_path = f"/pet/{petId}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1180,11 +1261,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet/:petId"
             else:
-                metrics_path = f"/pet/{petId}"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1208,18 +1290,25 @@ class Client:
 
     async def uploadFile(
         self,
-        petId: int,
-        body: bytes | dict[str, Any] | None = None,
-        additional_metadata: str | None = None,
+        path_params: UploadFilePathParams | dict[str, Any],
+        query_params: UploadFileQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: bytes | dict[str, Any] | None = None,
     ) -> ApiResponse | None:
-        url = self._get_url(f"/pet/{petId}/uploadImage")
+        method = "post"
 
-        params = {}
-        if additional_metadata is not None:
-            params["additionalMetadata"] = additional_metadata
+        if isinstance(path_params, UploadFilePathParams):
+            path = "/pet/{petId}/uploadImage".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/pet/{petId}/uploadImage".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        if isinstance(query_params, UploadFileQueryParams):
+            params = query_params.model_dump(by_alias=True, exclude_none=True)
+        else:
+            params = query_params
 
         headers_ = self.headers.copy()
 
@@ -1237,25 +1326,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet/:petId/uploadImage"
                 else:
-                    metrics_path = f"/pet/{petId}/uploadImage"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1263,11 +1344,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet/:petId/uploadImage"
             else:
-                metrics_path = f"/pet/{petId}/uploadImage"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1283,14 +1365,17 @@ class Client:
 
     async def placeOrder(
         self,
-        body: Order | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: Order | dict[str, Any] | None = None,
     ) -> EmptyBody | Order:
-        url = self._get_url(f"/store/order")
+        method = "post"
 
-        params = {}
+        path = "/store/order"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1308,25 +1393,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/store/order"
                 else:
-                    metrics_path = f"/store/order"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1334,11 +1411,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/store/order"
             else:
-                metrics_path = f"/store/order"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1365,14 +1443,17 @@ class Client:
 
     async def createUser(
         self,
-        body: User | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: User | dict[str, Any] | None = None,
     ) -> None:
-        url = self._get_url(f"/user")
+        method = "post"
 
-        params = {}
+        path = "/user"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1390,25 +1471,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user"
                 else:
-                    metrics_path = f"/user"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1416,11 +1489,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user"
             else:
-                metrics_path = f"/user"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1433,14 +1507,17 @@ class Client:
 
     async def createUsersWithListInput(
         self,
-        body: list[User] | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: list[User] | dict[str, Any] | None = None,
     ) -> User | None:
-        url = self._get_url(f"/user/createWithList")
+        method = "post"
 
-        params = {}
+        path = "/user/createWithList"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1458,25 +1535,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "post",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user/createWithList"
                 else:
-                    metrics_path = f"/user/createWithList"
-                self.metrics_integration.on_request_error(self.client_name, exc, "post", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1484,11 +1553,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user/createWithList"
             else:
-                metrics_path = f"/user/createWithList"
-            self.metrics_integration.on_request_success(self.client_name, response, "post", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="post",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1504,14 +1574,17 @@ class Client:
 
     async def updatePet(
         self,
-        body: Pet | dict[str, Any] | None = None,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: Pet | dict[str, Any] | None = None,
     ) -> EmptyBody | Pet:
-        url = self._get_url(f"/pet")
+        method = "put"
 
-        params = {}
+        path = "/pet"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1529,25 +1602,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "put",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet"
                 else:
-                    metrics_path = f"/pet"
-                self.metrics_integration.on_request_error(self.client_name, exc, "put", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1555,11 +1620,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet"
             else:
-                metrics_path = f"/pet"
-            self.metrics_integration.on_request_success(self.client_name, response, "put", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="put",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1608,15 +1674,21 @@ class Client:
 
     async def updateUser(
         self,
-        username: str,
-        body: User | dict[str, Any] | None = None,
+        path_params: UpdateUserPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        body: User | dict[str, Any] | None = None,
     ) -> None:
-        url = self._get_url(f"/user/{username}")
+        method = "put"
 
-        params = {}
+        if isinstance(path_params, UpdateUserPathParams):
+            path = "/user/{username}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/user/{username}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1634,25 +1706,17 @@ class Client:
         else:
             json = None
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "put",
-                url,
-                json=json,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, json=json, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user/:username"
                 else:
-                    metrics_path = f"/user/{username}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "put", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1660,11 +1724,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user/:username"
             else:
-                metrics_path = f"/user/{username}"
-            self.metrics_integration.on_request_success(self.client_name, response, "put", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="put",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1677,19 +1742,28 @@ class Client:
 
     async def deletePet(
         self,
-        petId: int,
-        api_key: str | None = None,
+        path_params: DeletePetPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
+        headers: DeletePetHeaders | dict[str, Any] | None = None,
     ) -> EmptyBody | None:
-        url = self._get_url(f"/pet/{petId}")
+        method = "delete"
 
-        params = {}
+        if isinstance(path_params, DeletePetPathParams):
+            path = "/pet/{petId}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/pet/{petId}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
-        if api_key is not None:
-            headers_["api_key"] = api_key
+
+        if isinstance(headers, DeletePetHeaders):
+            headers_ = headers.model_dump(by_alias=True, exclude_none=True)
+        elif isinstance(headers, dict):
+            headers_ = headers
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -1698,24 +1772,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "delete",
-                url,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/pet/:petId"
                 else:
-                    metrics_path = f"/pet/{petId}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1723,11 +1790,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/pet/:petId"
             else:
-                metrics_path = f"/pet/{petId}"
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="delete",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1751,14 +1819,20 @@ class Client:
 
     async def deleteOrder(
         self,
-        orderId: int,
+        path_params: DeleteOrderPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | None:
-        url = self._get_url(f"/store/order/{orderId}")
+        method = "delete"
 
-        params = {}
+        if isinstance(path_params, DeleteOrderPathParams):
+            path = "/store/order/{orderId}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/store/order/{orderId}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1769,24 +1843,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "delete",
-                url,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/store/order/:orderId"
                 else:
-                    metrics_path = f"/store/order/{orderId}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1794,11 +1861,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/store/order/:orderId"
             else:
-                metrics_path = f"/store/order/{orderId}"
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="delete",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -1833,14 +1901,20 @@ class Client:
 
     async def deleteUser(
         self,
-        username: str,
+        path_params: DeleteUserPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        headers: dict[str, Any] | None = None,
     ) -> EmptyBody | None:
-        url = self._get_url(f"/user/{username}")
+        method = "delete"
 
-        params = {}
+        if isinstance(path_params, DeleteUserPathParams):
+            path = "/user/{username}".format(**path_params.model_dump(by_alias=True))
+        else:
+            path = "/user/{username}".format(**path_params)
+
+        url = f"{self.base_url}{path}"
+
+        params = None
 
         headers_ = self.headers.copy()
 
@@ -1851,24 +1925,17 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if headers:
-            headers_ = headers
         try:
             response = await self.client.request(
-                "delete",
-                url,
-                headers=headers_,
-                params=params,
-                content=content,
-                auth=auth_,
+                method, url, headers=headers_, params=params, content=content, auth=auth_
             )
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "/user/:username"
                 else:
-                    metrics_path = f"/user/{username}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "delete", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
 
@@ -1876,11 +1943,12 @@ class Client:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/user/:username"
             else:
-                metrics_path = f"/user/{username}"
-            self.metrics_integration.on_request_success(self.client_name, response, "delete", metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
         req = RequestBox(
             client_name=self.client_name,
-            method="delete",
+            method=method,
             url=url,
             params=params,
             headers=headers_,

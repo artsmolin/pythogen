@@ -280,6 +280,14 @@ paths:
         - test
       summary: Get Empty
       operationId: get_empty
+      parameters:
+        - required: true
+          schema:
+            title: First Header
+            type: string
+          name: first-header
+          in: header
+
       responses:
         '200':
           description: Successful Response
