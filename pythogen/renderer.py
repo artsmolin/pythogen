@@ -53,6 +53,7 @@ def render_client(
             'typerepr': j2_typerepr,
             'responserepr': j2_responserepr,
             'iterresponsemap': iterresponsemap,
+            'parameterfield': parameterfield,
         },
     )
 
@@ -76,7 +77,7 @@ def render_client(
         required_headers=required_headers,
         operations=prepared_operations.all(),
     )
-    rendered_client = black.format_str(rendered_client, mode=black.FileMode())
+    rendered_client = black.format_str(rendered_client, mode=black.Mode(line_length=120))
     rendered_client = isort.code(
         rendered_client,
         force_grid_wrap=2,
@@ -101,8 +102,15 @@ class PreparedOperations(Generic[PathStr]):
     patch: dict[PathStr, models.OperationObject]
     delete_no_body: dict[PathStr, models.OperationObject]
 
-    def all(self) -> dict[PathStr, models.OperationObject]:
-        return self.get | self.post | self.post_no_body | self.put | self.patch | self.delete_no_body
+    def all(self) -> tuple[models.OperationObject, ...]:
+        return (
+            *self.get.values(),
+            *self.post.values(),
+            *self.post_no_body.values(),
+            *self.put.values(),
+            *self.patch.values(),
+            *self.delete_no_body.values(),
+        )
 
 
 def prepare_operations(document: models.Document) -> PreparedOperations:
@@ -282,6 +290,17 @@ def varname(value: str) -> str:
 def classname(value: str) -> str:
     value = value.replace('.', '')
     return inflection.camelize(value)
+
+
+def parameterfield(parameter: models.ParameterObject) -> str:
+    args: list[str] = []
+    if not parameter.required:
+        args.append('None')
+    if parameter.safety_key != parameter.orig_key:
+        args.append(f'alias="{parameter.orig_key}"')
+    if parameter.description:
+        args.append(f'description="{parameter.description}"')
+    return 'Field(' + ', '.join(args) + ')'
 
 
 PRIMITIVE_TYPE_MAPPING = {

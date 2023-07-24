@@ -27,10 +27,22 @@ def _get_httpx_async_client():
 
 def test_httpx_sync_client():
     httpx_sync_client = _get_httpx_sync_client()
-    response = httpx_sync_client.get_object(object_id='123', return_error='', from_='')
+    response = httpx_sync_client.get_object(
+        path_params=sync_client.GetObjectPathParams(object_id='123'),
+        query_params=sync_client.GetObjectQueryParams(
+            return_error='',
+            from_='',
+        )
+    )
     assert isinstance(response, sync_client.GetObjectResp)
 
-    response = httpx_sync_client.get_object(object_id='123', return_error='true', from_='')
+    response = httpx_sync_client.get_object(
+        path_params=sync_client.GetObjectPathParams(object_id='123'),
+        query_params=sync_client.GetObjectQueryParams(
+            return_error='true',
+            from_='',
+        ),
+    )
     assert isinstance(response, sync_client.UnknownError)
 
     data = sync_client.PostObjectData(
@@ -42,20 +54,28 @@ def test_httpx_sync_client():
         int_enum=sync_client.IntegerEnum._1,
         str_enum=sync_client.StringEnum.FIRST,
     )
-    response = httpx_sync_client.post_object(data)
+    response = httpx_sync_client.post_object(body=data)
     assert isinstance(response, sync_client.PostObjectResp)
 
-    response = httpx_sync_client.post_form_object(data)
+    response = httpx_sync_client.post_form_object(body=data)
     assert isinstance(response, sync_client.PostObjectResp)
 
     # /objects patch
-    response = httpx_sync_client.patch_object(body=sync_client.PatchObjectData(id='id', data=1), object_id='id')
+    response = httpx_sync_client.patch_object(
+        body=sync_client.PatchObjectData(id='id', data=1), 
+        path_params=sync_client.PatchObjectPathParams(object_id='id'),
+    )
     assert isinstance(response, sync_client.PatchObjectResp)
 
-    response = httpx_sync_client.put_object(body=sync_client.PutObjectData(id='id', data=1), object_id='id')
+    response = httpx_sync_client.put_object(
+        body=sync_client.PutObjectData(id='id', data=1), 
+        path_params=sync_client.PutObjectPathParams(object_id='id'),
+    )
     assert isinstance(response, sync_client.PutObjectResp)
 
-    response = httpx_sync_client.delete_object(object_id='id')
+    response = httpx_sync_client.delete_object(
+        path_params=sync_client.DeleteObjectPathParams(object_id='id'),
+    )
     assert isinstance(response, sync_client.DeleteObjectResp)
 
     response = httpx_sync_client.get_list_objects()
@@ -91,10 +111,22 @@ def test_httpx_sync_client():
 @pytest.mark.asyncio
 async def test_httpx_async_client():
     httpx_async_client = _get_httpx_async_client()
-    response = await httpx_async_client.get_object(object_id='123', return_error='', from_='')
+    response = await httpx_async_client.get_object(
+        path_params=async_client.GetObjectPathParams(object_id='123'),
+        query_params=async_client.GetObjectQueryParams(
+            return_error='',
+            from_='',
+        ),
+    )
     assert isinstance(response, async_client.GetObjectResp)
 
-    response = await httpx_async_client.get_object(object_id='123', return_error='true', from_='')
+    response = await httpx_async_client.get_object(
+        path_params=async_client.GetObjectPathParams(object_id='123'),
+        query_params=async_client.GetObjectQueryParams(
+            return_error='true',
+            from_='',
+        ),
+    )
     assert isinstance(response, async_client.UnknownError)
 
     data = async_client.PostObjectData(
@@ -106,20 +138,25 @@ async def test_httpx_async_client():
         int_enum=async_client.IntegerEnum._1,
         str_enum=async_client.StringEnum.FIRST,
     )
-    response = await httpx_async_client.post_object(data)
-    assert isinstance(response, async_client.PostObjectResp)
-
-    response = await httpx_async_client.post_form_object(data)
+    response = await httpx_async_client.post_object(body=data)
     assert isinstance(response, async_client.PostObjectResp)
 
     # /objects patch
-    response = await httpx_async_client.patch_object(body=async_client.PatchObjectData(id='id', data=1), object_id='id')
+    response = await httpx_async_client.patch_object(
+        body=async_client.PatchObjectData(id='id', data=1), 
+        path_params=async_client.PatchObjectPathParams(object_id='id'),
+    )
     assert isinstance(response, async_client.PatchObjectResp)
 
-    response = await httpx_async_client.put_object(body=async_client.PutObjectData(id='id', data=1), object_id='id')
+    response = await httpx_async_client.put_object(
+        body=async_client.PutObjectData(id='id', data=1), 
+        path_params=async_client.PutObjectPathParams(object_id='id'),
+    )
     assert isinstance(response, async_client.PutObjectResp)
 
-    response = await httpx_async_client.delete_object(object_id='id')
+    response = await httpx_async_client.delete_object(
+        path_params=async_client.DeleteObjectPathParams(object_id='id'),
+    )
     assert isinstance(response, async_client.DeleteObjectResp)
 
     response = await httpx_async_client.get_list_objects()

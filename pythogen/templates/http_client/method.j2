@@ -5,77 +5,65 @@
     async def {{ operation.fn_name }}(
     {%- endif %}
         self,
+        {#- path params -#}
+        {% if operation.path_params %}
+        path_params: {{ classname(operation.fn_name) }}PathParams | dict[str, Any],
+        {% endif %}
+
+        {#- query params -#}
+        {% if operation.query_params %}
+        query_params: {{ classname(operation.fn_name) }}QueryParams | dict[str, Any],
+        {% endif %}
+
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and operation.request_body.are_files_required %}
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]],
         {%- endif %}
-        {#- path params -#}
-        {%- for parameter in operation.path_params %}
-        {{ parameter.key }}: {{ typerepr(parameter.schema) }},
-        {%- endfor %}
-        {#- required query params -#}
-        {%- for parameter in operation.query_params -%}
-        {%- if parameter.required %}
-        {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }},
-        {%- endif %}
-        {%- endfor %}
-        {#- required headers -#}
-        {%- for parameter in operation.headers -%}
-        {%- if parameter.required %}
-        {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }},
-        {%- endif %}
-        {%- endfor %}
-        {%- if operation.request_body %}
-        body: {{ typerepr(operation.request_body.schema) }} | dict[str, Any] | None = None,
-        {%- endif %}
-        {#- optional query params -#}
-        {%- for parameter in operation.query_params -%}
-        {%- if not parameter.required %}
-        {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None,
-        {%- endif %}
-        {%- endfor %}
-        {#- optional headers -#}
-        {%- for parameter in operation.headers -%}
-        {%- if not parameter.required %}
-        {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = None,
-        {%- endif %}
-        {%- endfor %}
+
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         {%- if operation.request_body and operation.request_body.is_multipart_form_data and not operation.request_body.are_files_required %}
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
         {%- endif %}
-        headers: dict[str, Any] | None = None,
-    ) -> {{ responserepr(operation.responses) }}:
-        url = self._get_url(f'{{ path }}')
 
-        params = {
-            {%- for parameter in operation.query_params %}
-            {%- if parameter.required %}
-            '{{ parameter.orig_key }}': {{ varname(parameter.key) }},
-            {%- endif %}
-            {%- endfor %}
-        }
-        {%- for parameter in operation.query_params %}
-        {%- if not parameter.required %}
-        if {{ varname(parameter.key) }} is not None:
-            params['{{ parameter.orig_key }}'] = {{ varname(parameter.key) }}
+        {%- if operation.request_body %}
+        body: {{ typerepr(operation.request_body.schema) }} | dict[str, Any] | None = None,
         {%- endif %}
-        {%- endfor %}
+
+        {#- headers -#}
+        {% if operation.headers %}
+        headers: {{ classname(operation.fn_name) }}Headers | dict[str, Any] | None = None,
+        {% endif %}
+    ) -> {{ responserepr(operation.responses) }}:
+
+        method = "{{ method }}"
+
+        {% if operation.path_params %}
+        if isinstance(path_params, {{ classname(operation.fn_name) }}PathParams):
+            path = '{{ path }}'.format(**path_params.model_dump(by_alias=True))
+        else:
+            path = '{{ path }}'.format(**path_params)
+        {% else %}
+        path = '{{ path }}'
+        {% endif %}
+        url = f"{self.base_url}{path}"
+
+        {% if operation.query_params %}
+        if isinstance(query_params, {{ classname(operation.fn_name) }}QueryParams):
+            params = query_params.model_dump(by_alias=True, exclude_none=True)
+        else:
+            params = query_params
+        {% else %}
+        params = None
+        {% endif %}
 
         headers_ = self.headers.copy()
 
-        {%- for parameter in operation.headers %}
-        {%- if parameter.required %}
-        headers_['{{ parameter.key }}'] = {{ varname(parameter.key) }}
-        {%- endif  %}
-        {%- endfor %}
-
-        {%- for parameter in operation.headers %}
-        {%- if not parameter.required %}
-        if {{ varname(parameter.key) }} is not None:
-            headers_['{{ parameter.key }}'] = {{ varname(parameter.key) }}
-        {%- endif %}
-        {%- endfor %}
+        {% if operation.headers %}
+        if isinstance(headers, {{ classname(operation.fn_name) }}Headers):
+            headers_ = headers.model_dump(by_alias=True, exclude_none=True)
+        elif isinstance(headers, dict):
+            headers_ = headers
+        {% endif %}
 
         if auth is None:
             auth_ = DEFAULT_AUTH
@@ -83,6 +71,7 @@
             auth_ = auth
         else:
             auth_ = (auth.username, auth.password)
+
         {% if operation.request_body %}
         if isinstance(body, dict):
             json = body
@@ -99,15 +88,14 @@
         # let library do it for us
         headers_.pop("Content-Type", None)
         {% endif %}
-        if headers:
-            headers_ = headers
 
 {%- with req_body=operation.request_body -%}
 {% include 'request-metrics.j2' %}
 {%- endwith %}
+
         req = RequestBox(
             client_name=self.client_name,
-            method="{{ method }}",
+            method=method,
             url=url,
             params=params,
             headers=headers_,
@@ -122,7 +110,6 @@
 
         if response.status_code == {{ code }}:
             {% if code | int >= 400 -%}
-            method = "{{ method }}"
             if response.content is None:
                 content = None
             else:

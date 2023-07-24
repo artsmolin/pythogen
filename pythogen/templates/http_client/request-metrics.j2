@@ -1,13 +1,13 @@
 
         try:
-            response = {% if not sync %}await {% endif %}self.client.request("{{ method }}", url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, content=content, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
+            response = {% if not sync %}await {% endif %}self.client.request(method, url, {%- if operation.request_body %} {%- if req_body.is_form_data or req_body.is_multipart_form_data %} data{%- else %} json{%- endif %}=json, {%- endif %} headers=headers_, params=params, content=content, auth=auth_{%- if operation.request_body and req_body.is_multipart_form_data %}, files=files{%- endif %})
         except Exception as exc:
             if self.metrics_integration:
                 if self.metrics_integration.shadow_path():
                     metrics_path = "{{ path | replace('{', ':') | replace('}', '') }}"
                 else:
-                    metrics_path = f"{{ path }}"
-                self.metrics_integration.on_request_error(self.client_name, exc, "{{ method }}", metrics_path)
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
 
             raise exc
         {#
@@ -20,5 +20,5 @@
             if self.metrics_integration.shadow_path():
                 metrics_path = "{{ path | replace('{', ':') | replace('}', '') }}"
             else:
-                metrics_path = f"{{ path }}"
-            self.metrics_integration.on_request_success(self.client_name, response, "{{ method }}",  metrics_path)
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method,  metrics_path)
