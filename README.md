@@ -50,7 +50,10 @@ path/to/output/client.py
 from petstore.client_async import Client
 from petstore.client_async import Pet
 from petstore.client_async import EmptyBody
+from petstore.client_async import FindPetsByStatusQueryParams
 
 client = Client(base_url="http://your.base.url")
-pets: list[Pet] | EmptyBody = await client.findPetsByStatus(status="available")
+pets: list[Pet] | EmptyBody = await client.findPetsByStatus(
+  query_params=FindPetsByStatusQueryParams(status="available"),
+)
 ```
