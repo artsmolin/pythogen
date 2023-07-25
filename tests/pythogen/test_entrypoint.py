@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 from typer.testing import CliRunner
-from contextlib import contextmanager
+import subprocess
 
 from pythogen import main
 
@@ -34,3 +34,15 @@ def test_entrypoint_gen_http_client() -> None:
 def test_entrypoint_gen_http_client_pkg() -> None:
     result = runner.invoke(main.app, [OPENAPI_PATH, ASYNC_CLIENT_PKG_PATH, "--package-version", "0.0.1"])
     assert result.exit_code == 0
+
+
+@pytest.mark.usefixtures("temp_files")
+def test_entrypoint_gen_http_client_in_shell() -> None:
+    process = subprocess.Popen(
+        ['python', 'pythogen/main.py', OPENAPI_PATH, ASYNC_CLIENT_PATH],
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = process.communicate()
+    assert stdout == b''
+    assert stderr == b''
