@@ -175,7 +175,7 @@ paths:
       tags:
         - test
       summary: Get Object With Inline Array
-      operationId: get_object_with_inline_array
+      operationId: get_object_with_array_response
       responses:
         '200':
           description: Successful Response
@@ -287,7 +287,22 @@ paths:
             type: string
           name: first-header
           in: header
+      responses:
+        '200':
+          description: Successful Response
 
+  /no-operation-id:
+    get:
+      tags:
+        - test
+      summary: No operation ID
+      parameters:
+        - required: true
+          schema:
+            title: First Header
+            type: string
+          name: first-header
+          in: header
       responses:
         '200':
           description: Successful Response

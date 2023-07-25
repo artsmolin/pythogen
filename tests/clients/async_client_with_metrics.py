@@ -252,6 +252,14 @@ class GetEmptyHeaders(BaseModel):
     first_header: str = Field(alias="first-header")
 
 
+class GetNoOperationIdHeaders(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    first_header: str = Field(alias="first-header")
+
+
 class GetObjectSlowPathParams(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
@@ -392,7 +400,17 @@ class GetObjectWithInlineArrayResponse200(BaseModel):
     rewards: list[RewardsListItem] | None = None
 
 
-class GetObjectWithInlineArrayResponse200Item(BaseModel):
+class GetObjectWithArrayResponseResponse200(BaseModel):
+    """
+    None
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+
+class GetObjectWithArrayResponseResponse200Item(BaseModel):
     """
     None
     """
@@ -795,11 +813,11 @@ class Client:
 
             return UnknownError.model_validate(response.json())
 
-    async def get_object_with_inline_array(
+    async def get_object_with_array_response(
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> list[GetObjectWithInlineArrayResponse200Item] | None:
+    ) -> list[GetObjectWithArrayResponseResponse200Item] | None:
         method = "get"
 
         path = "/object-with-array-response"
@@ -852,7 +870,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return [GetObjectWithInlineArrayResponse200Item.model_validate(item) for item in response.json()]
+            return [GetObjectWithArrayResponseResponse200Item.model_validate(item) for item in response.json()]
 
     async def get_object_with_inline_array(
         self,
@@ -1135,6 +1153,71 @@ class Client:
         if self.metrics_integration:
             if self.metrics_integration.shadow_path():
                 metrics_path = "/empty"
+            else:
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method=method,
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
+        if response.status_code == 200:
+            return EmptyBody(status_code=response.status_code, text=response.text)
+
+    async def get_no_operation_id(
+        self,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: GetNoOperationIdHeaders | dict[str, Any] | None = None,
+    ) -> EmptyBody | None:
+        method = "get"
+
+        path = "/no-operation-id"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
+
+        headers_ = self.headers.copy()
+
+        if isinstance(headers, GetNoOperationIdHeaders):
+            headers_ = headers.model_dump(by_alias=True, exclude_none=True)
+        elif isinstance(headers, dict):
+            headers_ = headers
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+
+        try:
+            response = await self.client.request(
+                method, url, headers=headers_, params=params, content=content, auth=auth_
+            )
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/no-operation-id"
+                else:
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
+
+            raise exc
+
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/no-operation-id"
             else:
                 metrics_path = path
             self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
@@ -2006,7 +2089,8 @@ GetTextResponse200.model_rebuild()
 GetListObjectsResponse200.model_rebuild()
 RewardsListItem.model_rebuild()
 GetObjectWithInlineArrayResponse200.model_rebuild()
-GetObjectWithInlineArrayResponse200Item.model_rebuild()
+GetObjectWithArrayResponseResponse200.model_rebuild()
+GetObjectWithArrayResponseResponse200Item.model_rebuild()
 TierObj.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
 SafetyKeyForTesting.model_rebuild()

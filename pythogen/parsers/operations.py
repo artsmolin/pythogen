@@ -43,9 +43,17 @@ class OperationParser:
                 response_data = resolved_ref.ref_data
                 response_id = resolved_ref.ref_id
             else:
-                response_id = (
-                    f"{operation_data['operationId'].replace('_', ' ').title().replace(' ', '')}Response{status_code}"
-                )
+                operation_id: str = operation_data.get('operationId', '')
+                if not operation_id:
+                    operation_id = (
+                        path_str.removeprefix('/').replace('-', '_').replace('/', '_').replace('{', '').replace('}', '')
+                    )
+                    operation_id = method.value + '_' + operation_id
+                    operation_id = operation_id.lower()
+                else:
+                    operation_id = operation_id.replace('_', ' ').title().replace(' ', '')
+
+                response_id = f"{operation_id}Response{status_code}"
 
             responses[status_code] = self._response_parser.parse_item(response_id, response_data)
 

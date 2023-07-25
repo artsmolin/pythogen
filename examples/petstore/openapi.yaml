@@ -114,7 +114,7 @@ paths:
         - pet_or_tag
       summary: Add a new pet or tag to the store
       description: Add a new pet or tag to the store
-      operationId: addPet
+      operationId: addPetOrTag
       responses:
         '200':
           description: Successful operation

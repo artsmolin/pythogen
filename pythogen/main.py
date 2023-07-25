@@ -6,6 +6,8 @@
 from typing import Optional
 
 import typer
+from openapi_spec_validator import validate_spec
+from openapi_spec_validator.readers import read_from_filename
 
 from pythogen import packager
 from pythogen import renderer
@@ -29,6 +31,9 @@ def main(
     """
     Generate HTTP clients for python from OpenAPI
     """
+    spec_dict, _ = read_from_filename(input)
+    validate_spec(spec_dict)
+
     if package_version:
         resp = packager.init_package(
             output_path=output,

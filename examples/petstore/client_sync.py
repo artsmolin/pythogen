@@ -1119,7 +1119,7 @@ class Client:
 
             return EmptyBody(status_code=response.status_code, text=response.text)
 
-    def addPet(
+    def addPetOrTag(
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
