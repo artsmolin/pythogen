@@ -55,5 +55,9 @@ def main(
     )
 
 
+def run() -> None:
+    typer.run(main)
+
+
 if __name__ == '__main__':
     app()
