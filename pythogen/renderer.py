@@ -283,5 +283,5 @@ def varname(value: str) -> str:
 
 
 def classname(value: str) -> str:
-    value = value.replace('.', '')
+    value = value.replace('.', '').replace('-', '')
     return inflection.camelize(value)
