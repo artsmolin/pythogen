@@ -3,6 +3,7 @@ Responsible for rendering/generating client code from data
 that was parsed from an OpenAPI file.
 """
 import logging
+import re
 from dataclasses import dataclass
 from typing import Generic
 from typing import TypeVar
@@ -288,8 +289,9 @@ def varname(value: str) -> str:
 
 
 def classname(value: str) -> str:
-    value = value.replace('.', '')
-    return inflection.camelize(value)
+    clean_value = re.sub('\W|^(?=\d)', '_', value)  # remove special characters
+    clean_value = re.sub('_{2,}', '_', clean_value)  # __ -> _
+    return inflection.camelize(clean_value)
 
 
 def parameterfield(parameter: models.ParameterObject) -> str:

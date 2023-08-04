@@ -148,7 +148,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchObjectData'
+              $ref: '#/components/schemas/Patch-Object_Data'
         required: true
       responses:
         '200':
@@ -593,8 +593,8 @@ components:
       title: StringEnum
       type: string
       additionalProperties: false
-    PatchObjectData:
-      title: PatchObjectData
+    Patch-Object_Data:
+      title: Patch-Object_Data
       required:
         - id
         - data

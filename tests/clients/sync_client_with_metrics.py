@@ -549,7 +549,7 @@ class PutObjectData(BaseModel):
 
 class PatchObjectData(BaseModel):
     """
-    PatchObjectData
+    Patch-Object_Data
     """
 
     model_config = ConfigDict(
