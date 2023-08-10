@@ -15,6 +15,9 @@ Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i
 
 > Versions **0.2.*** use pydantic **v2.***.
 
+## Documentation
+Check documentation to see more details about the features. All documentation is in the "docs" directory and online at [artsmolin.github.io/pythogen](artsmolin.github.io/pythogen)
+
 ## Examples
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
 
