@@ -194,7 +194,7 @@ class {{ classname(enum_class.id) }}(str, Enum):
     {{ enum_class.title }}
     """
     {%- for val in enum_class.enum %}
-    {{ val.upper() }} = "{{ val }}"
+    {{ varname(val).upper() }} = "{{ val }}"
     {%- endfor %}
 
     def __str__(self) -> Any:

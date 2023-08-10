@@ -183,8 +183,8 @@ class StringEnum(str, Enum):
     StringEnum
     """
 
-    FIRST = "first"
-    SECOND = "second"
+    FIRST_FIELD = "first-field"
+    SECOND_FIELD = "second field"
 
     def __str__(self) -> Any:
         return self.value

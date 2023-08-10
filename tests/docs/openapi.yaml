@@ -589,7 +589,7 @@ components:
       additionalProperties: false
     StringEnum:
       description: An enumeration.
-      enum: [first, second]
+      enum: [first-field, "second field"]
       title: StringEnum
       type: string
       additionalProperties: false

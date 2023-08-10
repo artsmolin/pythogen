@@ -285,7 +285,10 @@ def _repr_any_of_schema(any_of_items: list[models.SchemaObject]) -> str:
 
 
 def varname(value: str) -> str:
-    return inflection.underscore(value)
+    clean_value = re.sub('\W|^(?=\d)', '_', value)  # remove special characters
+    clean_value = re.sub('_{2,}', '_', clean_value)  # __ -> _
+    clean_value = clean_value.replace(' ', '_')
+    return inflection.underscore(clean_value)
 
 
 def classname(value: str) -> str:
