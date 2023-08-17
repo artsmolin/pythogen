@@ -11,7 +11,8 @@ RUN poetry config virtualenvs.create false && \
 
 FROM python:3.11-slim-bullseye
 COPY --from=builder /usr/local /usr/local/
-COPY ./pythogen       /opt/pythogen
+COPY ./pythogen        /opt/pythogen
+COPY ./pyproject.toml  /opt/pyproject.toml
 ENV PYTHONPATH "${PYTHONPATH}:/opt"
 WORKDIR /opt
 ENTRYPOINT ["python", "pythogen/main.py"]

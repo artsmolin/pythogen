@@ -3,8 +3,10 @@
 """
 
 
+from pathlib import Path
 from typing import Optional
 
+import toml
 import typer
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
@@ -45,6 +47,12 @@ def main(
 
     document = parse_openapi_file(input)
 
+    pyproject_path = Path(__file__).parent.parent.absolute() / Path("pyproject.toml")
+    with open(pyproject_path, "r") as f:
+        pyproject_data = toml.load(f)
+
+    pythogen_version: str = pyproject_data["tool"]["poetry"]["version"]
+
     renderer.render_client(
         output_path=output,
         document=document,
@@ -52,6 +60,7 @@ def main(
         sync=sync,
         metrics=metrics,
         required_headers=headers.split(",") if headers else None,
+        pythogen_version=pythogen_version,
     )
 
 

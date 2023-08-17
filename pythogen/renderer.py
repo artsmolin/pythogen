@@ -32,6 +32,7 @@ def render_client(
     name: str,
     sync: bool,
     metrics: bool,
+    pythogen_version: str,
     required_headers: list[str] | None = None,
 ) -> None:
     """Отрисовывает сгенерированный клиент на основе j2-шаблонов
@@ -77,6 +78,7 @@ def render_client(
         discriminator_base_class_schemas=document.discriminator_base_class_schemas,
         required_headers=required_headers,
         operations=prepared_operations.all(),
+        pythogen_version=pythogen_version,
     )
     rendered_client = black.format_str(rendered_client, mode=black.Mode(line_length=120))
     rendered_client = isort.code(
