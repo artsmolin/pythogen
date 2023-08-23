@@ -25,7 +25,7 @@ repos:
     rev: v0.961
     hooks:
       - id: mypy
-        additional_dependencies: [ types-PyYAML, types-toml ]
+        additional_dependencies: [ types-PyYAML ]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
