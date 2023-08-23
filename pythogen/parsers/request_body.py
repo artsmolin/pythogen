@@ -22,7 +22,7 @@ class RequestBodyParser:
         self._schema_parser = schema_parser
         self._inline_schema_aggregator = inline_schema_aggregator
 
-    def parse_item(self, request_body_data: dict[str, Any], operation_data: dict[str, Any]) -> models.RequestBodyObject:
+    def parse_item(self, request_body_data: dict[str, Any], operation_id: str) -> models.RequestBodyObject:
         """Спарсить спецификацию тела ручки"""
         if request_body_data.get('$ref', None):
             resolved_ref = self._ref_resolver.resolve(request_body_data['$ref'])
@@ -30,7 +30,7 @@ class RequestBodyParser:
             id_ = resolved_ref.ref_id
         else:
             data = request_body_data
-            id_ = f"{operation_data['operationId'].replace('_', ' ').title().replace(' ', '')}RequestBody"
+            id_ = f"{operation_id}RequestBody"
 
         files_required = False
         content = data.get('content')
