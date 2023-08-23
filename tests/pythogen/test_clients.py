@@ -6,9 +6,6 @@ import pytest
 
 from clients import async_client
 from clients import sync_client
-from rich.console import Console
-
-console = Console()
 
 
 logging.basicConfig(level=logging.INFO)
