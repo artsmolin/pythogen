@@ -15,7 +15,7 @@ from pythogen import renderer
 from pythogen.parsers.document import parse_openapi_file
 
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_enable=False)
 
 
 @app.command()
