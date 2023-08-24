@@ -74,8 +74,8 @@ def parse_openapi_file(file_path: str) -> models.Document:
         openapi_data=openapi_data,
     )
 
-    paths = path_parser.parse_collection()
     schemas = schema_parser.parse_collection()
+    paths = path_parser.parse_collection()
     all_schemas: dict[str, models.SchemaObject] = {
         **schemas,
         **inline_schema_aggregator.get_mapping(),

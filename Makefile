@@ -36,3 +36,4 @@ requirements:
 tests:
 	docker-compose up -d --build mock_server && \
 	pytest --cov=pythogen tests/ -sq -v
+	docker-compose down

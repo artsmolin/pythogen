@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.17
+#   Version:     0.2.18
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -293,18 +293,6 @@ class BaseObjectResp(BaseModel):
         return v
 
 
-class AllOfRefObj(BaseModel):
-    """
-    All Of
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    id: str | None = None
-    data: int | None = None
-
-
 class GetBinaryResponse200(BaseModel):
     """
     None
@@ -393,6 +381,20 @@ class GetObjectWithArrayResponseResponse200Item(BaseModel):
     quantity: float
 
 
+class GetObjectNoRefSchemaResponse200(BaseModel):
+    """
+    GetObjectResp
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
+    integer_data: int | None = None
+    array_data: list[str] | None = None
+    boolean_data: bool | None = None
+
+
 class TierObj(BaseModel):
     """
     None
@@ -406,18 +408,27 @@ class TierObj(BaseModel):
     priority: int | None = None
 
 
-class GetObjectNoRefSchemaResponse200(BaseModel):
+class AllOfRefObj(BaseModel):
     """
-    GetObjectResp
+    All Of
     """
 
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
-    integer_data: int | None = None
-    array_data: list[str] | None = None
-    boolean_data: bool | None = None
+    id: str | None = None
+    data: int | None = None
+
+
+class ListAnyOfResp(BaseModel):
+    """
+    PostObjectResp
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    anyOfChildArray: list[Dog | Cat] | None = None
 
 
 class SafetyKeyForTesting(BaseModel):
@@ -1405,6 +1416,65 @@ class Client:
 
             return UnknownError.model_validate(response.json())
 
+    async def response_body_list_of_anyof(
+        self,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+    ) -> ListAnyOfResp | None:
+        method = "get"
+
+        path = "/nested-any-of"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+
+        try:
+            response = await self.client.request(
+                method, url, headers=headers_, params=params, content=content, auth=auth_
+            )
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/nested-any-of"
+                else:
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
+
+            raise exc
+
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/nested-any-of"
+            else:
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method=method,
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
+        if response.status_code == 200:
+            return ListAnyOfResp.model_validate(response.json())
+
     async def post_object_without_body(
         self,
         auth: BasicAuth | None = None,
@@ -2053,7 +2123,6 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-AllOfRefObj.model_rebuild()
 GetBinaryResponse200.model_rebuild()
 GetTextAsIntegerResponse200.model_rebuild()
 GetTextResponse200.model_rebuild()
@@ -2062,8 +2131,10 @@ RewardsListItem.model_rebuild()
 GetObjectWithInlineArrayResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200Item.model_rebuild()
-TierObj.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
+TierObj.model_rebuild()
+AllOfRefObj.model_rebuild()
+ListAnyOfResp.model_rebuild()
 SafetyKeyForTesting.model_rebuild()
 UnknownError.model_rebuild()
 DeleteObjectResp.model_rebuild()
