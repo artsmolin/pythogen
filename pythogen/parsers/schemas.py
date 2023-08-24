@@ -87,30 +87,31 @@ class SchemaParser:
         """
         schema_type = self._parse_type(schema_data)
 
-        self._processiong_parsed_schema_id_count[schema_id] += 1
-        if self._processiong_parsed_schema_id_count[schema_id] > 1 and from_depth_level:
-            """
-            Парсинг циклических схем
-            components:
-              schemas:
-                Schema1:
-                  type: object
-                  properties:
-                    property1:
-                      $ref: '#/components/schemas/Schema1'
-            """
-            return models.SchemaObject(
-                id=schema_id,
-                title=schema_data.get('title'),
-                required=schema_data.get('required'),
-                enum=schema_data.get('enum'),
-                type=schema_type,
-                format=self._parse_format(schema_data),
-                items=[],
-                properties=[],
-                description=self._get_description(schema_data),
-                is_fake=True,
-            )
+        if from_depth_level:
+            self._processiong_parsed_schema_id_count[schema_id] += 1
+            if self._processiong_parsed_schema_id_count[schema_id] > 1:
+                """
+                Парсинг циклических схем
+                components:
+                schemas:
+                    Schema1:
+                    type: object
+                    properties:
+                        property1:
+                        $ref: '#/components/schemas/Schema1'
+                """
+                return models.SchemaObject(
+                    id=schema_id,
+                    title=schema_data.get('title'),
+                    required=schema_data.get('required'),
+                    enum=schema_data.get('enum'),
+                    type=schema_type,
+                    format=self._parse_format(schema_data),
+                    items=[],
+                    properties=[],
+                    description=self._get_description(schema_data),
+                    is_fake=True,
+                )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
         if discr_schema and discr_schema not in self._discriminator_base_class_schemas:

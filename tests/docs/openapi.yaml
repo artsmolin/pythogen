@@ -449,6 +449,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostObjectResp'
+  /nested-any-of:
+    get:
+      tags:
+        - test
+      summary: Post Object With Request Body AnyOf
+      operationId: response_body_list_of_anyof
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAnyOfResp'
 components:
   schemas:
     AllOfResp:
@@ -486,6 +499,12 @@ components:
           title: name
           type: string
       additionalProperties: false
+    AnyOfChildItem:
+      title: AnyOfChildItem
+      type: object
+      anyOf:
+        - {$ref: '#/components/schemas/Dog'}
+        - {$ref: '#/components/schemas/Cat'}
     GetObjectResp:
       title: GetObjectResp
       type: object
@@ -694,3 +713,11 @@ components:
           title: With dot, hyphens and garbage
           type: integer
           description: __safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"
+    ListAnyOfResp:
+      title: PostObjectResp
+      type: object
+      properties:
+        anyOfChildArray:
+          type: array
+          items: {$ref: '#/components/schemas/AnyOfChildItem'}
+      additionalProperties: false

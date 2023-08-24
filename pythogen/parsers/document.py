@@ -47,29 +47,54 @@ def parse_openapi_file(file_path: str) -> models.Document:
     )
     response_parser = ResponseParser(
         ref_resolver=ref_resolver,
-        schema_parser=schema_parser,
+        schema_parser=SchemaParser(
+            ref_resolver=ref_resolver,
+            openapi_data=openapi_data,
+            discriminator_base_class_schemas=discriminator_base_class_schemas,
+            inline_schema_aggregator=inline_schema_aggregator,
+        ),
         inline_schema_aggregator=inline_schema_aggregator,
     )
     request_body_parser = RequestBodyParser(
         ref_resolver=ref_resolver,
-        schema_parser=schema_parser,
+        schema_parser=SchemaParser(
+            ref_resolver=ref_resolver,
+            openapi_data=openapi_data,
+            discriminator_base_class_schemas=discriminator_base_class_schemas,
+            inline_schema_aggregator=inline_schema_aggregator,
+        ),
         inline_schema_aggregator=inline_schema_aggregator,
     )
     parameters_parser = ParameterParser(
         ref_resolver=ref_resolver,
-        schema_parser=schema_parser,
+        schema_parser=SchemaParser(
+            ref_resolver=ref_resolver,
+            openapi_data=openapi_data,
+            discriminator_base_class_schemas=discriminator_base_class_schemas,
+            inline_schema_aggregator=inline_schema_aggregator,
+        ),
         openapi_data=openapi_data,
     )
     operation_parser = OperationParser(
         ref_resolver=ref_resolver,
-        schema_parser=schema_parser,
+        schema_parser=SchemaParser(
+            ref_resolver=ref_resolver,
+            openapi_data=openapi_data,
+            discriminator_base_class_schemas=discriminator_base_class_schemas,
+            inline_schema_aggregator=inline_schema_aggregator,
+        ),
         response_parser=response_parser,
         request_body_parser=request_body_parser,
         parameters_parser=parameters_parser,
     )
     path_parser = PathParser(
         ref_resolver=ref_resolver,
-        schema_parser=schema_parser,
+        schema_parser=SchemaParser(
+            ref_resolver=ref_resolver,
+            openapi_data=openapi_data,
+            discriminator_base_class_schemas=discriminator_base_class_schemas,
+            inline_schema_aggregator=inline_schema_aggregator,
+        ),
         operation_parser=operation_parser,
         openapi_data=openapi_data,
     )

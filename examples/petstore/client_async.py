@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.17
+#   Version:     0.2.18
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
