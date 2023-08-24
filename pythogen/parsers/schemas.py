@@ -54,10 +54,10 @@ class SchemaParser:
 
         self._schema_ids = list(self._openapi_data["components"].get('schemas', {}))
         self._processiong_parsed_schema_id_count: dict[str, int] = defaultdict(int)
+        self._schemas: dict[str, models.SchemaObject] = {}
 
     def parse_collection(self) -> dict[str, models.SchemaObject]:
         schemas_data = self._openapi_data["components"].get('schemas', {})
-        schemas = {}
         for schema_id, schema_data in schemas_data.items():
             if schema_data.get('$ref', None):
                 resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
@@ -66,9 +66,9 @@ class SchemaParser:
                 schema = self.parse_item(schema_id, schema_data)
 
             if not schema.is_fake:
-                schemas[schema_id] = schema
+                self._schemas[schema_id] = schema
 
-        return schemas
+        return self._schemas
 
     def parse_item(
         self, schema_id: str, schema_data: dict[str, Any], from_depth_level: bool = False
@@ -85,33 +85,35 @@ class SchemaParser:
             Флаг, указывающий, что схема была спарсена внутри другой схемы.
             Используется для разрешения циклических схем.
         """
+        if schema_id in self._schemas:
+            return self._schemas[schema_id]
+
         schema_type = self._parse_type(schema_data)
 
-        if from_depth_level:
-            self._processiong_parsed_schema_id_count[schema_id] += 1
-            if self._processiong_parsed_schema_id_count[schema_id] > 1:
-                """
-                Парсинг циклических схем
-                components:
-                schemas:
-                    Schema1:
-                    type: object
-                    properties:
-                        property1:
-                        $ref: '#/components/schemas/Schema1'
-                """
-                return models.SchemaObject(
-                    id=schema_id,
-                    title=schema_data.get('title'),
-                    required=schema_data.get('required'),
-                    enum=schema_data.get('enum'),
-                    type=schema_type,
-                    format=self._parse_format(schema_data),
-                    items=[],
-                    properties=[],
-                    description=self._get_description(schema_data),
-                    is_fake=True,
-                )
+        self._processiong_parsed_schema_id_count[schema_id] += 1
+        if self._processiong_parsed_schema_id_count[schema_id] > 1 and from_depth_level:
+            """
+            Парсинг циклических схем
+            components:
+            schemas:
+                Schema1:
+                type: object
+                properties:
+                    property1:
+                    $ref: '#/components/schemas/Schema1'
+            """
+            return models.SchemaObject(
+                id=schema_id,
+                title=schema_data.get('title'),
+                required=schema_data.get('required'),
+                enum=schema_data.get('enum'),
+                type=schema_type,
+                format=self._parse_format(schema_data),
+                items=[],
+                properties=[],
+                description=self._get_description(schema_data),
+                is_fake=True,
+            )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
         if discr_schema and discr_schema not in self._discriminator_base_class_schemas:

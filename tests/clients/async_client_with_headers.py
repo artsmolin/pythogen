@@ -293,18 +293,6 @@ class BaseObjectResp(BaseModel):
         return v
 
 
-class AllOfRefObj(BaseModel):
-    """
-    All Of
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    id: str | None = None
-    data: int | None = None
-
-
 class GetBinaryResponse200(BaseModel):
     """
     None
@@ -393,6 +381,20 @@ class GetObjectWithArrayResponseResponse200Item(BaseModel):
     quantity: float
 
 
+class GetObjectNoRefSchemaResponse200(BaseModel):
+    """
+    GetObjectResp
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
+    integer_data: int | None = None
+    array_data: list[str] | None = None
+    boolean_data: bool | None = None
+
+
 class TierObj(BaseModel):
     """
     None
@@ -406,18 +408,16 @@ class TierObj(BaseModel):
     priority: int | None = None
 
 
-class GetObjectNoRefSchemaResponse200(BaseModel):
+class AllOfRefObj(BaseModel):
     """
-    GetObjectResp
+    All Of
     """
 
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
-    integer_data: int | None = None
-    array_data: list[str] | None = None
-    boolean_data: bool | None = None
+    id: str | None = None
+    data: int | None = None
 
 
 class ListAnyOfResp(BaseModel):
@@ -2126,7 +2126,6 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-AllOfRefObj.model_rebuild()
 GetBinaryResponse200.model_rebuild()
 GetTextAsIntegerResponse200.model_rebuild()
 GetTextResponse200.model_rebuild()
@@ -2135,8 +2134,9 @@ RewardsListItem.model_rebuild()
 GetObjectWithInlineArrayResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200Item.model_rebuild()
-TierObj.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
+TierObj.model_rebuild()
+AllOfRefObj.model_rebuild()
 ListAnyOfResp.model_rebuild()
 SafetyKeyForTesting.model_rebuild()
 UnknownError.model_rebuild()
