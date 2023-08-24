@@ -50,10 +50,10 @@ class SchemaParser:
 
         self._schema_ids = list(self._openapi_data["components"].get('schemas', {}))
         self._processiong_parsed_schema_id_count: dict[str, int] = defaultdict(int)
+        self._schemas: dict[str, models.SchemaObject] = {}
 
     def parse_collection(self) -> dict[str, models.SchemaObject]:
         schemas_data = self._openapi_data["components"].get('schemas', {})
-        schemas = {}
         for schema_id, schema_data in schemas_data.items():
             if schema_data.get('$ref', None):
                 resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
@@ -62,9 +62,9 @@ class SchemaParser:
                 schema = self.parse_item(schema_id, schema_data)
 
             if not schema.is_fake:
-                schemas[schema_id] = schema
+                self._schemas[schema_id] = schema
 
-        return schemas
+        return self._schemas
 
     def parse_item(
         self, schema_id: str, schema_data: dict[str, Any], from_depth_level: bool = False
@@ -81,6 +81,8 @@ class SchemaParser:
             Флаг, указывающий, что схема была спарсена внутри другой схемы.
             Используется для разрешения циклических схем.
         """
+        if schema_id in self._schemas:
+            return self._schemas[schema_id]
         schema_type = self._parse_type(schema_data)
 
         self._processiong_parsed_schema_id_count[schema_id] += 1
