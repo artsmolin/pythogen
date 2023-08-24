@@ -95,12 +95,12 @@ class SchemaParser:
             """
             Парсинг циклических схем
             components:
-                schemas:
-                    Schema1:
-                    type: object
-                    properties:
-                        property1:
-                        $ref: '#/components/schemas/Schema1'
+              schemas:
+                Schema1:
+                  type: object
+                  properties:
+                    property1:
+                      $ref: '#/components/schemas/Schema1'
             """
             return models.SchemaObject(
                 id=schema_id,
