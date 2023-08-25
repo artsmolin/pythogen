@@ -152,18 +152,6 @@ class RequestBodyAnyofRequestBody(BaseModel):
     ]
 
 
-class AllOfRefObj(BaseModel):
-    """
-    All Of
-    """
-
-    # required ---
-
-    # optional ---
-    id: str | None = None
-    data: int | None = None
-
-
 class GetBinaryResponse200(BaseModel):
     """
     None
@@ -242,6 +230,22 @@ class GetObjectWithInlineArrayResponse200Item(BaseModel):
     # optional ---
 
 
+class GetObjectNoRefSchemaResponse200(BaseModel):
+    """
+    GetObjectResp
+    """
+
+    # required ---
+
+    # optional ---
+    string_data: str | None = Field(
+        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
+    )
+    integer_data: int | None = None
+    array_data: list[str] | None = None
+    boolean_data: bool | None = None
+
+
 class AnimalObj(BaseModel):
     """
     None
@@ -277,20 +281,16 @@ class TierObj(BaseModel):
     priority: int | None = None
 
 
-class GetObjectNoRefSchemaResponse200(BaseModel):
+class AllOfRefObj(BaseModel):
     """
-    GetObjectResp
+    All Of
     """
 
     # required ---
 
     # optional ---
-    string_data: str | None = Field(
-        description="String Data. [__discriminator__(BaseObjectResp.string_data)]"
-    )
-    integer_data: int | None = None
-    array_data: list[str] | None = None
-    boolean_data: bool | None = None
+    id: str | None = None
+    data: int | None = None
 
 
 class TestSafetyKey(BaseModel):
@@ -1606,7 +1606,6 @@ class Client:
 
 
 RequestBodyAnyofRequestBody.update_forward_refs()
-AllOfRefObj.update_forward_refs()
 GetBinaryResponse200.update_forward_refs()
 GetTextAsIntegerResponse200.update_forward_refs()
 GetTextResponse200.update_forward_refs()
@@ -1614,10 +1613,11 @@ GetListObjectsResponse200.update_forward_refs()
 RewardsListItem.update_forward_refs()
 GetObjectWithInlineArrayResponse200.update_forward_refs()
 GetObjectWithInlineArrayResponse200Item.update_forward_refs()
+GetObjectNoRefSchemaResponse200.update_forward_refs()
 AnimalObj.update_forward_refs()
 AnyOfChildObj.update_forward_refs()
 TierObj.update_forward_refs()
-GetObjectNoRefSchemaResponse200.update_forward_refs()
+AllOfRefObj.update_forward_refs()
 TestSafetyKey.update_forward_refs()
 UnknownError.update_forward_refs()
 DeleteObjectResp.update_forward_refs()

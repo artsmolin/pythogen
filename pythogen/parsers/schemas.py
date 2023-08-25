@@ -48,12 +48,11 @@ class SchemaParser:
         self._discriminator_base_class_schemas = discriminator_base_class_schemas
         self._inline_schema_aggregator = inline_schema_aggregator
 
-        self._schema_ids = list(self._openapi_data["components"].get('schemas', {}))
         self._processiong_parsed_schema_id_count: dict[str, int] = defaultdict(int)
         self._schemas: dict[str, models.SchemaObject] = {}
 
     def parse_collection(self) -> dict[str, models.SchemaObject]:
-        schemas_data = self._openapi_data["components"].get('schemas', {})
+        schemas_data = self._openapi_data.get('components', {}).get('schemas', {})
         for schema_id, schema_data in schemas_data.items():
             if schema_data.get('$ref', None):
                 resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
@@ -137,6 +136,8 @@ class SchemaParser:
             data_type = models.Type.object
         elif 'anyOf' in data:
             data_type = models.Type.any_of
+        elif 'type' not in data:
+            data_type = models.Type.object
         else:
             raw_data_type: str | None = data.get('type')
             try:
