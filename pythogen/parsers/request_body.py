@@ -75,7 +75,7 @@ class RequestBodyParser:
         file_required = False
         for k in list(schema_data.get("properties", {})):
             prop = properties[k]
-            if prop.get("type") == "string" and prop.get("format") == models.DataFormat.binary.value:
+            if prop.get("type") == "string" and prop.get("format") == models.Format.binary.value:
                 del properties[k]
                 if k in required:
                     required.remove(k)

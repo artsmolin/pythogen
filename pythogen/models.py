@@ -10,6 +10,33 @@ from dataclasses import dataclass
 from enum import Enum
 
 
+class SafetyKeyMixin:
+    @property
+    def key(self):
+        return self._safe_key()
+
+    def _safe_key(self):
+        if self.safety_key:
+            return self.safety_key
+
+        if self.orig_key.isidentifier() and not keyword.iskeyword(self.orig_key):
+            return self.orig_key
+
+        key = self.orig_key
+
+        if not key.isidentifier():
+            key = re.sub('[-.]', '_', key)
+            # stolen from https://stackoverflow.com/a/3303361
+            key = re.sub('[^0-9a-zA-Z_]', '', key)
+            key = re.sub('^[^a-zA-Z_]+', '', key)
+
+        if keyword.iskeyword(key):
+            key += "_"
+
+        self.safety_key = key
+        return self.safety_key
+
+
 class HttpMethod(Enum):
     get = 'get'
     put = 'put'
@@ -37,6 +64,7 @@ class Format(Enum):
     byte = 'byte'
     binary = 'binary'
     date_time = 'date-time'
+    datetime = 'date-time'
     password = 'password'
     uuid = 'uuid'
     uri = 'uri'
@@ -91,35 +119,10 @@ class Type(Enum):
 
 
 @dataclass
-class SchemaProperty:
+class SchemaProperty(SafetyKeyMixin):
     orig_key: str
     safety_key: str | None
     schema: 'SchemaObject'
-
-    @property
-    def key(self):
-        return self._safe_key()
-
-    def _safe_key(self):
-        if self.safety_key:
-            return self.safety_key
-
-        if self.orig_key.isidentifier() and not keyword.iskeyword(self.orig_key):
-            return self.orig_key
-
-        key = self.orig_key
-
-        if not key.isidentifier():
-            key = re.sub('[-.]', '_', key)
-            # stolen from https://stackoverflow.com/a/3303361
-            key = re.sub('[^0-9a-zA-Z_]', '', key)
-            key = re.sub('^[^a-zA-Z_]+', '', key)
-
-        if keyword.iskeyword(key):
-            key += "_"
-
-        self.safety_key = key
-        return self.safety_key
 
 
 @dataclass
@@ -159,7 +162,7 @@ class SchemaObject:
 
 
 @dataclass
-class ParameterObject:
+class ParameterObject(SafetyKeyMixin):
     """
     https://swagger.io/specification/#parameter-object
     """
@@ -171,10 +174,6 @@ class ParameterObject:
     location: ParameterLocation
     required: bool
     schema: SchemaObject
-
-    @property
-    def key(self):
-        return self.safety_key if self.safety_key else self.orig_key
 
 
 @dataclass
