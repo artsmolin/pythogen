@@ -227,7 +227,7 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = 
         models.Format.binary: 'bytes',
         models.Format.uri: 'HttpUrl',
         models.Format.date: 'datetime.date',
-        models.Format.date_time: 'datetime.datetime',
+        models.Format.datetime: 'datetime.datetime',
     }
 
     # TODO: всегда передавать document в функцию

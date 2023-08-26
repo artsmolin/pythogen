@@ -150,7 +150,7 @@ class SchemaParser:
         data_format = data.get('format')
         if data_format:
             try:
-                return models.Format[data_format.replace('-', '_')]
+                return models.Format(data_format)
             except Exception:
                 raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
         return None
@@ -185,7 +185,7 @@ class SchemaParser:
         data_format = data.get('format')
         if data_format:
             try:
-                data_format = models.Format[data_format.replace('-', '_')]
+                data_format = models.Format(data_format)
             except Exception:
                 raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
 

@@ -582,7 +582,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/objects/{object_id}")
 
         params = {
@@ -999,7 +999,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> UnknownError | GetObjectResp:
+    ) -> GetObjectResp | UnknownError:
         url = self._get_url(f"/slow/objects/{object_id}")
 
         params = {}

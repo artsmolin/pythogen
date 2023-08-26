@@ -63,11 +63,18 @@ class Format(Enum):
     date = 'date'
     byte = 'byte'
     binary = 'binary'
-    date_time = 'date-time'
     datetime = 'date-time'
     password = 'password'
     uuid = 'uuid'
     uri = 'uri'
+
+    @classmethod
+    def _missing_(cls, value):
+        value = re.sub('[_-]*', '', value)
+        for member in cls:
+            if member.lower() == value:
+                return member
+        return None
 
 
 @dataclass
