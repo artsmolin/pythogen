@@ -322,5 +322,5 @@ FORMAT_MAPPING = {
     models.Format.binary: 'bytes',
     models.Format.uri: 'HttpUrl',
     models.Format.date: 'datetime.date',
-    models.Format.date_time: 'datetime.datetime',
+    models.Format.datetime: 'datetime.datetime',
 }

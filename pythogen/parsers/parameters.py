@@ -13,7 +13,7 @@ class ParameterParser:
         self._schema_parser = schema_parser
 
     def parse_collections(self) -> dict[str, models.ParameterObject]:
-        parameters = self._openapi_data["components"].get('parameters', {})
+        parameters = self._openapi_data.get('components', {}).get('parameters', {})
         result = {}
         for parameter_id, parameter_data in parameters.items():
             if parameter_data.get('$ref', None):
