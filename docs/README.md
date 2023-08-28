@@ -15,10 +15,6 @@ Generator of python HTTP-clients from OpenApi specification based on [httpx](htt
 
 ---
 
-<p align="center">
-  <img src="https://github.com/artsmolin/pythogen/raw/main/docs/images/example.png">
-</p>
-
 - [Overview](#overview)
   - [Installation](#installation)
   - [Generation](#generation)
