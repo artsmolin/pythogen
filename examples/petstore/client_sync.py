@@ -633,7 +633,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: dict[str, Any] | None = None,
-    ) -> LoginuserResponse200 | EmptyBody:
+    ) -> EmptyBody | LoginuserResponse200:
         url = self._get_url(f"/user/login")
 
         params = {}

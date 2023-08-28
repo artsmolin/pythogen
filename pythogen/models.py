@@ -72,7 +72,7 @@ class Format(Enum):
     def _missing_(cls, value):
         value = re.sub('[_-]*', '', value)
         for member in cls:
-            if member.lower() == value:
+            if member.name.lower() == value:
                 return member
         return None
 
