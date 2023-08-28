@@ -11,9 +11,6 @@
 ---
 
 Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i> and <i>pydantic</i>
-> Versions **0.1.*** use pydantic **v1.*** and are no longer supported.
-
-> Versions **0.2.*** use pydantic **v2.***.
 
 ## Documentation
 Check documentation to see more details about the features. All documentation is in the "docs" directory and online at [artsmolin.github.io/pythogen](artsmolin.github.io/pythogen)
