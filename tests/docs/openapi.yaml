@@ -472,6 +472,7 @@ components:
           title: All Of
           allOf:
             - $ref: '#/components/schemas/Data'
+            - $ref: '#/components/schemas/Cat'
     Data:
       title: Data
       type: object

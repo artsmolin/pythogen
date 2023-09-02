@@ -7,6 +7,7 @@ from __future__ import annotations
 import keyword
 import re
 from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 
 
@@ -148,6 +149,7 @@ class SchemaObject:
     properties: list[SchemaProperty]
     description: str | None = None
     additional_roperties: bool = False
+    all_of: list['SchemaObject'] = field(default_factory=list)
 
     # Технические поля
     discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None
@@ -280,6 +282,11 @@ class Document:
                 index = len(sorted) - 1
 
             schema = self.schemas[key]
+
+            for all_of_item in schema.all_of:
+                if all_of_item.id in key_for_processing and all_of_item.id not in sorted:
+                    sorted.insert(index, all_of_item.id)
+
             for property in schema.properties:
                 if property.schema.id in key_for_processing and property.schema.id not in sorted:
                     sorted.insert(index, property.schema.id)
