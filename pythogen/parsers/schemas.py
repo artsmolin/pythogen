@@ -88,6 +88,7 @@ class SchemaParser:
             return self._schemas[schema_id]
 
         schema_type = self._parse_type(schema_data)
+        all_of = self._parse_all_of(schema_data)
 
         self._processiong_parsed_schema_id_count[schema_id] += 1
         if self._processiong_parsed_schema_id_count[schema_id] > 1 and from_depth_level:
@@ -112,6 +113,7 @@ class SchemaParser:
                 properties=[],
                 description=self._get_description(schema_data),
                 is_fake=True,
+                all_of=all_of,
             )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
@@ -128,7 +130,17 @@ class SchemaParser:
             items=self._parse_items(schema_id, schema_data),
             properties=self._parse_properties(schema_type, schema_data),
             description=self._get_description(schema_data),
+            all_of=all_of,
         )
+
+    def _parse_all_of(self, data: dict[str, Any]) -> list[models.SchemaObject]:
+        result: list[models.SchemaObject] = []
+        for all_of_item in data.get("allOf", []):
+            if ref := all_of_item.get('$ref'):
+                resolved_ref = self._ref_resolver.resolve(ref)
+                all_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
+                result.append(all_of_item_schema)
+        return result
 
     def _parse_type(self, data: dict[str, Any]) -> models.Type:
         if data == {}:
@@ -216,18 +228,7 @@ class SchemaParser:
                     elif 'allOf' in property_schema_data:
                         property_schema_id = key + "_ref_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)
-
-                        for all_of_reference_container in property_schema_data['allOf']:
-                            ref = all_of_reference_container['$ref']
-                            all_of_resolved_ref = self._ref_resolver.resolve(ref)
-                            all_of_reference_parsed_schema = self.parse_item(
-                                schema_id=all_of_resolved_ref.ref_id,
-                                schema_data=all_of_resolved_ref.ref_data,
-                            )
-                            schema.properties += all_of_reference_parsed_schema.properties
-
                         self._inline_schema_aggregator.add(property_schema_id, schema)
-
                     elif property_schema_data.get('type') == models.Type.array.value:
                         # specify inline array name
                         property_schema_id = key + "_list"

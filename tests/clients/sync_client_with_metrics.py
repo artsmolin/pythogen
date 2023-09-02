@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.20
+#   Version:     0.2.21
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -440,9 +440,20 @@ class TierObj(BaseModel):
     priority: int | None = None
 
 
-class AllOfRefObj(BaseModel):
+class Cat(BaseModel):
     """
-    All Of
+    Cat
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    name: str | None = None
+
+
+class Data(BaseModel):
+    """
+    Data
     """
 
     model_config = ConfigDict(
@@ -450,6 +461,17 @@ class AllOfRefObj(BaseModel):
     )
     id: str | None = None
     data: int | None = None
+
+
+class AllOfRefObj(
+    Data,
+    Cat,
+):
+    """
+    All Of
+    """
+
+    ...
 
 
 class ListAnyOfResp(BaseModel):
@@ -606,17 +628,6 @@ class Dog(BaseModel):
     name: str | None = None
 
 
-class Cat(BaseModel):
-    """
-    Cat
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    name: str | None = None
-
-
 class GetObjectResp(BaseModel):
     """
     GetObjectResp
@@ -634,18 +645,6 @@ class GetObjectResp(BaseModel):
     child: GetObjectResp | None = None
     childs: list[GetObjectResp] | None = None
     animal: Cat | Dog | None = None
-
-
-class Data(BaseModel):
-    """
-    Data
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    id: str | None = None
-    data: int | None = None
 
 
 class AllOfResp(BaseModel):
@@ -2135,6 +2134,8 @@ GetObjectWithArrayResponseResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200Item.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
 TierObj.model_rebuild()
+Cat.model_rebuild()
+Data.model_rebuild()
 AllOfRefObj.model_rebuild()
 ListAnyOfResp.model_rebuild()
 SafetyKeyForTesting.model_rebuild()
@@ -2148,7 +2149,5 @@ PutObjectData.model_rebuild()
 PatchObjectData.model_rebuild()
 PostObjectData.model_rebuild()
 Dog.model_rebuild()
-Cat.model_rebuild()
 GetObjectResp.model_rebuild()
-Data.model_rebuild()
 AllOfResp.model_rebuild()

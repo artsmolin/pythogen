@@ -231,6 +231,14 @@ class {{ schema.name }}(BaseModel):
 {%- for model in models %}
 
 {%- if model.type.value == "any_of"  %}
+{%- elif model.all_of %}
+class {{ classname(model.id) }}(
+    {% for all_of_item_model in model.all_of %}{{ classname(all_of_item_model.id) }},{% endfor %}
+):
+    """
+    {{ model.title }}
+    """
+    ...
 {%- else %}
 class {{ classname(model.id) }}(BaseModel):
     """
