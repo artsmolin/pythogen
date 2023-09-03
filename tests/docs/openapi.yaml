@@ -473,6 +473,13 @@ components:
           allOf:
             - $ref: '#/components/schemas/Data'
             - $ref: '#/components/schemas/Cat'
+            - type: object
+              properties:
+                bark:
+                  type: boolean
+                breed:
+                  type: string
+                  enum: [Dingo, Husky, Retriever, Shepherd]
     Data:
       title: Data
       type: object

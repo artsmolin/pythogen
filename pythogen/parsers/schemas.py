@@ -88,7 +88,7 @@ class SchemaParser:
             return self._schemas[schema_id]
 
         schema_type = self._parse_type(schema_data)
-        all_of = self._parse_all_of(schema_data)
+        all_of = self._parse_all_of(schema_id, schema_data)
 
         self._processiong_parsed_schema_id_count[schema_id] += 1
         if self._processiong_parsed_schema_id_count[schema_id] > 1 and from_depth_level:
@@ -133,13 +133,19 @@ class SchemaParser:
             all_of=all_of,
         )
 
-    def _parse_all_of(self, data: dict[str, Any]) -> list[models.SchemaObject]:
+    def _parse_all_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
         result: list[models.SchemaObject] = []
-        for all_of_item in data.get("allOf", []):
+        for all_of_item_num, all_of_item in enumerate(parent_data.get("allOf", [])):
             if ref := all_of_item.get('$ref'):
                 resolved_ref = self._ref_resolver.resolve(ref)
                 all_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 result.append(all_of_item_schema)
+            else:
+                all_of_item_schema_id = f"{parent_id}_item_{all_of_item_num}"
+                all_of_item_schema = self.parse_item(all_of_item_schema_id, all_of_item)
+                self._inline_schema_aggregator.add(all_of_item_schema_id, all_of_item_schema)
+                result.append(all_of_item_schema)
+
         return result
 
     def _parse_type(self, data: dict[str, Any]) -> models.Type:
