@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.21
+#   Version:     0.2.22
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -22,6 +22,7 @@ from enum import Enum
 from enum import IntEnum
 from typing import IO
 from typing import Any
+from typing import Literal
 from typing import Mapping
 from typing import Protocol
 from typing import Sequence
@@ -408,6 +409,18 @@ class TierObj(BaseModel):
     priority: int | None = None
 
 
+class AllOfRefObjItem2(BaseModel):
+    """
+    None
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    bark: bool | None = None
+    breed: Literal["Dingo", "Husky", "Retriever", "Shepherd"] | None = None
+
+
 class Cat(BaseModel):
     """
     Cat
@@ -434,6 +447,7 @@ class Data(BaseModel):
 class AllOfRefObj(
     Data,
     Cat,
+    AllOfRefObjItem2,
 ):
     """
     All Of
@@ -2135,6 +2149,7 @@ GetObjectWithArrayResponseResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200Item.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
 TierObj.model_rebuild()
+AllOfRefObjItem2.model_rebuild()
 Cat.model_rebuild()
 Data.model_rebuild()
 AllOfRefObj.model_rebuild()
