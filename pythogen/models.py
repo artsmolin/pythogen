@@ -153,6 +153,7 @@ class SchemaObject:
     description: str | None = None
     additional_roperties: bool = False
     all_of: list['SchemaObject'] = field(default_factory=list)
+    any_of: list['SchemaObject'] = field(default_factory=list)
 
     # Технические поля
     discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None

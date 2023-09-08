@@ -89,6 +89,7 @@ class SchemaParser:
 
         schema_type = self._parse_type(schema_data)
         all_of = self._parse_all_of(schema_id, schema_data)
+        any_of = self._parse_any_of(schema_id, schema_data)
 
         self._processiong_parsed_schema_id_count[schema_id] += 1
         if self._processiong_parsed_schema_id_count[schema_id] > 1 and from_depth_level:
@@ -114,6 +115,7 @@ class SchemaParser:
                 description=self._get_description(schema_data),
                 is_fake=True,
                 all_of=all_of,
+                any_of=any_of,
             )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
@@ -131,20 +133,36 @@ class SchemaParser:
             properties=self._parse_properties(schema_type, schema_data),
             description=self._get_description(schema_data),
             all_of=all_of,
+            any_of=any_of,
         )
 
     def _parse_all_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
         result: list[models.SchemaObject] = []
-        for all_of_item_num, all_of_item in enumerate(parent_data.get("allOf", [])):
+        for i, all_of_item in enumerate(parent_data.get("allOf", [])):
             if ref := all_of_item.get('$ref'):
                 resolved_ref = self._ref_resolver.resolve(ref)
                 all_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 result.append(all_of_item_schema)
             else:
-                all_of_item_schema_id = f"{parent_id}_item_{all_of_item_num}"
+                all_of_item_schema_id = f"{parent_id}_item_{i}"
                 all_of_item_schema = self.parse_item(all_of_item_schema_id, all_of_item)
                 self._inline_schema_aggregator.add(all_of_item_schema_id, all_of_item_schema)
                 result.append(all_of_item_schema)
+
+        return result
+
+    def _parse_any_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
+        result: list[models.SchemaObject] = []
+        for i, any_of_item in enumerate(parent_data.get("anyOf", [])):
+            if ref := any_of_item.get('$ref'):
+                resolved_ref = self._ref_resolver.resolve(ref)
+                any_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
+                result.append(any_of_item_schema)
+            else:
+                any_of_item_schema_id = f"{parent_id}_item_{i}"
+                any_of_item_schema = self.parse_item(any_of_item_schema_id, any_of_item, from_depth_level=True)
+                self._inline_schema_aggregator.add(any_of_item_schema_id, any_of_item_schema)
+                result.append(any_of_item_schema)
 
         return result
 
@@ -158,7 +176,7 @@ class SchemaParser:
         elif 'allOf' in data:
             data_type = models.Type.object
         elif 'anyOf' in data:
-            data_type = models.Type.any_of
+            data_type = models.Type.object
         elif 'type' not in data:
             data_type = models.Type.object
         else:
@@ -326,43 +344,6 @@ class SchemaParser:
                 resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
                 schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 return schema
-            elif items_schema_data.get('anyOf'):
-                items = []
-                for any_ref_item in items_schema_data['anyOf']:
-                    ref = any_ref_item.get('$ref', None)
-                    any_ref_any_type = any_ref_item.get('type')
-                    if ref:
-                        resolved_ref = self._ref_resolver.resolve(ref)
-                        ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
-                        items.append(ref_schema)
-                    elif any_ref_any_type in PRIMITIVE_TYPES:
-                        items.append(
-                            models.SchemaObject(
-                                id='',
-                                type=models.Type(any_ref_any_type),
-                                enum=None,
-                                properties=[],
-                                title=None,
-                                format=None,
-                                items=None,
-                                required=None,
-                            )
-                        )
-                    else:
-                        items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
-                        schema = self.parse_item(items_schema_id, items_schema_data)
-                        self._inline_schema_aggregator.add(items_schema_id, schema)
-
-                return models.SchemaObject(
-                    id='',
-                    type=models.Type.any_of,
-                    enum=None,
-                    properties=[],
-                    title=None,
-                    format=None,
-                    items=items,
-                    required=None,
-                )
             else:
                 parent_raw_type = data.get('type')
                 if parent_raw_type == 'array':
@@ -373,54 +354,5 @@ class SchemaParser:
                 if items_schema_data.get('type') not in PRIMITIVE_TYPES:
                     self._inline_schema_aggregator.add(items_schema_id, schema)
                 return schema
-
-        if data.get('anyOf'):
-            items = []
-            for any_ref_item in data['anyOf']:
-                ref = any_ref_item.get('$ref', None)
-                any_ref_any_type = any_ref_item.get('type')
-                if ref:
-                    resolved_ref = self._ref_resolver.resolve(ref)
-                    ref_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
-                    items.append(ref_schema)
-                elif any_ref_any_type in PRIMITIVE_TYPES:
-                    items.append(
-                        models.SchemaObject(
-                            id='',
-                            type=models.Type(any_ref_any_type),
-                            enum=None,
-                            properties=[],
-                            title=None,
-                            format=None,
-                            items=None,
-                            required=None,
-                        )
-                    )
-                elif models.Type(any_ref_any_type) is models.Type.object:
-                    additional_roperties = any_ref_item.get('additionalProperties', False)
-                    if additional_roperties:
-                        item_schema_id = f'{parent_schema_id}Item'
-                        items.append(
-                            models.SchemaObject(
-                                id=item_schema_id,
-                                type=models.Type.object,
-                                enum=None,
-                                properties=[],
-                                title=None,
-                                format=None,
-                                items=None,
-                                required=None,
-                                additional_roperties=True,
-                            )
-                        )
-                elif models.Type(any_ref_any_type) is models.Type.array:
-                    schema_id = f'<inline+{models.SchemaObject.__name__}>'
-                    schema = self.parse_item(schema_id, any_ref_item)
-                    items.append(schema)
-                else:
-                    schema_id = f'<inline+{models.SchemaObject.__name__}>'
-                    schema = self.parse_item(schema_id, any_ref_item)  # type: ignore
-                    self._inline_schema_aggregator.add(schema_id, schema)
-            return items
 
         return None

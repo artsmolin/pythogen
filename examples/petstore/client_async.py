@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.22
+#   Version:     0.2.24
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -29,6 +29,7 @@ from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
+from pydantic import RootModel
 
 
 # backward compatibility for httpx<0.18.2
@@ -272,6 +273,7 @@ class DeleteUserPathParams(BaseModel):
 class LoginuserResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -283,6 +285,7 @@ class LoginuserResponse200(BaseModel):
 class CreateuserswithlistinputRequestBody(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -293,6 +296,7 @@ class CreateuserswithlistinputRequestBody(BaseModel):
 class GetinventoryResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -303,6 +307,7 @@ class GetinventoryResponse200(BaseModel):
 class UploadfileRequestBody(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -314,6 +319,7 @@ class UploadfileRequestBody(BaseModel):
 class FindpetsbytagsResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -324,6 +330,7 @@ class FindpetsbytagsResponse200(BaseModel):
 class FindpetsbystatusResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -331,9 +338,40 @@ class FindpetsbystatusResponse200(BaseModel):
     )
 
 
+class AddpetortagRequestBody(RootModel):
+    """
+    None
+
+    """
+
+    root: list[Pet | Tag]
+
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
+
+
+class AddpetortagResponse200(RootModel):
+    """
+    None
+
+    """
+
+    root: list[Pet | Tag]
+
+    def __iter__(self):
+        return iter(self.root)
+
+    def __getitem__(self, item):
+        return self.root[item]
+
+
 class ApiResponse(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -347,6 +385,7 @@ class ApiResponse(BaseModel):
 class Tag(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -359,6 +398,7 @@ class Tag(BaseModel):
 class Category(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -371,6 +411,7 @@ class Category(BaseModel):
 class Pet(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -387,6 +428,7 @@ class Pet(BaseModel):
 class User(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -405,6 +447,7 @@ class User(BaseModel):
 class Address(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -419,6 +462,7 @@ class Address(BaseModel):
 class Customer(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -432,6 +476,7 @@ class Customer(BaseModel):
 class Order(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -1142,8 +1187,8 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        body: Pet | Tag | dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet | Tag:
+        body: AddpetortagRequestBody | dict[str, Any] | None = None,
+    ) -> AddpetortagResponse200 | EmptyBody:
         method = "post"
 
         path = "/pet_or_tag"
@@ -1163,7 +1208,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, Pet | Tag):
+        elif isinstance(body, AddpetortagRequestBody):
             json = body.model_dump(by_alias=True)
         else:
             json = None
@@ -1203,7 +1248,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return self._parse_any_of(response.json(), [Pet, Tag])
+            return AddpetortagResponse200.model_validate(response.json())
 
         if response.status_code == 405:
             if response.content is None:
@@ -2029,6 +2074,8 @@ GetinventoryResponse200.model_rebuild()
 UploadfileRequestBody.model_rebuild()
 FindpetsbytagsResponse200.model_rebuild()
 FindpetsbystatusResponse200.model_rebuild()
+AddpetortagRequestBody.model_rebuild()
+AddpetortagResponse200.model_rebuild()
 ApiResponse.model_rebuild()
 Tag.model_rebuild()
 Category.model_rebuild()
