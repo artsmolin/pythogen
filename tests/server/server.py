@@ -120,6 +120,10 @@ async def get_binary(request: web.Request) -> web.Response:
     return web.Response(body=b'some_body')
 
 
+async def get_list_of_anyof(request: web.Request) -> web.Response:
+    return web.json_response(data={'anyOfChildArray': [{"name": "DogName"}, {"name": "CatName"}]})
+
+
 app = web.Application()
 app.add_routes(
     [
@@ -137,6 +141,7 @@ app.add_routes(
         web.post('/multipart-form-data', post_file_multipart_form_data),
         web.get('/slow/objects/{object_id}', get_object_slow),
         web.put('/slow/objects/{object_id}', put_object_slow),
+        web.get('/nested-any-of', get_list_of_anyof),
     ]
 )
 

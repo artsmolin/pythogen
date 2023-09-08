@@ -178,4 +178,9 @@ async def test_httpx_async_client():
     )
     assert isinstance(response, async_client.PostObjectResp)
 
+    response = await httpx_async_client.response_body_list_of_anyof()
+    assert isinstance(response, async_client.ListAnyOfResp)
+    assert len(response.anyOfChildArray) == 2
+    assert isinstance(response.anyOfChildArray[0].root, async_client.Dog)
+
     await httpx_async_client.close()
