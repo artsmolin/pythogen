@@ -68,6 +68,9 @@ class Format(Enum):
     password = 'password'
     uuid = 'uuid'
     uri = 'uri'
+    hostname = 'hostname'
+    ipv4 = 'ipv4'
+    ipv6 = 'ipv6'
 
     @classmethod
     def _missing_(cls, value):
