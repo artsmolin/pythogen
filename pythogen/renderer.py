@@ -277,7 +277,7 @@ def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Doc
         elif item.id:
             items.append(classname(item.id))
         else:
-            print("[rendered]j2_repr_any_of unsupported SchemaObject")
+            logger.error(f"j2_repr_any_of unsupported SchemaObject {item}")
     return ' | '.join(items)
 
 

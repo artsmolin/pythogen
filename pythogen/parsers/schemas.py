@@ -141,11 +141,11 @@ class SchemaParser:
         for i, all_of_item in enumerate(parent_data.get("allOf", [])):
             if ref := all_of_item.get('$ref'):
                 resolved_ref = self._ref_resolver.resolve(ref)
-                all_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
+                all_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 result.append(all_of_item_schema)
             else:
                 all_of_item_schema_id = f"{parent_id}_item_{i}"
-                all_of_item_schema = self.parse_item(all_of_item_schema_id, all_of_item)
+                all_of_item_schema = self.parse_item(all_of_item_schema_id, all_of_item, from_depth_level=True)
                 self._inline_schema_aggregator.add(all_of_item_schema_id, all_of_item_schema)
                 result.append(all_of_item_schema)
 
