@@ -333,13 +333,7 @@ class RequestBodyAnyofRequestBody(RootModel):
 
     """
 
-    root: list[Data | PostObjectData]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: Data | PostObjectData
 
 
 class GetBinaryResponse200(BaseModel):
@@ -459,13 +453,7 @@ class IntEnumOrNullObj(RootModel):
 
     """
 
-    root: list[int | None]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: int | None
 
 
 class OptionalAnyofStringDataObj(RootModel):
@@ -474,13 +462,7 @@ class OptionalAnyofStringDataObj(RootModel):
 
     """
 
-    root: list[str | None]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: str | None
 
 
 class OptionalAnyofStringDataObjItem0(BaseModel):
@@ -501,13 +483,7 @@ class AnimalObj(RootModel):
 
     """
 
-    root: list[Cat | Dog]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: Cat | Dog
 
 
 class AnyOfChildObj(RootModel):
@@ -516,13 +492,7 @@ class AnyOfChildObj(RootModel):
 
     """
 
-    root: list[GetObjectResp | Cat]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: GetObjectResp | Cat
 
 
 class TierObj(BaseModel):
@@ -596,13 +566,7 @@ class AnyOfChildItem(RootModel):
 
     """
 
-    root: list[Dog | Cat]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: Dog | Cat
 
 
 class ListAnyOfResp(BaseModel):

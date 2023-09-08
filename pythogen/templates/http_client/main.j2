@@ -238,13 +238,7 @@ class {{ classname(model.id) }}(RootModel):
     {{ model.title }}
     {{ model.description }}
     """
-    root: list[{{ repranyof(model.any_of, document) }}]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: {{ repranyof(model.any_of, document) }}
 {%- elif model.all_of %}
 class {{ classname(model.id) }}(
     {% for all_of_item_model in model.all_of %}{{ classname(all_of_item_model.id) }},{% endfor %}

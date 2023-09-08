@@ -344,13 +344,7 @@ class AddpetortagRequestBody(RootModel):
 
     """
 
-    root: list[Pet | Tag]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: Pet | Tag
 
 
 class AddpetortagResponse200(RootModel):
@@ -359,13 +353,7 @@ class AddpetortagResponse200(RootModel):
 
     """
 
-    root: list[Pet | Tag]
-
-    def __iter__(self):
-        return iter(self.root)
-
-    def __getitem__(self, item):
-        return self.root[item]
+    root: Pet | Tag
 
 
 class ApiResponse(BaseModel):
