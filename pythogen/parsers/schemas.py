@@ -184,7 +184,7 @@ class SchemaParser:
             try:
                 data_type = models.Type(raw_data_type)
             except ValueError:
-                raise Exception(f'Unable to parse schema "{id}", unknown type "{raw_data_type}" on "{data}"')
+                raise Exception(f'Unable to parse schema, unknown type "{raw_data_type}" on "{data}"')
         return data_type
 
     def _parse_format(self, data: dict[str, Any]) -> models.Format | None:
@@ -193,7 +193,7 @@ class SchemaParser:
             try:
                 return models.Format(data_format)
             except Exception:
-                raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
+                raise Exception(f'Unable to parse schema, unknown format "{data_format}"')
         return None
 
     def _get_description(self, data: dict[str, Any]) -> str | None:
