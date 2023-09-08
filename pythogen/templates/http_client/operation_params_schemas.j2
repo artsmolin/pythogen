@@ -12,14 +12,14 @@ class {{ classname(operation.fn_name) }}PathParams(BaseModel):
     {# required #}
     {%- for parameter in operation.path_params %}
     {%- if parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} = {{ parameterfield(parameter) }}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema, document) }} = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 
     {# optional #}
     {%- for parameter in operation.path_params -%}
     {%- if not parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = {{ parameterfield(parameter) }}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema, document) }} | None = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 {% endif %}
@@ -37,14 +37,14 @@ class {{ classname(operation.fn_name) }}QueryParams(BaseModel):
     {# required #}
     {%- for parameter in operation.query_params -%}
     {%- if parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} = {{ parameterfield(parameter) }}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema, document) }} = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 
     {# optional #}
     {%- for parameter in operation.query_params -%}
     {%- if not parameter.required %}
-    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema) }} | None = {{ parameterfield(parameter) }}
+    {{ varname(parameter.key) }}: {{ typerepr(parameter.schema, document) }} | None = {{ parameterfield(parameter) }}
     {%- endif %}
     {%- endfor %}
 {%- endif %}
@@ -61,14 +61,14 @@ class {{ classname(operation.fn_name) }}Headers(BaseModel):
     {# required #}
     {%- for header in operation.headers -%}
     {%- if header.required %}
-    {{ varname(header.key) }}: {{ typerepr(header.schema) }} = {{ parameterfield(header) }}
+    {{ varname(header.key) }}: {{ typerepr(header.schema, document) }} = {{ parameterfield(header) }}
     {%- endif %}
     {%- endfor %}
 
     {# optional #}
     {%- for header in operation.headers -%}
     {%- if not header.required %}
-    {{ varname(header.key) }}: {{ typerepr(header.schema) }} | None = {{ parameterfield(header) }}
+    {{ varname(header.key) }}: {{ typerepr(header.schema, document) }} | None = {{ parameterfield(header) }}
     {%- endif %}
     {%- endfor %}
 {%- endif %}

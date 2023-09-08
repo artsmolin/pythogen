@@ -26,14 +26,14 @@
         {%- endif %}
 
         {%- if operation.request_body %}
-        body: {{ typerepr(operation.request_body.schema) }} | dict[str, Any] | None = None,
+        body: {{ typerepr(operation.request_body.schema, document) }} | dict[str, Any] | None = None,
         {%- endif %}
 
         {#- headers -#}
         {% if operation.headers %}
         headers: {{ classname(operation.fn_name) }}Headers | dict[str, Any] | None = None,
         {% endif %}
-    ) -> {{ responserepr(operation.responses) }}:
+    ) -> {{ responserepr(operation.responses, document) }}:
 
         method = "{{ method }}"
 
@@ -75,7 +75,7 @@
         {% if operation.request_body %}
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, {{typerepr(operation.request_body.schema)}}):
+        elif isinstance(body, {{typerepr(operation.request_body.schema, document)}}):
             json = body.model_dump(by_alias=True)
         else:
             json = None

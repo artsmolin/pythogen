@@ -210,7 +210,7 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
     return mapping
 
 
-def j2_responserepr(responses: models.ResponsesObject) -> str:
+def j2_responserepr(responses: models.ResponsesObject, document: models.Document) -> str:
     """Represent method response on j2 template"""
     types = []
 
@@ -220,7 +220,7 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         elif response.schema.type in [models.Type.string, models.Type.integer]:
             types.append(classname(response.schema.id))
         else:
-            types.append(j2_typerepr(response.schema))
+            types.append(j2_typerepr(response.schema, document))
 
     types = sorted(list(set(types)))
 
@@ -233,11 +233,9 @@ def j2_responserepr(responses: models.ResponsesObject) -> str:
         return ' | '.join(types)
 
 
-def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = None) -> str:
+def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
     """Represent data type on j2 template"""
-    # TODO: всегда передавать document в функцию
-    if document:
-        schema = document.schemas.get(schema.id, schema)
+    schema = document.schemas.get(schema.id, schema)
 
     representation = 'dict'
 
@@ -257,25 +255,25 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document | None = 
 
     elif schema.type == models.Type.array and schema.items:
         if schema.items.type is models.Type.any_of:  # type: ignore
-            list_items_repr = _repr_any_of_schema(schema.items.items)  # type: ignore
+            list_items_repr = _repr_any_of_schema(schema.items.items, document)  # type: ignore
             representation = f'list[{list_items_repr}]'
         else:
-            item = j2_typerepr(schema.items)  # type: ignore
+            item = j2_typerepr(schema.items, document)  # type: ignore
             representation = f'list[{item}]'
 
     elif schema.type is models.Type.any_of:
-        representation = _repr_any_of_schema(schema.items)  # type: ignore
+        representation = _repr_any_of_schema(schema.items, document)  # type: ignore
 
     return representation
 
 
-def _repr_any_of_schema(any_of_items: list[models.SchemaObject]) -> str:
+def _repr_any_of_schema(any_of_items: list[models.SchemaObject], document: models.Document) -> str:
     items = []
     for item in any_of_items:
         if item.additional_roperties:
             items.append('dict[Any, Any]')
         elif item.type is models.Type.array and item.items:
-            repr = j2_typerepr(item)
+            repr = j2_typerepr(item, document)
             items.append(repr)
         elif item.id:
             items.append(classname(item.id))
