@@ -11,9 +11,6 @@ from pythogen.parsers.references import RefResolver
 logger = logging.getLogger(__name__)
 
 
-PRIMITIVE_TYPES = ('string', 'number', 'integer', 'boolean', 'null')
-
-
 class SchemaParser:
     """Парсер схемы
 
@@ -351,7 +348,7 @@ class SchemaParser:
                 else:
                     items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
                 schema = self.parse_item(items_schema_id, items_schema_data)
-                if items_schema_data.get('type') not in PRIMITIVE_TYPES:
+                if models.Type(items_schema_data.get('type')) not in models.Type.get_primitive_types():
                     self._inline_schema_aggregator.add(items_schema_id, schema)
                 return schema
 

@@ -270,18 +270,6 @@ class DeleteUserPathParams(BaseModel):
     username: str = Field(alias="username")
 
 
-class LoginuserResponse200(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: str | None = None
-
-
 class CreateuserswithlistinputRequestBody(BaseModel):
     """
     None
@@ -302,18 +290,6 @@ class GetinventoryResponse200(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-
-class UploadfileRequestBody(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    content: bytes | None = None
 
 
 class FindpetsbytagsResponse200(BaseModel):
@@ -883,7 +859,7 @@ class Client:
         query_params: LoginUserQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> EmptyBody | str:
         method = "get"
 
         path = "/user/login"
@@ -939,7 +915,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return LoginuserResponse200(text=response.text)
+            return response.text
 
         if response.status_code == 400:
             if response.content is None:
@@ -2056,10 +2032,8 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-LoginuserResponse200.model_rebuild()
 CreateuserswithlistinputRequestBody.model_rebuild()
 GetinventoryResponse200.model_rebuild()
-UploadfileRequestBody.model_rebuild()
 FindpetsbytagsResponse200.model_rebuild()
 FindpetsbystatusResponse200.model_rebuild()
 AddpetortagRequestBody.model_rebuild()

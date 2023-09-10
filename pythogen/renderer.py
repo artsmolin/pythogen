@@ -189,19 +189,16 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
                 continue
             continue
 
-        if response.schema.type == models.Type.string:
-            if response.schema.format is models.Format.binary:
-                mapper = f'{classname(response.schema.id)}(content=response.content)'
-                mapping.append((code, mapper))
-                continue
+        if response.schema.type == models.Type.string and response.schema.format is models.Format.binary:
+            mapping.append((code, 'response.content'))
+            continue
 
-            mapper = f'{classname(response.schema.id)}(text=response.text)'
-            mapping.append((code, mapper))
+        if response.schema.type == models.Type.string:
+            mapping.append((code, 'response.text'))
             continue
 
         if response.schema.type == models.Type.integer:
-            mapper = f'{classname(response.schema.id)}(text=response.text)'
-            mapping.append((code, mapper))
+            mapping.append((code, f'int(response.text)'))
             continue
 
         raise NotImplementedError(
@@ -218,8 +215,6 @@ def j2_responserepr(responses: models.ResponsesObject, document: models.Document
     for response in responses.patterned.values():
         if not response.schema:
             types.append('EmptyBody')
-        elif response.schema.type in [models.Type.string, models.Type.integer]:
-            types.append(classname(response.schema.id))
         else:
             types.append(j2_typerepr(response.schema, document))
 

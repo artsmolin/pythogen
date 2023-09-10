@@ -125,8 +125,12 @@ class Type(Enum):
     object = 'object'
     null = 'null'
 
-    # TODO: refactor
-    any_of = 'any_of'
+    def is_primitive(self) -> bool:
+        return self in Type.get_primitive_types()
+
+    @classmethod
+    def get_primitive_types(cls) -> tuple[Type, ...]:
+        return (cls.string, cls.number, cls.integer, cls.boolean, cls.null)
 
 
 @dataclass
@@ -314,7 +318,7 @@ class Document:
 
     @property
     def sorted_schemas(self) -> list[SchemaObject]:
-        keys = [key for key, schema in self.schemas.items() if schema.enum is None]
+        keys = [key for key, schema in self.schemas.items() if schema.enum is None and not schema.type.is_primitive()]
         return self._build_sorted_schemas(keys, exclude_enums=True)
 
     @property

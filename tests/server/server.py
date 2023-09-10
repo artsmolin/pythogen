@@ -101,6 +101,10 @@ async def get_text(request: web.Request) -> web.Response:
     return web.Response(text='Hello')
 
 
+async def get_text_as_integer(request: web.Request) -> web.Response:
+    return web.Response(text='1')
+
+
 async def get_allof(request: web.Request) -> web.json_response:
     return web.json_response(
         data={
@@ -135,6 +139,7 @@ app.add_routes(
         web.patch('/objects/{object_id}', patch_object),
         web.delete('/objects/{object_id}', delete_object),
         web.get('/text', get_text),
+        web.get('/text_as_integer', get_text_as_integer),
         web.get('/allof', get_allof),
         web.get('/empty', get_empty),
         web.get('/binary', get_binary),

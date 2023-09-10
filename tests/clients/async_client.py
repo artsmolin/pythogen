@@ -304,42 +304,6 @@ class RequestBodyAnyofRequestBody(RootModel):
     root: Data | PostObjectData
 
 
-class GetBinaryResponse200(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    content: bytes | None = None
-
-
-class GetTextAsIntegerResponse200(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: int | None = None
-
-
-class GetTextResponse200(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: str | None = None
-
-
 class GetListObjectsResponse200(BaseModel):
     """
     None
@@ -433,18 +397,6 @@ class OptionalAnyofStringDataObj(RootModel):
     root: str | None
 
 
-class OptionalAnyofStringDataObjItem0(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: str | None = None
-
-
 class AnimalObj(RootModel):
     """
     None
@@ -534,7 +486,7 @@ class AnyOfChildItem(RootModel):
 
     """
 
-    root: Dog | Cat
+    root: Dog | Cat | int
 
 
 class ListAnyOfResp(BaseModel):
@@ -1084,7 +1036,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> GetTextResponse200 | None:
+    ) -> str | None:
         method = "get"
 
         path = "/text"
@@ -1137,13 +1089,13 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetTextResponse200(text=response.text)
+            return response.text
 
     async def get_text_as_integer(
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> GetTextAsIntegerResponse200 | None:
+    ) -> int | None:
         method = "get"
 
         path = "/text_as_integer"
@@ -1196,7 +1148,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetTextAsIntegerResponse200(text=response.text)
+            return int(response.text)
 
     async def get_empty(
         self,
@@ -1332,7 +1284,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> GetBinaryResponse200 | None:
+    ) -> bytes | None:
         method = "get"
 
         path = "/binary"
@@ -1385,7 +1337,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetBinaryResponse200(content=response.content)
+            return response.content
 
     async def get_allof(
         self,
@@ -2232,9 +2184,6 @@ class Client:
 
 
 RequestBodyAnyofRequestBody.model_rebuild()
-GetBinaryResponse200.model_rebuild()
-GetTextAsIntegerResponse200.model_rebuild()
-GetTextResponse200.model_rebuild()
 GetListObjectsResponse200.model_rebuild()
 RewardsListItem.model_rebuild()
 GetObjectWithInlineArrayResponse200.model_rebuild()
@@ -2243,7 +2192,6 @@ GetObjectWithArrayResponseResponse200Item.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
 IntEnumOrNullObj.model_rebuild()
 OptionalAnyofStringDataObj.model_rebuild()
-OptionalAnyofStringDataObjItem0.model_rebuild()
 AnimalObj.model_rebuild()
 AnyOfChildObj.model_rebuild()
 TierObj.model_rebuild()
