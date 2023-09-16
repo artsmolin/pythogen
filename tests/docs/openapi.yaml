@@ -706,6 +706,13 @@ components:
           title: Code
           type: string
           default: unknown_error
+        loc:
+          items:
+            anyOf:
+              - {type: string}
+              - {type: integer}
+          title: Location
+          type: array
       additionalProperties: false
     SafetyKeyForTesting:
       title: model for testing safety key

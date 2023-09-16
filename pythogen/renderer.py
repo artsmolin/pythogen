@@ -252,9 +252,18 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
     elif schema.any_of:
         representation = classname(schema.id)
 
+    elif (
+        schema.type == models.Type.array
+        and schema.items
+        and isinstance(schema.items, models.SchemaObject)
+        and schema.items.any_of
+    ):
+        represented_items = " | ".join((j2_typerepr(anyof_item, document) for anyof_item in schema.items.any_of))
+        representation = f'list[{represented_items}]'
+
     elif schema.type == models.Type.array and schema.items:
-        item = j2_typerepr(schema.items, document)  # type: ignore
-        representation = f'list[{item}]'
+        represented_item = j2_typerepr(schema.items, document)  # type: ignore
+        representation = f'list[{represented_item}]'
 
     return representation
 

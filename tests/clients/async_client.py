@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.26
+#   Version:     0.2.27
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -504,7 +504,7 @@ class ListAnyOfResp(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    anyOfChildArray: list[AnyOfChildItem] | None = None
+    anyOfChildArray: list[Dog | Cat | int] | None = None
 
 
 class SafetyKeyForTesting(BaseModel):
@@ -538,6 +538,7 @@ class UnknownError(BaseModel):
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
     code: str | None = None
+    loc: list[str | int] | None = None
 
 
 class DeleteObjectResp(BaseModel):
