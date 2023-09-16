@@ -34,7 +34,7 @@
         headers: {{ classname(operation.fn_name) }}Headers | dict[str, Any] | None = None,
         {% endif %}
 
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> {{ responserepr(operation.responses, document) }}:
         """
         {{ operation.method.value|upper }} {{ operation.path_str }}

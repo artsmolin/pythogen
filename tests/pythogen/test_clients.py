@@ -163,7 +163,7 @@ async def test_httpx_async_client():
     assert isinstance(response, list)
     assert isinstance(response[0], async_client.GetObjectResp)
 
-    meta = async_client.MetaBox()
+    meta = async_client.PythogenMetaBox()
     response = await httpx_async_client.get_allof(meta=meta)
     assert isinstance(response, async_client.AllOfResp)
     assert meta.response

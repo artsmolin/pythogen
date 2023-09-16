@@ -700,7 +700,7 @@ class BasicAuth(BaseModel):
     password: str
 
 
-class MetaBox(BaseModel):
+class PythogenMetaBox(BaseModel):
     request: RequestBox | None = None
     response: ResponseBox | None = None
 
@@ -747,7 +747,7 @@ class Client:
         query_params: GetObjectNoRefSchemaQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> GetObjectNoRefSchemaResponse200 | None:
         """
         GET /objects/no-ref-schema/{object_id}
@@ -824,7 +824,7 @@ class Client:
         query_params: GetObjectQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> GetObjectResp | UnknownError:
         """
         GET /objects/{object_id}
@@ -910,7 +910,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> list[GetObjectWithArrayResponseResponse200Item] | None:
         """
         GET /object-with-array-response
@@ -979,7 +979,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> GetObjectWithInlineArrayResponse200 | None:
         """
         GET /object-with-inline-array
@@ -1048,7 +1048,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> list[GetObjectResp] | None:
         """
         GET /objects
@@ -1117,7 +1117,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> str | None:
         """
         GET /text
@@ -1186,7 +1186,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> int | None:
         """
         GET /text_as_integer
@@ -1256,7 +1256,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetEmptyHeaders | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | None:
         """
         GET /empty
@@ -1331,7 +1331,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetNoOperationIdHeaders | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | None:
         """
         GET /no-operation-id
@@ -1405,7 +1405,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> bytes | None:
         """
         GET /binary
@@ -1474,7 +1474,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> AllOfResp | None:
         """
         GET /allof
@@ -1545,7 +1545,7 @@ class Client:
         query_params: GetObjectSlowQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> GetObjectResp | UnknownError:
         """
         GET /slow/objects/{object_id}
@@ -1631,7 +1631,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> ListAnyOfResp | None:
         """
         GET /nested-any-of
@@ -1700,7 +1700,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /post-without-body
@@ -1770,7 +1770,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /objects
@@ -1849,7 +1849,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /objects-form-data
@@ -1930,7 +1930,7 @@ class Client:
         content: str | bytes | None = None,
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
         body: PostFile | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /multipart-form-data
@@ -2013,7 +2013,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /request-body-anyof
@@ -2093,7 +2093,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PatchObjectData | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PatchObjectResp | None:
         """
         PATCH /objects/{object_id}
@@ -2176,7 +2176,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PutObjectResp | None:
         """
         PUT /objects/{object_id}
@@ -2259,7 +2259,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> PutObjectResp | None:
         """
         PUT /slow/objects/{object_id}
@@ -2341,7 +2341,7 @@ class Client:
         path_params: DeleteObjectPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> DeleteObjectResp | None:
         """
         DELETE /objects/{object_id}

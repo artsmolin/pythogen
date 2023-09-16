@@ -459,7 +459,7 @@ class BasicAuth(BaseModel):
     password: str
 
 
-class MetaBox(BaseModel):
+class PythogenMetaBox(BaseModel):
     request: RequestBox | None = None
     response: ResponseBox | None = None
 
@@ -505,7 +505,7 @@ class Client:
         query_params: FindPetsByStatusQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | list[Pet]:
         """
         GET /pet/findByStatus
@@ -591,7 +591,7 @@ class Client:
         query_params: FindPetsByTagsQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | list[Pet]:
         """
         GET /pet/findByTags
@@ -677,7 +677,7 @@ class Client:
         path_params: GetPetByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | Pet:
         """
         GET /pet/{petId}
@@ -773,7 +773,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> GetinventoryResponse200 | None:
         """
         GET /store/inventory
@@ -845,7 +845,7 @@ class Client:
         path_params: GetOrderByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | Order:
         """
         GET /store/order/{orderId}
@@ -942,7 +942,7 @@ class Client:
         query_params: LoginUserQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | str:
         """
         GET /user/login
@@ -1027,7 +1027,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> None:
         """
         GET /user/logout
@@ -1096,7 +1096,7 @@ class Client:
         path_params: GetUserByNamePathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | User:
         """
         GET /user/{username}
@@ -1193,7 +1193,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | Pet:
         """
         POST /pet
@@ -1283,7 +1283,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: AddpetortagRequestBody | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> AddpetortagResponse200 | EmptyBody:
         """
         POST /pet_or_tag
@@ -1374,7 +1374,7 @@ class Client:
         query_params: UpdatePetWithFormQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | None:
         """
         POST /pet/{petId}
@@ -1462,7 +1462,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: bytes | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> ApiResponse | None:
         """
         POST /pet/{petId}/uploadImage
@@ -1547,7 +1547,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Order | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | Order:
         """
         POST /store/order
@@ -1637,7 +1637,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> None:
         """
         POST /user
@@ -1713,7 +1713,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: list[User] | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> User | None:
         """
         POST /user/createWithList
@@ -1792,7 +1792,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | Pet:
         """
         PUT /pet
@@ -1905,7 +1905,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> None:
         """
         PUT /user/{username}
@@ -1985,7 +1985,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: DeletePetHeaders | dict[str, Any] | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | None:
         """
         DELETE /pet/{petId}
@@ -2073,7 +2073,7 @@ class Client:
         path_params: DeleteOrderPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | None:
         """
         DELETE /store/order/{orderId}
@@ -2167,7 +2167,7 @@ class Client:
         path_params: DeleteUserPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        meta: MetaBox | None = None,
+        meta: PythogenMetaBox | None = None,
     ) -> EmptyBody | None:
         """
         DELETE /user/{username}
