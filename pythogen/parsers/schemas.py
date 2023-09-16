@@ -352,7 +352,8 @@ class SchemaParser:
                 else:
                     items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
                 schema = self.parse_item(items_schema_id, items_schema_data)
-                if not models.Type(items_schema_data.get('type')).is_primitive:
+                items_schema_data_type = items_schema_data.get('type')
+                if items_schema_data_type and not models.Type(items_schema_data_type).is_primitive:
                     self._inline_schema_aggregator.add(items_schema_id, schema)
                 return schema
 
