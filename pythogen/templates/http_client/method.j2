@@ -34,6 +34,12 @@
         headers: {{ classname(operation.fn_name) }}Headers | dict[str, Any] | None = None,
         {% endif %}
     ) -> {{ responserepr(operation.responses, document) }}:
+        """
+        {{ operation.method.value|upper }} {{ operation.path_str }}
+        Operation ID: {{ operation.operation_id }}
+        Summary:      {{ operation.summary }}
+        Description:  {{ operation.description }}
+        """
 
         method = "{{ method }}"
 

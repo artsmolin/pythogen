@@ -327,6 +327,24 @@ class {{ name }}:
         metrics_integration: MetricsIntegration | None = None,
         logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
+        """
+        Parameters
+        ----------
+        base_url
+            Base URL
+        timeout
+            In seconds
+        client_name
+            Used in metrics
+        client
+            httpx-client
+        headers
+            Headers that will be passed in all requests
+        metrics_integration
+            The object that is responsible for collecting and sending metrics
+        logs_integration
+            The object that is responsible for logging events
+        """
         {%- if sync %}
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         {%- else %}

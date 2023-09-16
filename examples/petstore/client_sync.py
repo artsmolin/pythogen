@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.24
+#   Version:     0.2.25
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -470,6 +470,24 @@ class Client:
         metrics_integration: MetricsIntegration | None = None,
         logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
+        """
+        Parameters
+        ----------
+        base_url
+            Base URL
+        timeout
+            In seconds
+        client_name
+            Used in metrics
+        client
+            httpx-client
+        headers
+            Headers that will be passed in all requests
+        metrics_integration
+            The object that is responsible for collecting and sending metrics
+        logs_integration
+            The object that is responsible for logging events
+        """
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
@@ -483,6 +501,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | list[Pet]:
+        """
+        GET /pet/findByStatus
+        Operation ID: findPetsByStatus
+        Summary:      Finds Pets by status
+        Description:  Multiple status values can be provided with comma separated strings
+        """
+
         method = "get"
 
         path = "/pet/findByStatus"
@@ -555,6 +580,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | list[Pet]:
+        """
+        GET /pet/findByTags
+        Operation ID: findPetsByTags
+        Summary:      Finds Pets by tags
+        Description:  Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+        """
+
         method = "get"
 
         path = "/pet/findByTags"
@@ -627,6 +659,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | Pet:
+        """
+        GET /pet/{petId}
+        Operation ID: getPetById
+        Summary:      Find pet by ID
+        Description:  Returns a single pet
+        """
+
         method = "get"
 
         if isinstance(path_params, GetPetByIdPathParams):
@@ -709,6 +748,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> GetinventoryResponse200 | None:
+        """
+        GET /store/inventory
+        Operation ID: getInventory
+        Summary:      Returns pet inventories by status
+        Description:  Returns a map of status codes to quantities
+        """
+
         method = "get"
 
         path = "/store/inventory"
@@ -767,6 +813,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | Order:
+        """
+        GET /store/order/{orderId}
+        Operation ID: getOrderById
+        Summary:      Find purchase order by ID
+        Description:  For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
+        """
+
         method = "get"
 
         if isinstance(path_params, GetOrderByIdPathParams):
@@ -850,6 +903,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | str:
+        """
+        GET /user/login
+        Operation ID: loginUser
+        Summary:      Logs user into the system
+        Description:
+        """
+
         method = "get"
 
         path = "/user/login"
@@ -921,6 +981,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> None:
+        """
+        GET /user/logout
+        Operation ID: logoutUser
+        Summary:      Logs out current logged in user session
+        Description:
+        """
+
         method = "get"
 
         path = "/user/logout"
@@ -976,6 +1043,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | User:
+        """
+        GET /user/{username}
+        Operation ID: getUserByName
+        Summary:      Get user by user name
+        Description:
+        """
+
         method = "get"
 
         if isinstance(path_params, GetUserByNamePathParams):
@@ -1059,6 +1133,13 @@ class Client:
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
     ) -> EmptyBody | Pet:
+        """
+        POST /pet
+        Operation ID: addPet
+        Summary:      Add a new pet to the store
+        Description:  Add a new pet to the store
+        """
+
         method = "post"
 
         path = "/pet"
@@ -1137,6 +1218,13 @@ class Client:
         content: str | bytes | None = None,
         body: AddpetortagRequestBody | dict[str, Any] | None = None,
     ) -> AddpetortagResponse200 | EmptyBody:
+        """
+        POST /pet_or_tag
+        Operation ID: addPetOrTag
+        Summary:      Add a new pet or tag to the store
+        Description:  Add a new pet or tag to the store
+        """
+
         method = "post"
 
         path = "/pet_or_tag"
@@ -1216,6 +1304,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | None:
+        """
+        POST /pet/{petId}
+        Operation ID: updatePetWithForm
+        Summary:      Updates a pet in the store with form data
+        Description:
+        """
+
         method = "post"
 
         if isinstance(path_params, UpdatePetWithFormPathParams):
@@ -1290,6 +1385,13 @@ class Client:
         content: str | bytes | None = None,
         body: bytes | dict[str, Any] | None = None,
     ) -> ApiResponse | None:
+        """
+        POST /pet/{petId}/uploadImage
+        Operation ID: uploadFile
+        Summary:      uploads an image
+        Description:
+        """
+
         method = "post"
 
         if isinstance(path_params, UploadFilePathParams):
@@ -1363,6 +1465,13 @@ class Client:
         content: str | bytes | None = None,
         body: Order | dict[str, Any] | None = None,
     ) -> EmptyBody | Order:
+        """
+        POST /store/order
+        Operation ID: placeOrder
+        Summary:      Place an order for a pet
+        Description:  Place a new order in the store
+        """
+
         method = "post"
 
         path = "/store/order"
@@ -1441,6 +1550,13 @@ class Client:
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
     ) -> None:
+        """
+        POST /user
+        Operation ID: createUser
+        Summary:      Create user
+        Description:  This can only be done by the logged in user.
+        """
+
         method = "post"
 
         path = "/user"
@@ -1505,6 +1621,13 @@ class Client:
         content: str | bytes | None = None,
         body: list[User] | dict[str, Any] | None = None,
     ) -> User | None:
+        """
+        POST /user/createWithList
+        Operation ID: createUsersWithListInput
+        Summary:      Creates list of users with given input array
+        Description:  Creates list of users with given input array
+        """
+
         method = "post"
 
         path = "/user/createWithList"
@@ -1572,6 +1695,13 @@ class Client:
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
     ) -> EmptyBody | Pet:
+        """
+        PUT /pet
+        Operation ID: updatePet
+        Summary:      Update an existing pet
+        Description:  Update an existing pet by Id
+        """
+
         method = "put"
 
         path = "/pet"
@@ -1673,6 +1803,13 @@ class Client:
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
     ) -> None:
+        """
+        PUT /user/{username}
+        Operation ID: updateUser
+        Summary:      Update user
+        Description:  This can only be done by the logged in user.
+        """
+
         method = "put"
 
         if isinstance(path_params, UpdateUserPathParams):
@@ -1741,6 +1878,13 @@ class Client:
         content: str | bytes | None = None,
         headers: DeletePetHeaders | dict[str, Any] | None = None,
     ) -> EmptyBody | None:
+        """
+        DELETE /pet/{petId}
+        Operation ID: deletePet
+        Summary:      Deletes a pet
+        Description:
+        """
+
         method = "delete"
 
         if isinstance(path_params, DeletePetPathParams):
@@ -1815,6 +1959,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | None:
+        """
+        DELETE /store/order/{orderId}
+        Operation ID: deleteOrder
+        Summary:      Delete purchase order by ID
+        Description:  For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
+        """
+
         method = "delete"
 
         if isinstance(path_params, DeleteOrderPathParams):
@@ -1895,6 +2046,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> EmptyBody | None:
+        """
+        DELETE /user/{username}
+        Operation ID: deleteUser
+        Summary:      Delete user
+        Description:  This can only be done by the logged in user.
+        """
+
         method = "delete"
 
         if isinstance(path_params, DeleteUserPathParams):
