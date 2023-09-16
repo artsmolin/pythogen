@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.22
+#   Version:     0.2.24
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -29,6 +29,7 @@ from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
+from pydantic import RootModel
 
 
 # backward compatibility for httpx<0.18.2
@@ -269,20 +270,10 @@ class DeleteUserPathParams(BaseModel):
     username: str = Field(alias="username")
 
 
-class LoginuserResponse200(BaseModel):
-    """
-    None
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: str | None = None
-
-
 class CreateuserswithlistinputRequestBody(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -293,27 +284,18 @@ class CreateuserswithlistinputRequestBody(BaseModel):
 class GetinventoryResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-
-
-class UploadfileRequestBody(BaseModel):
-    """
-    None
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    content: bytes | None = None
 
 
 class FindpetsbytagsResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -324,6 +306,7 @@ class FindpetsbytagsResponse200(BaseModel):
 class FindpetsbystatusResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -331,9 +314,28 @@ class FindpetsbystatusResponse200(BaseModel):
     )
 
 
+class AddpetortagRequestBody(RootModel):
+    """
+    None
+
+    """
+
+    root: Pet | Tag
+
+
+class AddpetortagResponse200(RootModel):
+    """
+    None
+
+    """
+
+    root: Pet | Tag
+
+
 class ApiResponse(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -347,6 +349,7 @@ class ApiResponse(BaseModel):
 class Tag(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -359,6 +362,7 @@ class Tag(BaseModel):
 class Category(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -371,6 +375,7 @@ class Category(BaseModel):
 class Pet(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -387,6 +392,7 @@ class Pet(BaseModel):
 class User(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -405,6 +411,7 @@ class User(BaseModel):
 class Address(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -419,6 +426,7 @@ class Address(BaseModel):
 class Customer(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -432,6 +440,7 @@ class Customer(BaseModel):
 class Order(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -840,7 +849,7 @@ class Client:
         query_params: LoginUserQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> EmptyBody | LoginuserResponse200:
+    ) -> EmptyBody | str:
         method = "get"
 
         path = "/user/login"
@@ -894,7 +903,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return LoginuserResponse200(text=response.text)
+            return response.text
 
         if response.status_code == 400:
             if response.content is None:
@@ -1126,8 +1135,8 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        body: Pet | Tag | dict[str, Any] | None = None,
-    ) -> EmptyBody | Pet | Tag:
+        body: AddpetortagRequestBody | dict[str, Any] | None = None,
+    ) -> AddpetortagResponse200 | EmptyBody:
         method = "post"
 
         path = "/pet_or_tag"
@@ -1147,7 +1156,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, Pet | Tag):
+        elif isinstance(body, AddpetortagRequestBody):
             json = body.model_dump(by_alias=True)
         else:
             json = None
@@ -1187,7 +1196,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return self._parse_any_of(response.json(), [Pet, Tag])
+            return AddpetortagResponse200.model_validate(response.json())
 
         if response.status_code == 405:
             if response.content is None:
@@ -1999,12 +2008,12 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-LoginuserResponse200.model_rebuild()
 CreateuserswithlistinputRequestBody.model_rebuild()
 GetinventoryResponse200.model_rebuild()
-UploadfileRequestBody.model_rebuild()
 FindpetsbytagsResponse200.model_rebuild()
 FindpetsbystatusResponse200.model_rebuild()
+AddpetortagRequestBody.model_rebuild()
+AddpetortagResponse200.model_rebuild()
 ApiResponse.model_rebuild()
 Tag.model_rebuild()
 Category.model_rebuild()

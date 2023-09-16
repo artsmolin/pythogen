@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.22
+#   Version:     0.2.24
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -38,6 +38,7 @@ from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import FieldValidationInfo
 from pydantic import HttpUrl
+from pydantic import RootModel
 from pydantic import field_validator
 
 
@@ -326,42 +327,19 @@ class BaseObjectResp(BaseModel):
         return v
 
 
-class GetBinaryResponse200(BaseModel):
+class RequestBodyAnyofRequestBody(RootModel):
     """
     None
+
     """
 
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    content: bytes | None = None
-
-
-class GetTextAsIntegerResponse200(BaseModel):
-    """
-    None
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: int | None = None
-
-
-class GetTextResponse200(BaseModel):
-    """
-    None
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    text: str | None = None
+    root: Data | PostObjectData
 
 
 class GetListObjectsResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -372,6 +350,7 @@ class GetListObjectsResponse200(BaseModel):
 class RewardsListItem(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -384,6 +363,7 @@ class RewardsListItem(BaseModel):
 class GetObjectWithInlineArrayResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -395,6 +375,7 @@ class GetObjectWithInlineArrayResponse200(BaseModel):
 class GetObjectWithArrayResponseResponse200(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -405,6 +386,7 @@ class GetObjectWithArrayResponseResponse200(BaseModel):
 class GetObjectWithArrayResponseResponse200Item(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -417,6 +399,7 @@ class GetObjectWithArrayResponseResponse200Item(BaseModel):
 class GetObjectNoRefSchemaResponse200(BaseModel):
     """
     GetObjectResp
+
     """
 
     model_config = ConfigDict(
@@ -428,9 +411,46 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     boolean_data: bool | None = None
 
 
+class IntEnumOrNullObj(RootModel):
+    """
+    None
+
+    """
+
+    root: int | None
+
+
+class OptionalAnyofStringDataObj(RootModel):
+    """
+    None
+
+    """
+
+    root: str | None
+
+
+class AnimalObj(RootModel):
+    """
+    None
+
+    """
+
+    root: Cat | Dog
+
+
+class AnyOfChildObj(RootModel):
+    """
+    None
+
+    """
+
+    root: GetObjectResp | Cat
+
+
 class TierObj(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -444,6 +464,7 @@ class TierObj(BaseModel):
 class AllOfRefObjItem2(BaseModel):
     """
     None
+
     """
 
     model_config = ConfigDict(
@@ -456,6 +477,7 @@ class AllOfRefObjItem2(BaseModel):
 class Cat(BaseModel):
     """
     Cat
+
     """
 
     model_config = ConfigDict(
@@ -467,6 +489,7 @@ class Cat(BaseModel):
 class Data(BaseModel):
     """
     Data
+
     """
 
     model_config = ConfigDict(
@@ -479,29 +502,47 @@ class Data(BaseModel):
 class AllOfRefObj(
     Data,
     Cat,
-    AllOfRefObjItem2,
 ):
     """
     All Of
-    """
 
-    ...
-
-
-class ListAnyOfResp(BaseModel):
-    """
-    PostObjectResp
     """
 
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    anyOfChildArray: list[Dog | Cat] | None = None
+
+    bark: bool | None = None
+    breed: Literal["Dingo", "Husky", "Retriever", "Shepherd"] | None = None
+
+    ...
+
+
+class AnyOfChildItem(RootModel):
+    """
+    AnyOfChildItem
+
+    """
+
+    root: Dog | Cat | int
+
+
+class ListAnyOfResp(BaseModel):
+    """
+    PostObjectResp
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    anyOfChildArray: list[AnyOfChildItem] | None = None
 
 
 class SafetyKeyForTesting(BaseModel):
     """
     model for testing safety key
+
     """
 
     model_config = ConfigDict(
@@ -522,6 +563,7 @@ class SafetyKeyForTesting(BaseModel):
 class UnknownError(BaseModel):
     """
     UnknownError
+
     """
 
     model_config = ConfigDict(
@@ -533,6 +575,7 @@ class UnknownError(BaseModel):
 class DeleteObjectResp(BaseModel):
     """
     DeleteObjectResp
+
     """
 
     model_config = ConfigDict(
@@ -544,6 +587,7 @@ class DeleteObjectResp(BaseModel):
 class PutObjectResp(BaseModel):
     """
     PutObjectResp
+
     """
 
     model_config = ConfigDict(
@@ -555,6 +599,7 @@ class PutObjectResp(BaseModel):
 class PatchObjectResp(BaseModel):
     """
     PatchObjectResp
+
     """
 
     model_config = ConfigDict(
@@ -566,6 +611,7 @@ class PatchObjectResp(BaseModel):
 class PostObjectResp(BaseModel):
     """
     PostObjectResp
+
     """
 
     model_config = ConfigDict(
@@ -577,6 +623,7 @@ class PostObjectResp(BaseModel):
 class PostFile(BaseModel):
     """
     PostFile
+
     """
 
     model_config = ConfigDict(
@@ -588,6 +635,7 @@ class PostFile(BaseModel):
 class PutObjectData(BaseModel):
     """
     PutObjectData
+
     """
 
     model_config = ConfigDict(
@@ -600,6 +648,7 @@ class PutObjectData(BaseModel):
 class PatchObjectData(BaseModel):
     """
     Patch-Object_Data
+
     """
 
     model_config = ConfigDict(
@@ -612,6 +661,7 @@ class PatchObjectData(BaseModel):
 class PostObjectData(BaseModel):
     """
     PostObjectData
+
     """
 
     model_config = ConfigDict(
@@ -622,29 +672,19 @@ class PostObjectData(BaseModel):
     array_data: list[str]
     boolean_data: bool
     event_data: dict = Field(description="__safety_key__(event_data)", alias="event-data")
-    optional_anyof_string_data: str | None = None
+    optional_anyof_string_data: OptionalAnyofStringDataObj | None = None
     date_attr: datetime.date | None = None
     datetime_attr: datetime.datetime | None = None
     url: HttpUrl | None = None
     int_enum: IntegerEnum | None = Field(None, description="An enumeration.")
     str_enum: StringEnum | None = Field(None, description="An enumeration.")
-    int_enum_or_null: IntegerEnum | None = None
-
-
-class Dog(BaseModel):
-    """
-    Dog
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-    name: str | None = None
+    int_enum_or_null: IntEnumOrNullObj | None = None
 
 
 class GetObjectResp(BaseModel):
     """
     GetObjectResp
+
     """
 
     model_config = ConfigDict(
@@ -655,15 +695,28 @@ class GetObjectResp(BaseModel):
     array_data: list[str] | None = None
     boolean_data: bool | None = None
     tier: TierObj | None = None
-    anyOfChild: GetObjectResp | Cat | None = None
+    anyOfChild: AnyOfChildObj | None = None
     child: GetObjectResp | None = None
     childs: list[GetObjectResp] | None = None
-    animal: Cat | Dog | None = None
+    animal: AnimalObj | None = None
+
+
+class Dog(BaseModel):
+    """
+    Dog
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    name: str | None = None
 
 
 class AllOfResp(BaseModel):
     """
     All Of Resp
+
     """
 
     model_config = ConfigDict(
@@ -1021,7 +1074,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> GetTextResponse200 | None:
+    ) -> str | None:
         method = "get"
 
         path = "/text"
@@ -1074,13 +1127,13 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetTextResponse200(text=response.text)
+            return response.text
 
     async def get_text_as_integer(
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> GetTextAsIntegerResponse200 | None:
+    ) -> int | None:
         method = "get"
 
         path = "/text_as_integer"
@@ -1133,7 +1186,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetTextAsIntegerResponse200(text=response.text)
+            return int(response.text)
 
     async def get_empty(
         self,
@@ -1269,7 +1322,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-    ) -> GetBinaryResponse200 | None:
+    ) -> bytes | None:
         method = "get"
 
         path = "/binary"
@@ -1322,7 +1375,7 @@ class Client:
         )
 
         if response.status_code == 200:
-            return GetBinaryResponse200(content=response.content)
+            return response.content
 
     async def get_allof(
         self,
@@ -1790,7 +1843,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
-        body: Data | PostObjectData | dict[str, Any] | None = None,
+        body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
     ) -> PostObjectResp | None:
         method = "post"
 
@@ -1811,7 +1864,7 @@ class Client:
 
         if isinstance(body, dict):
             json = body
-        elif isinstance(body, Data | PostObjectData):
+        elif isinstance(body, RequestBodyAnyofRequestBody):
             json = body.model_dump(by_alias=True)
         else:
             json = None
@@ -2168,20 +2221,23 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-GetBinaryResponse200.model_rebuild()
-GetTextAsIntegerResponse200.model_rebuild()
-GetTextResponse200.model_rebuild()
+RequestBodyAnyofRequestBody.model_rebuild()
 GetListObjectsResponse200.model_rebuild()
 RewardsListItem.model_rebuild()
 GetObjectWithInlineArrayResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200.model_rebuild()
 GetObjectWithArrayResponseResponse200Item.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
+IntEnumOrNullObj.model_rebuild()
+OptionalAnyofStringDataObj.model_rebuild()
+AnimalObj.model_rebuild()
+AnyOfChildObj.model_rebuild()
 TierObj.model_rebuild()
 AllOfRefObjItem2.model_rebuild()
 Cat.model_rebuild()
 Data.model_rebuild()
 AllOfRefObj.model_rebuild()
+AnyOfChildItem.model_rebuild()
 ListAnyOfResp.model_rebuild()
 SafetyKeyForTesting.model_rebuild()
 UnknownError.model_rebuild()
@@ -2193,6 +2249,6 @@ PostFile.model_rebuild()
 PutObjectData.model_rebuild()
 PatchObjectData.model_rebuild()
 PostObjectData.model_rebuild()
-Dog.model_rebuild()
 GetObjectResp.model_rebuild()
+Dog.model_rebuild()
 AllOfResp.model_rebuild()

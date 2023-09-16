@@ -43,6 +43,7 @@ from prometheus_client import Histogram
 {%- endif %}
 import httpx
 from pydantic import BaseModel
+from pydantic import RootModel
 from pydantic import Field
 from pydantic import field_validator
 from pydantic import FieldValidationInfo
@@ -230,19 +231,53 @@ class {{ schema.name }}(BaseModel):
 
 {%- for model in models %}
 
-{%- if model.type.value == "any_of"  %}
+{%- if model.type.value == "null"  %}
+{%- elif model.any_of  %}
+class {{ classname(model.id) }}(RootModel):
+    """
+    {{ model.title }}
+    {{ model.description }}
+    """
+    root: {{ repranyof(model.any_of, document) }}
 {%- elif model.all_of %}
 class {{ classname(model.id) }}(
-    {% for all_of_item_model in model.all_of %}{{ classname(all_of_item_model.id) }},{% endfor %}
+    {% for all_of_item_model in model.named_allof_models %}{{ typerepr(all_of_item_model, document) }},{% endfor %}
 ):
     """
     {{ model.title }}
+    {{ model.description }}
     """
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    {% for all_of_item_model in model.inline_allof_models %}
+    {%- for property in all_of_item_model.required_properties %}
+        {%- if property.schema.description %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+        {%- else %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }}
+        {%- endif %}
+    {%- endfor %}
+
+    {%- for property in all_of_item_model.optional_properties %}
+        {%- if property.schema.description %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(None, description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
+        {%- else %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = None
+        {%- endif %}
+    {%- endfor %}
+
+    {%- for property in all_of_item_model.required_properties + all_of_item_model.optional_properties if property.safety_key %}
+    {%- break %}
+    {%- endfor %}
+    {% endfor %}
     ...
 {%- else %}
 class {{ classname(model.id) }}(BaseModel):
     """
     {{ model.title }}
+    {{ model.description }}
     """
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
@@ -378,7 +413,7 @@ class {{ name }}:
 
 
 {% for model in models %}
-{%- if model.type.value != "any_of" %}
+{%- if model.type.value not in ("any_of", "null") %}
 {{ classname(model.id) }}.model_rebuild()
 {%- else %}
 {%- endif -%}

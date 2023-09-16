@@ -86,10 +86,13 @@ def test_httpx_sync_client():
     assert isinstance(response, sync_client.EmptyBody)
 
     response = httpx_sync_client.get_text()
-    assert isinstance(response, sync_client.GetTextResponse200)
+    assert isinstance(response, str)
 
     response = httpx_sync_client.get_binary()
-    assert isinstance(response, sync_client.GetBinaryResponse200)
+    assert isinstance(response, bytes)
+
+    response = httpx_sync_client.get_text_as_integer()
+    assert isinstance(response, int)
 
     response = httpx_sync_client.post_multipart_form_data(
         body=sync_client.PostFile(text="ping"),
@@ -167,15 +170,23 @@ async def test_httpx_async_client():
     assert isinstance(response, async_client.EmptyBody)
 
     response = await httpx_async_client.get_text()
-    assert isinstance(response, async_client.GetTextResponse200)
+    assert isinstance(response, str)
 
     response = await httpx_async_client.get_binary()
-    assert isinstance(response, async_client.GetBinaryResponse200)
+    assert isinstance(response, bytes)
+
+    response = await httpx_async_client.get_text_as_integer()
+    assert isinstance(response, int)
 
     response = await httpx_async_client.post_multipart_form_data(
         body=async_client.PostFile(text="ping"),
         files=[("file", ("hello.txt", io.BytesIO(b"hello world"), 'text/plain'))],
     )
     assert isinstance(response, async_client.PostObjectResp)
+
+    response = await httpx_async_client.response_body_list_of_anyof()
+    assert isinstance(response, async_client.ListAnyOfResp)
+    assert len(response.anyOfChildArray) == 2
+    assert isinstance(response.anyOfChildArray[0].root, async_client.Dog)
 
     await httpx_async_client.close()

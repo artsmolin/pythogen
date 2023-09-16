@@ -56,6 +56,7 @@ def render_client(
             'responserepr': j2_responserepr,
             'iterresponsemap': iterresponsemap,
             'parameterfield': parameterfield,
+            'repranyof': j2_repr_any_of,
         },
     )
 
@@ -158,8 +159,8 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
             mapping.append((code, mapper))
             continue
 
-        if response.schema.type == models.Type.any_of and isinstance(response.schema.items, list):
-            items_class_names = [classname(items.id) for items in response.schema.items]
+        if response.schema.any_of:
+            items_class_names = [classname(items.id) for items in response.schema.any_of]
             items_class_names_str: str = '[' + ', '.join(items_class_names) + ']'
             mapper = f'self._parse_any_of(response.json(), {items_class_names_str})'
             mapping.append((code, mapper))
@@ -188,19 +189,16 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
                 continue
             continue
 
-        if response.schema.type == models.Type.string:
-            if response.schema.format is models.Format.binary:
-                mapper = f'{classname(response.schema.id)}(content=response.content)'
-                mapping.append((code, mapper))
-                continue
+        if response.schema.type == models.Type.string and response.schema.format is models.Format.binary:
+            mapping.append((code, 'response.content'))
+            continue
 
-            mapper = f'{classname(response.schema.id)}(text=response.text)'
-            mapping.append((code, mapper))
+        if response.schema.type == models.Type.string:
+            mapping.append((code, 'response.text'))
             continue
 
         if response.schema.type == models.Type.integer:
-            mapper = f'{classname(response.schema.id)}(text=response.text)'
-            mapping.append((code, mapper))
+            mapping.append((code, f'int(response.text)'))
             continue
 
         raise NotImplementedError(
@@ -217,8 +215,6 @@ def j2_responserepr(responses: models.ResponsesObject, document: models.Document
     for response in responses.patterned.values():
         if not response.schema:
             types.append('EmptyBody')
-        elif response.schema.type in [models.Type.string, models.Type.integer]:
-            types.append(classname(response.schema.id))
         else:
             types.append(j2_typerepr(response.schema, document))
 
@@ -239,7 +235,7 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
 
     representation = 'dict'
 
-    if schema.type in PRIMITIVE_TYPE_MAPPING:
+    if schema.type.is_primitive:
         if schema.enum:
             if schema.id == '<inline+SchemaObject>':
                 representation = f'Literal{schema.enum}'
@@ -253,21 +249,17 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
     elif schema.type == models.Type.object and schema.id != '<inline+SchemaObject>':
         representation = classname(schema.id)
 
-    elif schema.type == models.Type.array and schema.items:
-        if schema.items.type is models.Type.any_of:  # type: ignore
-            list_items_repr = _repr_any_of_schema(schema.items.items, document)  # type: ignore
-            representation = f'list[{list_items_repr}]'
-        else:
-            item = j2_typerepr(schema.items, document)  # type: ignore
-            representation = f'list[{item}]'
+    elif schema.any_of:
+        representation = classname(schema.id)
 
-    elif schema.type is models.Type.any_of:
-        representation = _repr_any_of_schema(schema.items, document)  # type: ignore
+    elif schema.type == models.Type.array and schema.items:
+        item = j2_typerepr(schema.items, document)  # type: ignore
+        representation = f'list[{item}]'
 
     return representation
 
 
-def _repr_any_of_schema(any_of_items: list[models.SchemaObject], document: models.Document) -> str:
+def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Document) -> str:
     items = []
     for item in any_of_items:
         if item.additional_roperties:
@@ -275,12 +267,12 @@ def _repr_any_of_schema(any_of_items: list[models.SchemaObject], document: model
         elif item.type is models.Type.array and item.items:
             repr = j2_typerepr(item, document)
             items.append(repr)
+        elif item.type in PRIMITIVE_TYPE_MAPPING:
+            items.append(PRIMITIVE_TYPE_MAPPING[item.type])
         elif item.id:
             items.append(classname(item.id))
         else:
-            if item.type is models.Type.null and not item.required:
-                continue
-            items.append(PRIMITIVE_TYPE_MAPPING[item.type])
+            logger.error(f"j2_repr_any_of unsupported SchemaObject {item}")
     return ' | '.join(items)
 
 

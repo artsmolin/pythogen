@@ -513,6 +513,7 @@ components:
       anyOf:
         - {$ref: '#/components/schemas/Dog'}
         - {$ref: '#/components/schemas/Cat'}
+        - type: integer
     GetObjectResp:
       title: GetObjectResp
       type: object

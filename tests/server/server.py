@@ -101,6 +101,10 @@ async def get_text(request: web.Request) -> web.Response:
     return web.Response(text='Hello')
 
 
+async def get_text_as_integer(request: web.Request) -> web.Response:
+    return web.Response(text='1')
+
+
 async def get_allof(request: web.Request) -> web.json_response:
     return web.json_response(
         data={
@@ -120,6 +124,10 @@ async def get_binary(request: web.Request) -> web.Response:
     return web.Response(body=b'some_body')
 
 
+async def get_list_of_anyof(request: web.Request) -> web.Response:
+    return web.json_response(data={'anyOfChildArray': [{"name": "DogName"}, {"name": "CatName"}]})
+
+
 app = web.Application()
 app.add_routes(
     [
@@ -131,12 +139,14 @@ app.add_routes(
         web.patch('/objects/{object_id}', patch_object),
         web.delete('/objects/{object_id}', delete_object),
         web.get('/text', get_text),
+        web.get('/text_as_integer', get_text_as_integer),
         web.get('/allof', get_allof),
         web.get('/empty', get_empty),
         web.get('/binary', get_binary),
         web.post('/multipart-form-data', post_file_multipart_form_data),
         web.get('/slow/objects/{object_id}', get_object_slow),
         web.put('/slow/objects/{object_id}', put_object_slow),
+        web.get('/nested-any-of', get_list_of_anyof),
     ]
 )
 
