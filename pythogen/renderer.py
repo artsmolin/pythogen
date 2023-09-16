@@ -267,7 +267,7 @@ def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Doc
         elif item.type is models.Type.array and item.items:
             repr = j2_typerepr(item, document)
             items.append(repr)
-        elif item.type in PRIMITIVE_TYPE_MAPPING:
+        elif item.type.is_primitive:
             items.append(PRIMITIVE_TYPE_MAPPING[item.type])
         elif item.id:
             items.append(classname(item.id))

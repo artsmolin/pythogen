@@ -127,11 +127,13 @@ class Type(Enum):
 
     @property
     def is_primitive(self) -> bool:
-        return self in Type.get_primitive_types()
-
-    @classmethod
-    def get_primitive_types(cls) -> tuple[Type, ...]:
-        return (cls.string, cls.number, cls.integer, cls.boolean, cls.null)
+        return self in (
+            Type.string,
+            Type.number,
+            Type.integer,
+            Type.boolean,
+            Type.null,
+        )
 
 
 @dataclass
