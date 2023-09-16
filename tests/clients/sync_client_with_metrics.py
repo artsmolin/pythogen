@@ -502,12 +502,18 @@ class Data(BaseModel):
 class AllOfRefObj(
     Data,
     Cat,
-    AllOfRefObjItem2,
 ):
     """
     All Of
 
     """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    bark: bool | None = None
+    breed: Literal["Dingo", "Husky", "Retriever", "Shepherd"] | None = None
 
     ...
 

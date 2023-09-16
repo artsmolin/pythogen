@@ -235,7 +235,7 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
 
     representation = 'dict'
 
-    if schema.type in PRIMITIVE_TYPE_MAPPING:
+    if schema.type.is_primitive:
         if schema.enum:
             if schema.id == '<inline+SchemaObject>':
                 representation = f'Literal{schema.enum}'

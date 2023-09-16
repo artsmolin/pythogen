@@ -125,6 +125,7 @@ class Type(Enum):
     object = 'object'
     null = 'null'
 
+    @property
     def is_primitive(self) -> bool:
         return self in Type.get_primitive_types()
 
@@ -162,6 +163,7 @@ class SchemaObject:
     # Технические поля
     discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None
     is_fake: bool = False
+    is_inline: bool = False
 
     @property
     def required_properties(self) -> list[SchemaProperty]:
@@ -176,6 +178,14 @@ class SchemaObject:
             return self.properties
 
         return [p for p in self.properties if p.orig_key not in self.required]
+
+    @property
+    def inline_allof_models(self) -> list[SchemaObject]:
+        return [item for item in self.all_of if item.is_inline]
+
+    @property
+    def named_allof_models(self) -> list[SchemaObject]:
+        return [item for item in self.all_of if not item.is_inline]
 
 
 @dataclass
@@ -318,7 +328,7 @@ class Document:
 
     @property
     def sorted_schemas(self) -> list[SchemaObject]:
-        keys = [key for key, schema in self.schemas.items() if schema.enum is None and not schema.type.is_primitive()]
+        keys = [key for key, schema in self.schemas.items() if schema.enum is None and not schema.type.is_primitive]
         return self._build_sorted_schemas(keys, exclude_enums=True)
 
     @property

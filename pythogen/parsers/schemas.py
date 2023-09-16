@@ -67,7 +67,7 @@ class SchemaParser:
         return self._schemas
 
     def parse_item(
-        self, schema_id: str, schema_data: dict[str, Any], from_depth_level: bool = False
+        self, schema_id: str, schema_data: dict[str, Any], from_depth_level: bool = False, is_inline: bool = False
     ) -> models.SchemaObject:
         """Спарсить схему из OpenAPI-спеки
 
@@ -113,6 +113,7 @@ class SchemaParser:
                 is_fake=True,
                 all_of=all_of,
                 any_of=any_of,
+                is_inline=is_inline,
             )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
@@ -131,6 +132,7 @@ class SchemaParser:
             description=self._get_description(schema_data),
             all_of=all_of,
             any_of=any_of,
+            is_inline=is_inline,
         )
 
     def _parse_all_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
@@ -142,7 +144,9 @@ class SchemaParser:
                 result.append(all_of_item_schema)
             else:
                 all_of_item_schema_id = f"{parent_id}_item_{i}"
-                all_of_item_schema = self.parse_item(all_of_item_schema_id, all_of_item, from_depth_level=True)
+                all_of_item_schema = self.parse_item(
+                    all_of_item_schema_id, all_of_item, from_depth_level=True, is_inline=True
+                )
                 self._inline_schema_aggregator.add(all_of_item_schema_id, all_of_item_schema)
                 result.append(all_of_item_schema)
 
