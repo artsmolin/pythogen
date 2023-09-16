@@ -530,6 +530,11 @@ components:
           type: array
           items:
             type: string
+        array_with_anyof:
+          items:
+            anyOf:
+              - {type: string}
+              - {type: integer}
         boolean_data:
           title: Boolean Data
           type: boolean

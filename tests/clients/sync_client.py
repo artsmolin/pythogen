@@ -661,6 +661,7 @@ class GetObjectResp(BaseModel):
     string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
     integer_data: int | None = None
     array_data: list[str] | None = None
+    array_with_anyof: dict | None = None
     boolean_data: bool | None = None
     tier: TierObj | None = None
     anyOfChild: AnyOfChildObj | None = None
