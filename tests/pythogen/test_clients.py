@@ -163,8 +163,11 @@ async def test_httpx_async_client():
     assert isinstance(response, list)
     assert isinstance(response[0], async_client.GetObjectResp)
 
-    response = await httpx_async_client.get_allof()
+    meta = async_client.MetaBox()
+    response = await httpx_async_client.get_allof(meta=meta)
     assert isinstance(response, async_client.AllOfResp)
+    assert meta.response
+    assert meta.response.status_code == 200
 
     response = await httpx_async_client.get_empty()
     assert isinstance(response, async_client.EmptyBody)

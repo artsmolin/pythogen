@@ -33,6 +33,8 @@
         {% if operation.headers %}
         headers: {{ classname(operation.fn_name) }}Headers | dict[str, Any] | None = None,
         {% endif %}
+
+        meta: MetaBox | None = None,
     ) -> {{ responserepr(operation.responses, document) }}:
         """
         {{ operation.method.value|upper }} {{ operation.path_str }}
@@ -111,6 +113,10 @@
         resp = ResponseBox(
             status_code=response.status_code,
         )
+
+        if meta:
+            meta.request = req
+            meta.response = resp
 
         {%- for code, mapper in iterresponsemap(operation.responses) %}
 

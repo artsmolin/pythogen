@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.27
+#   Version:     0.2.28
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -700,6 +700,11 @@ class BasicAuth(BaseModel):
     password: str
 
 
+class MetaBox(BaseModel):
+    request: RequestBox | None = None
+    response: ResponseBox | None = None
+
+
 class Client:
     def __init__(
         self,
@@ -742,6 +747,7 @@ class Client:
         query_params: GetObjectNoRefSchemaQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> GetObjectNoRefSchemaResponse200 | None:
         """
         GET /objects/no-ref-schema/{object_id}
@@ -805,6 +811,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.model_validate(response.json())
 
@@ -814,6 +824,7 @@ class Client:
         query_params: GetObjectQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> GetObjectResp | UnknownError:
         """
         GET /objects/{object_id}
@@ -877,6 +888,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return GetObjectResp.model_validate(response.json())
 
@@ -895,6 +910,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> list[GetObjectWithArrayResponseResponse200Item] | None:
         """
         GET /object-with-array-response
@@ -952,6 +968,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return [GetObjectWithArrayResponseResponse200Item.model_validate(item) for item in response.json()]
 
@@ -959,6 +979,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> GetObjectWithInlineArrayResponse200 | None:
         """
         GET /object-with-inline-array
@@ -1016,6 +1037,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return GetObjectWithInlineArrayResponse200.model_validate(response.json())
 
@@ -1023,6 +1048,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> list[GetObjectResp] | None:
         """
         GET /objects
@@ -1080,6 +1106,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return [GetObjectResp.model_validate(item) for item in response.json()]
 
@@ -1087,6 +1117,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> str | None:
         """
         GET /text
@@ -1144,6 +1175,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return response.text
 
@@ -1151,6 +1186,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> int | None:
         """
         GET /text_as_integer
@@ -1208,6 +1244,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return int(response.text)
 
@@ -1216,6 +1256,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetEmptyHeaders | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | None:
         """
         GET /empty
@@ -1278,6 +1319,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1286,6 +1331,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetNoOperationIdHeaders | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | None:
         """
         GET /no-operation-id
@@ -1348,6 +1394,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return EmptyBody(status_code=response.status_code, text=response.text)
 
@@ -1355,6 +1405,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> bytes | None:
         """
         GET /binary
@@ -1412,6 +1463,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return response.content
 
@@ -1419,6 +1474,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> AllOfResp | None:
         """
         GET /allof
@@ -1476,6 +1532,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return AllOfResp.model_validate(response.json())
 
@@ -1485,6 +1545,7 @@ class Client:
         query_params: GetObjectSlowQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> GetObjectResp | UnknownError:
         """
         GET /slow/objects/{object_id}
@@ -1548,6 +1609,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return GetObjectResp.model_validate(response.json())
 
@@ -1566,6 +1631,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> ListAnyOfResp | None:
         """
         GET /nested-any-of
@@ -1623,6 +1689,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return ListAnyOfResp.model_validate(response.json())
 
@@ -1630,6 +1700,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /post-without-body
@@ -1687,6 +1758,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PostObjectResp.model_validate(response.json())
 
@@ -1695,6 +1770,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /objects
@@ -1761,6 +1837,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PostObjectResp.model_validate(response.json())
 
@@ -1769,6 +1849,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /objects-form-data
@@ -1836,6 +1917,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PostObjectResp.model_validate(response.json())
 
@@ -1845,6 +1930,7 @@ class Client:
         content: str | bytes | None = None,
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
         body: PostFile | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /multipart-form-data
@@ -1915,6 +2001,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PostObjectResp.model_validate(response.json())
 
@@ -1923,6 +2013,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PostObjectResp | None:
         """
         POST /request-body-anyof
@@ -1989,6 +2080,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PostObjectResp.model_validate(response.json())
 
@@ -1998,6 +2093,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PatchObjectData | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PatchObjectResp | None:
         """
         PATCH /objects/{object_id}
@@ -2067,6 +2163,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PatchObjectResp.model_validate(response.json())
 
@@ -2076,6 +2176,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PutObjectResp | None:
         """
         PUT /objects/{object_id}
@@ -2145,6 +2246,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PutObjectResp.model_validate(response.json())
 
@@ -2154,6 +2259,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> PutObjectResp | None:
         """
         PUT /slow/objects/{object_id}
@@ -2223,6 +2329,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return PutObjectResp.model_validate(response.json())
 
@@ -2231,6 +2341,7 @@ class Client:
         path_params: DeleteObjectPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> DeleteObjectResp | None:
         """
         DELETE /objects/{object_id}
@@ -2290,6 +2401,10 @@ class Client:
         resp = ResponseBox(
             status_code=response.status_code,
         )
+
+        if meta:
+            meta.request = req
+            meta.response = resp
 
         if response.status_code == 200:
             return DeleteObjectResp.model_validate(response.json())

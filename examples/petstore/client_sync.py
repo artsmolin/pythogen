@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.27
+#   Version:     0.2.28
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -459,6 +459,11 @@ class BasicAuth(BaseModel):
     password: str
 
 
+class MetaBox(BaseModel):
+    request: RequestBox | None = None
+    response: ResponseBox | None = None
+
+
 class Client:
     def __init__(
         self,
@@ -500,6 +505,7 @@ class Client:
         query_params: FindPetsByStatusQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | list[Pet]:
         """
         GET /pet/findByStatus
@@ -560,6 +566,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return [Pet.model_validate(item) for item in response.json()]
 
@@ -579,6 +589,7 @@ class Client:
         query_params: FindPetsByTagsQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | list[Pet]:
         """
         GET /pet/findByTags
@@ -639,6 +650,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return [Pet.model_validate(item) for item in response.json()]
 
@@ -658,6 +673,7 @@ class Client:
         path_params: GetPetByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | Pet:
         """
         GET /pet/{petId}
@@ -718,6 +734,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return Pet.model_validate(response.json())
 
@@ -747,6 +767,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> GetinventoryResponse200 | None:
         """
         GET /store/inventory
@@ -804,6 +825,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return GetinventoryResponse200.model_validate(response.json())
 
@@ -812,6 +837,7 @@ class Client:
         path_params: GetOrderByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | Order:
         """
         GET /store/order/{orderId}
@@ -872,6 +898,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return Order.model_validate(response.json())
 
@@ -902,6 +932,7 @@ class Client:
         query_params: LoginUserQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | str:
         """
         GET /user/login
@@ -962,6 +993,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return response.text
 
@@ -980,6 +1015,7 @@ class Client:
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> None:
         """
         GET /user/logout
@@ -1037,11 +1073,16 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
     def getUserByName(
         self,
         path_params: GetUserByNamePathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | User:
         """
         GET /user/{username}
@@ -1102,6 +1143,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return User.model_validate(response.json())
 
@@ -1132,6 +1177,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | Pet:
         """
         POST /pet
@@ -1198,6 +1244,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return Pet.model_validate(response.json())
 
@@ -1217,6 +1267,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: AddpetortagRequestBody | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> AddpetortagResponse200 | EmptyBody:
         """
         POST /pet_or_tag
@@ -1283,6 +1334,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return AddpetortagResponse200.model_validate(response.json())
 
@@ -1303,6 +1358,7 @@ class Client:
         query_params: UpdatePetWithFormQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | None:
         """
         POST /pet/{petId}
@@ -1366,6 +1422,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 405:
             if response.content is None:
                 content = None
@@ -1384,6 +1444,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: bytes | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> ApiResponse | None:
         """
         POST /pet/{petId}/uploadImage
@@ -1456,6 +1517,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return ApiResponse.model_validate(response.json())
 
@@ -1464,6 +1529,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Order | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | Order:
         """
         POST /store/order
@@ -1530,6 +1596,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return Order.model_validate(response.json())
 
@@ -1549,6 +1619,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> None:
         """
         POST /user
@@ -1615,11 +1686,16 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
     def createUsersWithListInput(
         self,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: list[User] | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> User | None:
         """
         POST /user/createWithList
@@ -1686,6 +1762,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return User.model_validate(response.json())
 
@@ -1694,6 +1774,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | Pet:
         """
         PUT /pet
@@ -1760,6 +1841,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 200:
             return Pet.model_validate(response.json())
 
@@ -1802,6 +1887,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> None:
         """
         PUT /user/{username}
@@ -1871,12 +1957,17 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
     def deletePet(
         self,
         path_params: DeletePetPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: DeletePetHeaders | dict[str, Any] | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | None:
         """
         DELETE /pet/{petId}
@@ -1942,6 +2033,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 400:
             if response.content is None:
                 content = None
@@ -1958,6 +2053,7 @@ class Client:
         path_params: DeleteOrderPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | None:
         """
         DELETE /store/order/{orderId}
@@ -2018,6 +2114,10 @@ class Client:
             status_code=response.status_code,
         )
 
+        if meta:
+            meta.request = req
+            meta.response = resp
+
         if response.status_code == 400:
             if response.content is None:
                 content = None
@@ -2045,6 +2145,7 @@ class Client:
         path_params: DeleteUserPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
+        meta: MetaBox | None = None,
     ) -> EmptyBody | None:
         """
         DELETE /user/{username}
@@ -2104,6 +2205,10 @@ class Client:
         resp = ResponseBox(
             status_code=response.status_code,
         )
+
+        if meta:
+            meta.request = req
+            meta.response = resp
 
         if response.status_code == 400:
             if response.content is None:

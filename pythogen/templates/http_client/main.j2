@@ -312,6 +312,12 @@ class BasicAuth(BaseModel):
     password: str
 
 
+class MetaBox(BaseModel):
+    request: RequestBox | None = None
+    response: ResponseBox | None = None
+
+
+
 class {{ name }}:
     def __init__(
         self,
