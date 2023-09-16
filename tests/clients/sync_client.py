@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.24
+#   Version:     0.2.25
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -709,6 +709,24 @@ class Client:
         metrics_integration: MetricsIntegration | None = None,
         logs_integration: LogsIntegration | None = DefaultLogsIntegration(),
     ):
+        """
+        Parameters
+        ----------
+        base_url
+            Base URL
+        timeout
+            In seconds
+        client_name
+            Used in metrics
+        client
+            httpx-client
+        headers
+            Headers that will be passed in all requests
+        metrics_integration
+            The object that is responsible for collecting and sending metrics
+        logs_integration
+            The object that is responsible for logging events
+        """
         self.client = client or httpx.Client(timeout=Timeout(timeout))
         self.base_url = base_url
         self.headers = headers or {}
@@ -723,6 +741,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> GetObjectNoRefSchemaResponse200 | None:
+        """
+        GET /objects/no-ref-schema/{object_id}
+        Operation ID: get_object_no_ref_schema
+        Summary:      Get Object No Ref Schema
+        Description:  None
+        """
+
         method = "get"
 
         if isinstance(path_params, GetObjectNoRefSchemaPathParams):
@@ -788,6 +813,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> GetObjectResp | UnknownError:
+        """
+        GET /objects/{object_id}
+        Operation ID: get_object
+        Summary:      Get Object
+        Description:  None
+        """
+
         method = "get"
 
         if isinstance(path_params, GetObjectPathParams):
@@ -862,6 +894,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> list[GetObjectWithArrayResponseResponse200Item] | None:
+        """
+        GET /object-with-array-response
+        Operation ID: get_object_with_array_response
+        Summary:      Get Object With Inline Array
+        Description:  None
+        """
+
         method = "get"
 
         path = "/object-with-array-response"
@@ -919,6 +958,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> GetObjectWithInlineArrayResponse200 | None:
+        """
+        GET /object-with-inline-array
+        Operation ID: get_object_with_inline_array
+        Summary:      Get Object With Inline Array
+        Description:  None
+        """
+
         method = "get"
 
         path = "/object-with-inline-array"
@@ -976,6 +1022,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> list[GetObjectResp] | None:
+        """
+        GET /objects
+        Operation ID: get_list_objects
+        Summary:      Get list objects
+        Description:  None
+        """
+
         method = "get"
 
         path = "/objects"
@@ -1033,6 +1086,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> str | None:
+        """
+        GET /text
+        Operation ID: get_text
+        Summary:      Get Text
+        Description:  None
+        """
+
         method = "get"
 
         path = "/text"
@@ -1090,6 +1150,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> int | None:
+        """
+        GET /text_as_integer
+        Operation ID: get_text_as_integer
+        Summary:      Get Text As Integer
+        Description:  None
+        """
+
         method = "get"
 
         path = "/text_as_integer"
@@ -1148,6 +1215,13 @@ class Client:
         content: str | bytes | None = None,
         headers: GetEmptyHeaders | dict[str, Any] | None = None,
     ) -> EmptyBody | None:
+        """
+        GET /empty
+        Operation ID: get_empty
+        Summary:      Get Empty
+        Description:  None
+        """
+
         method = "get"
 
         path = "/empty"
@@ -1211,6 +1285,13 @@ class Client:
         content: str | bytes | None = None,
         headers: GetNoOperationIdHeaders | dict[str, Any] | None = None,
     ) -> EmptyBody | None:
+        """
+        GET /no-operation-id
+        Operation ID: None
+        Summary:      No operation ID
+        Description:  None
+        """
+
         method = "get"
 
         path = "/no-operation-id"
@@ -1273,6 +1354,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> bytes | None:
+        """
+        GET /binary
+        Operation ID: get_binary
+        Summary:      Get Binary
+        Description:  None
+        """
+
         method = "get"
 
         path = "/binary"
@@ -1330,6 +1418,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> AllOfResp | None:
+        """
+        GET /allof
+        Operation ID: get_allof
+        Summary:      Get Allof
+        Description:  None
+        """
+
         method = "get"
 
         path = "/allof"
@@ -1389,6 +1484,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> GetObjectResp | UnknownError:
+        """
+        GET /slow/objects/{object_id}
+        Operation ID: get_object_slow
+        Summary:      Get Object Slow
+        Description:  None
+        """
+
         method = "get"
 
         if isinstance(path_params, GetObjectSlowPathParams):
@@ -1463,6 +1565,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> ListAnyOfResp | None:
+        """
+        GET /nested-any-of
+        Operation ID: response_body_list_of_anyof
+        Summary:      Post Object With Request Body AnyOf
+        Description:  None
+        """
+
         method = "get"
 
         path = "/nested-any-of"
@@ -1520,6 +1629,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> PostObjectResp | None:
+        """
+        POST /post-without-body
+        Operation ID: post_object_without_body
+        Summary:      Post Object Without Body
+        Description:  None
+        """
+
         method = "post"
 
         path = "/post-without-body"
@@ -1578,6 +1694,13 @@ class Client:
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
     ) -> PostObjectResp | None:
+        """
+        POST /objects
+        Operation ID: post_object
+        Summary:      Post Object
+        Description:  None
+        """
+
         method = "post"
 
         path = "/objects"
@@ -1645,6 +1768,13 @@ class Client:
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
     ) -> PostObjectResp | None:
+        """
+        POST /objects-form-data
+        Operation ID: post_form_object
+        Summary:      Post Form Object
+        Description:  None
+        """
+
         method = "post"
 
         path = "/objects-form-data"
@@ -1714,6 +1844,13 @@ class Client:
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
         body: PostFile | dict[str, Any] | None = None,
     ) -> PostObjectResp | None:
+        """
+        POST /multipart-form-data
+        Operation ID: post_multipart_form_data
+        Summary:      Post Multipart Form Data
+        Description:  None
+        """
+
         method = "post"
 
         path = "/multipart-form-data"
@@ -1785,6 +1922,13 @@ class Client:
         content: str | bytes | None = None,
         body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
     ) -> PostObjectResp | None:
+        """
+        POST /request-body-anyof
+        Operation ID: request_body_anyof
+        Summary:      Post Object With Request Body AnyOf
+        Description:  None
+        """
+
         method = "post"
 
         path = "/request-body-anyof"
@@ -1853,6 +1997,13 @@ class Client:
         content: str | bytes | None = None,
         body: PatchObjectData | dict[str, Any] | None = None,
     ) -> PatchObjectResp | None:
+        """
+        PATCH /objects/{object_id}
+        Operation ID: patch_object
+        Summary:      Patch Object
+        Description:  None
+        """
+
         method = "patch"
 
         if isinstance(path_params, PatchObjectPathParams):
@@ -1924,6 +2075,13 @@ class Client:
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
     ) -> PutObjectResp | None:
+        """
+        PUT /objects/{object_id}
+        Operation ID: put_object
+        Summary:      Put Object
+        Description:  None
+        """
+
         method = "put"
 
         if isinstance(path_params, PutObjectPathParams):
@@ -1995,6 +2153,13 @@ class Client:
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
     ) -> PutObjectResp | None:
+        """
+        PUT /slow/objects/{object_id}
+        Operation ID: put_object_slow
+        Summary:      Put Object Slow
+        Description:  None
+        """
+
         method = "put"
 
         if isinstance(path_params, PutObjectSlowPathParams):
@@ -2065,6 +2230,13 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
     ) -> DeleteObjectResp | None:
+        """
+        DELETE /objects/{object_id}
+        Operation ID: delete_object
+        Summary:      Delete Object
+        Description:  None
+        """
+
         method = "delete"
 
         if isinstance(path_params, DeleteObjectPathParams):
