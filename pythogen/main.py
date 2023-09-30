@@ -10,12 +10,13 @@ import typer
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
 
+from pythogen import exceptions
 from pythogen import packager
 from pythogen import renderer
 from pythogen.parsers.document import parse_openapi_file
 
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_enable=False)
 
 
 @app.command()
@@ -44,7 +45,10 @@ def main(
         )
         output = resp.client_output_path
 
-    document = parse_openapi_file(input)
+    try:
+        document = parse_openapi_file(input)
+    except exceptions.Exit:
+        return None
 
     pythogen_version: str = metadata.version('pythogen')
 

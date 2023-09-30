@@ -14,19 +14,22 @@ install-pre-commit:
 format: install-pre-commit clean
 	pre-commit run --all-files
 
+async-client:
+	@python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client.py
+
 clients:
-	# async clients for tests
-	python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client.py
-	python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client_with_metrics.py --metrics
-	python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client_with_headers.py --headers X-API-KEY,X-API-SECRET
+	@# async clients for tests
+	@python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client.py
+	@python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client_with_metrics.py --metrics
+	@python pythogen/main.py tests/docs/openapi.yaml tests/clients/async_client_with_headers.py --headers X-API-KEY,X-API-SECRET
 
-	# sync clients for tests
-	python pythogen/main.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
-	python pythogen/main.py tests/docs/openapi.yaml tests/clients/sync_client_with_metrics.py --sync --metrics
+	@# sync clients for tests
+	@python pythogen/main.py tests/docs/openapi.yaml tests/clients/sync_client.py --sync
+	@python pythogen/main.py tests/docs/openapi.yaml tests/clients/sync_client_with_metrics.py --sync --metrics
 
-	# clients for examles
-	python pythogen/main.py examples/petstore/openapi.yaml examples/petstore/client_async.py
-	python pythogen/main.py examples/petstore/openapi.yaml examples/petstore/client_sync.py --sync
+	@# clients for examles
+	@python pythogen/main.py examples/petstore/openapi.yaml examples/petstore/client_async.py
+	@python pythogen/main.py examples/petstore/openapi.yaml examples/petstore/client_sync.py --sync
 
 requirements:
 	pip install --upgrade pip

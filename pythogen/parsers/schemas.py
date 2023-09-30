@@ -1,14 +1,12 @@
-import logging
 import re
 from collections import defaultdict
 from typing import Any
 
+from pythogen import console
+from pythogen import exceptions
 from pythogen import models
 from pythogen.parsers.inline_schemas_aggregator import InlineSchemasAggregator
 from pythogen.parsers.references import RefResolver
-
-
-logger = logging.getLogger(__name__)
 
 
 class SchemaParser:
@@ -213,14 +211,32 @@ class SchemaParser:
         if not raw_discriminator:
             return None
 
+        property_name: str | None = raw_discriminator.get("propertyName")
+        if not property_name:
+            console.print_error(
+                title=f"Failed to generate a client",
+                msg=f"The discriminator must contain the \"propertyName\" field.",
+                invalid_data=data,
+            )
+            raise exceptions.Exit()
+
+        raw_mapping: dict[str, Any] | None = raw_discriminator.get("mapping")
+        if not raw_mapping:
+            console.print_error(
+                title=f"Failed to generate a client",
+                msg=f"The discriminator must contain the \"mapping\" field.",
+                invalid_data=data,
+            )
+            raise exceptions.Exit()
+
         mapping: dict[str, models.SchemaObject] = {}
-        for discriminator_value, ref in raw_discriminator["mapping"].items():
+        for discriminator_value, ref in raw_mapping.items():
             resolved_ref = self._ref_resolver.resolve(ref)
             schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
             mapping[discriminator_value] = schema
 
         return models.Discriminator(
-            property_name=raw_discriminator["propertyName"],
+            property_name=property_name,
             mapping=mapping,
         )
 
