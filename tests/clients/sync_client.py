@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.28
+#   Version:     0.2.29
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -324,7 +324,7 @@ class RewardsListItem(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    pricePlanCode: str
+    pricePlanCode: str = Field(..., alias="pricePlanCode")
     quantity: float
 
 
@@ -360,7 +360,7 @@ class GetObjectWithArrayResponseResponse200Item(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    pricePlanCode: str
+    pricePlanCode: str = Field(..., alias="pricePlanCode")
     quantity: float
 
 
@@ -504,7 +504,7 @@ class ListAnyOfResp(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    anyOfChildArray: list[Dog | Cat | int] | None = None
+    anyOfChildArray: list[Dog | Cat | int] | None = Field(None, alias="anyOfChildArray")
 
 
 class SafetyKeyForTesting(BaseModel):
@@ -516,15 +516,15 @@ class SafetyKeyForTesting(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
-    for_: str | None = Field(None, description='reserved word, expecting "for_"', alias="for")
-    class_: str | None = Field(None, description='reserved word, expecting "class_"', alias="class")
+    for_: str | None = Field(None, alias="for", description='reserved word, expecting "for_"')
+    class_: str | None = Field(None, alias="class", description='reserved word, expecting "class_"')
     with_dot_and_hyphens: int | None = Field(
-        None, description='invalid identifier, expecting "with_dot_and_hyphens"', alias="33with.dot-and-hyphens&*"
+        None, alias="33with.dot-and-hyphens&*", description='invalid identifier, expecting "with_dot_and_hyphens"'
     )
     old_feature_priority: int | None = Field(
         None,
-        description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
         alias="34with.dot-and-hyphens&*",
+        description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
     )
 
 
@@ -640,7 +640,7 @@ class PostObjectData(BaseModel):
     integer_data: int
     array_data: list[str]
     boolean_data: bool
-    event_data: dict = Field(description="__safety_key__(event_data)", alias="event-data")
+    event_data: dict = Field(..., alias="event-data", description="__safety_key__(event_data)")
     optional_anyof_string_data: OptionalAnyofStringDataObj | None = None
     date_attr: datetime.date | None = None
     datetime_attr: datetime.datetime | None = None
@@ -665,7 +665,7 @@ class GetObjectResp(BaseModel):
     array_with_anyof: dict | None = None
     boolean_data: bool | None = None
     tier: TierObj | None = None
-    anyOfChild: AnyOfChildObj | None = None
+    anyOfChild: AnyOfChildObj | None = Field(None, alias="anyOfChild")
     child: GetObjectResp | None = None
     childs: list[GetObjectResp] | None = None
     animal: AnimalObj | None = None
@@ -681,6 +681,45 @@ class Dog(BaseModel):
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
     name: str | None = None
+
+
+class DogWithKind(BaseModel):
+    """
+    Dog
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    kind: Literal["dog"]
+    name: str
+
+
+class CatWithKind(BaseModel):
+    """
+    Cat
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    kind: Literal["cat"]
+    name: str
+
+
+class DiscriminatedOneOfResp(BaseModel):
+    """
+    All Of Resp
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    required_discriminated_animal: CatWithKind | DogWithKind = Field(..., discriminator="kind")
+    discriminated_animal: CatWithKind | DogWithKind | None = Field(None, discriminator="kind")
 
 
 class AllOfResp(BaseModel):
@@ -1538,6 +1577,75 @@ class Client:
 
         if response.status_code == 200:
             return AllOfResp.model_validate(response.json())
+
+    def get_discriminated_oneof(
+        self,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        meta: PythogenMetaBox | None = None,
+    ) -> DiscriminatedOneOfResp | None:
+        """
+        GET /discriminated-oneof
+        Operation ID: get_discriminated_oneof
+        Summary:      Get discriminated oneof
+        Description:  None
+        """
+
+        method = "get"
+
+        path = "/discriminated-oneof"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+
+        try:
+            response = self.client.request(method, url, headers=headers_, params=params, content=content, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/discriminated-oneof"
+                else:
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
+
+            raise exc
+
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/discriminated-oneof"
+            else:
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method=method,
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
+        if meta:
+            meta.request = req
+            meta.response = resp
+
+        if response.status_code == 200:
+            return DiscriminatedOneOfResp.model_validate(response.json())
 
     def get_object_slow(
         self,
@@ -2478,4 +2586,7 @@ PatchObjectData.model_rebuild()
 PostObjectData.model_rebuild()
 GetObjectResp.model_rebuild()
 Dog.model_rebuild()
+DogWithKind.model_rebuild()
+CatWithKind.model_rebuild()
+DiscriminatedOneOfResp.model_rebuild()
 AllOfResp.model_rebuild()

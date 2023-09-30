@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.28
+#   Version:     0.2.29
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -382,7 +382,7 @@ class Pet(BaseModel):
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
     name: str
-    photoUrls: list[str]
+    photoUrls: list[str] = Field(..., alias="photoUrls")
     id: int | None = None
     category: Category | None = None
     tags: list[Tag] | None = None
@@ -400,12 +400,12 @@ class User(BaseModel):
     )
     id: int | None = None
     username: str | None = None
-    firstName: str | None = None
-    lastName: str | None = None
+    firstName: str | None = Field(None, alias="firstName")
+    lastName: str | None = Field(None, alias="lastName")
     email: str | None = None
     password: str | None = None
     phone: str | None = None
-    userStatus: int | None = Field(None, description="User Status")
+    userStatus: int | None = Field(None, alias="userStatus", description="User Status")
 
 
 class Address(BaseModel):
@@ -447,9 +447,9 @@ class Order(BaseModel):
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
     id: int | None = None
-    petId: int | None = None
+    petId: int | None = Field(None, alias="petId")
     quantity: int | None = None
-    shipDate: datetime.datetime | None = None
+    shipDate: datetime.datetime | None = Field(None, alias="shipDate")
     status: Literal["placed", "approved", "delivered"] | None = Field(None, description="Order Status")
     complete: bool | None = None
 

@@ -253,19 +253,11 @@ class {{ classname(model.id) }}(
 
     {% for all_of_item_model in model.inline_allof_models %}
     {%- for property in all_of_item_model.required_properties %}
-        {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
-        {%- else %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }}
-        {%- endif %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} {{ propertyfield(property, model) }}
     {%- endfor %}
 
     {%- for property in all_of_item_model.optional_properties %}
-        {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(None, description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
-        {%- else %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = None
-        {%- endif %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None {{ propertyfield(property, model) }}
     {%- endfor %}
 
     {%- for property in all_of_item_model.required_properties + all_of_item_model.optional_properties if property.safety_key %}
@@ -284,19 +276,11 @@ class {{ classname(model.id) }}(BaseModel):
     )
 
     {%- for property in model.required_properties %}
-        {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} = Field(description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
-        {%- else %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }}
-        {%- endif %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} {{ propertyfield(property, model) }}
     {%- endfor %}
 
     {%- for property in model.optional_properties %}
-        {%- if property.schema.description %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = Field(None, description="{{ property.schema.description }}"{%- if property.safety_key %}, alias="{{ property.orig_key }}"{%- endif %})
-        {%- else %}
-    {{ property.key }}: {{ typerepr(property.schema, document) }} | None = None
-        {%- endif %}
+    {{ property.key }}: {{ typerepr(property.schema, document) }} | None {{ propertyfield(property, model) }}
     {%- endfor %}
 
     {%- for property in model.required_properties + model.optional_properties if property.safety_key %}

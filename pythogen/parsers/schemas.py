@@ -103,7 +103,7 @@ class SchemaParser:
             return models.SchemaObject(
                 id=schema_id,
                 title=schema_data.get('title'),
-                required=schema_data.get('required'),
+                required=schema_data.get('required', []),
                 enum=schema_data.get('enum'),
                 type=schema_type,
                 format=self._parse_format(schema_data),
@@ -114,6 +114,7 @@ class SchemaParser:
                 all_of=all_of,
                 any_of=any_of,
                 is_inline=is_inline,
+                discriminator=self._parse_discriminator(schema_data),
             )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
@@ -123,7 +124,7 @@ class SchemaParser:
         return models.SchemaObject(
             id=schema_id,
             title=schema_data.get('title'),
-            required=schema_data.get('required'),
+            required=schema_data.get('required', []),
             enum=schema_data.get('enum'),
             type=schema_type,
             format=self._parse_format(schema_data),
@@ -133,6 +134,7 @@ class SchemaParser:
             all_of=all_of,
             any_of=any_of,
             is_inline=is_inline,
+            discriminator=self._parse_discriminator(schema_data),
         )
 
     def _parse_all_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
@@ -205,6 +207,24 @@ class SchemaParser:
             description = description.replace('"', '\\"')
         return description
 
+    def _parse_discriminator(self, data: dict[str, Any]) -> models.Discriminator | None:
+        raw_discriminator: dict[str, Any] | None = data.get("discriminator")
+
+        if not raw_discriminator:
+            return None
+
+        mapping: dict[str, models.SchemaObject] = {}
+        for discriminator_value, ref in raw_discriminator["mapping"].items():
+            resolved_ref = self._ref_resolver.resolve(ref)
+            schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
+            mapping[discriminator_value] = schema
+
+        return models.Discriminator(
+            property_name=raw_discriminator["propertyName"],
+            mapping=mapping,
+        )
+
+    # TODO: remove
     def _get_discriminator_base_class_schema(
         self,
         data: dict[str, Any],
@@ -292,7 +312,7 @@ class SchemaParser:
                             title=None,
                             format=None,
                             items=None,
-                            required=None,
+                            required=[],
                         ),
                     )
                 )
@@ -309,7 +329,7 @@ class SchemaParser:
                             title=None,
                             format=models.Format.binary,
                             items=None,
-                            required=None,
+                            required=[],
                         ),
                     )
                 )
@@ -327,7 +347,7 @@ class SchemaParser:
                             title=None,
                             format=None,
                             items=None,
-                            required=None,
+                            required=[],
                         ),
                     )
                 )

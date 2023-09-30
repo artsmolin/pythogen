@@ -128,6 +128,10 @@ async def get_list_of_anyof(request: web.Request) -> web.Response:
     return web.json_response(data={'anyOfChildArray': [{"name": "DogName"}, {"name": "CatName"}]})
 
 
+async def get_discriminated_oneof(request: web.Request) -> web.Response:
+    return web.json_response(data={'required_discriminated_animal': {'kind': 'dog', 'name': 'Puppy'}})
+
+
 app = web.Application()
 app.add_routes(
     [
@@ -147,6 +151,7 @@ app.add_routes(
         web.get('/slow/objects/{object_id}', get_object_slow),
         web.put('/slow/objects/{object_id}', put_object_slow),
         web.get('/nested-any-of', get_list_of_anyof),
+        web.get('/discriminated-oneof', get_discriminated_oneof),
     ]
 )
 

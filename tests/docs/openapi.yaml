@@ -333,6 +333,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AllOfResp'
+  /discriminated-oneof:
+    get:
+      tags:
+        - test
+      summary: Get discriminated oneof
+      operationId: get_discriminated_oneof
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscriminatedOneOfResp'
   /objects-form-data:
     post:
       tags:
@@ -480,6 +493,27 @@ components:
                 breed:
                   type: string
                   enum: [Dingo, Husky, Retriever, Shepherd]
+    DiscriminatedOneOfResp:
+      title: All Of Resp
+      type: object
+      required: ['required_discriminated_animal']
+      properties:
+        discriminated_animal:
+          discriminator:
+            mapping: {cat: '#/components/schemas/CatWithKind', dog: '#/components/schemas/DogWithKind'}
+            propertyName: kind
+          oneOf:
+            - {$ref: '#/components/schemas/CatWithKind'}
+            - {$ref: '#/components/schemas/DogWithKind'}
+          title: Animal
+        required_discriminated_animal:
+          discriminator:
+            mapping: {cat: '#/components/schemas/CatWithKind', dog: '#/components/schemas/DogWithKind'}
+            propertyName: kind
+          oneOf:
+            - {$ref: '#/components/schemas/CatWithKind'}
+            - {$ref: '#/components/schemas/DogWithKind'}
+          title: Animal
     Data:
       title: Data
       type: object
@@ -491,6 +525,28 @@ components:
           title: Data
           type: integer
       additionalProperties: false
+    CatWithKind:
+      additionalProperties: false
+      properties:
+        kind:
+          enum: [cat]
+          title: Kind
+          type: string
+        name: {title: Name, type: string}
+      required: [kind, name]
+      title: Cat
+      type: object
+    DogWithKind:
+      additionalProperties: false
+      properties:
+        kind:
+          enum: [dog]
+          title: Kind
+          type: string
+        name: {title: Name, type: string}
+      required: [kind, name]
+      title: Dog
+      type: object
     Cat:
       title: Cat
       type: object

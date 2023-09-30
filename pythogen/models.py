@@ -151,7 +151,6 @@ class SchemaObject:
 
     id: str
     title: str | None
-    required: list[str] | None
     enum: list[str] | None
     type: Type
     format: Format | None
@@ -159,8 +158,10 @@ class SchemaObject:
     properties: list[SchemaProperty]
     description: str | None = None
     additional_roperties: bool = False
+    required: list[str] = field(default_factory=list)
     all_of: list['SchemaObject'] = field(default_factory=list)
     any_of: list['SchemaObject'] = field(default_factory=list)
+    discriminator: Discriminator | None = None
 
     # Технические поля
     discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None
@@ -169,14 +170,14 @@ class SchemaObject:
 
     @property
     def required_properties(self) -> list[SchemaProperty]:
-        if self.required is None:
+        if not self.required:
             return []
 
         return [p for p in self.properties if p.orig_key in self.required]
 
     @property
     def optional_properties(self) -> list[SchemaProperty]:
-        if self.required is None:
+        if not self.required:
             return self.properties
 
         return [p for p in self.properties if p.orig_key not in self.required]
@@ -343,3 +344,9 @@ class Document:
 class DiscriminatorBaseClassSchema:
     name: str
     attr: str
+
+
+@dataclass
+class Discriminator:
+    property_name: str
+    mapping: dict[str, SchemaObject]

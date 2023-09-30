@@ -192,4 +192,9 @@ async def test_httpx_async_client():
     assert len(response.anyOfChildArray) == 2
     assert isinstance(response.anyOfChildArray[0], async_client.Dog)
 
+    response = await httpx_async_client.get_discriminated_oneof()
+    assert isinstance(response, async_client.DiscriminatedOneOfResp)
+    assert isinstance(response.required_discriminated_animal, async_client.DogWithKind)
+    assert response.discriminated_animal is None
+
     await httpx_async_client.close()

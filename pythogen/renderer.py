@@ -56,6 +56,7 @@ def render_client(
             'responserepr': j2_responserepr,
             'iterresponsemap': iterresponsemap,
             'parameterfield': parameterfield,
+            'propertyfield': propertyfield,
             'repranyof': j2_repr_any_of,
         },
     )
@@ -265,6 +266,9 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
         represented_item = j2_typerepr(schema.items, document)  # type: ignore
         representation = f'list[{represented_item}]'
 
+    elif schema.discriminator:
+        representation = " | ".join((j2_typerepr(item, document) for item in schema.discriminator.mapping.values()))
+
     return representation
 
 
@@ -300,13 +304,49 @@ def classname(value: str) -> str:
 
 def parameterfield(parameter: models.ParameterObject) -> str:
     args: list[str] = []
+
     if not parameter.required:
         args.append('None')
+
     if parameter.safety_key != parameter.orig_key:
         args.append(f'alias="{parameter.orig_key}"')
+
     if parameter.description:
         args.append(f'description="{parameter.description}"')
+
+    if parameter.schema.discriminator:
+        args.append(f'discriminator="{parameter.schema.discriminator.property_name}"')
+
     return 'Field(' + ', '.join(args) + ')'
+
+
+def propertyfield(property: models.SchemaProperty, parent_schema: models.SchemaObject) -> str:
+    args: list[str] = []
+
+    if property.orig_key not in parent_schema.required:
+        args.append('None')
+    else:
+        args.append('...')
+
+    if property.safety_key and property.safety_key != property.orig_key:
+        args.append(f'alias="{property.orig_key}"')
+
+    if not property.safety_key and varname(property.orig_key) != property.orig_key:
+        args.append(f'alias="{property.orig_key}"')
+
+    if property.schema.description:
+        args.append(f'description="{property.schema.description}"')
+
+    if property.schema.discriminator:
+        args.append(f'discriminator="{property.schema.discriminator.property_name}"')
+
+    if args == ["None"]:
+        return "= None"
+
+    if args == ["..."]:
+        return ""
+
+    return "= Field(" + ", ".join(args) + ")"
 
 
 PRIMITIVE_TYPE_MAPPING = {
