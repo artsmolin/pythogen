@@ -184,8 +184,8 @@ class SchemaParser:
             raw_data_type: str | None = data.get('type')
             try:
                 data_type = models.Type(raw_data_type)
-            except ValueError:
-                raise Exception(f'Unable to parse schema, unknown type "{raw_data_type}" on "{data}"')
+            except ValueError as exc:
+                raise Exception(f'Unable to parse schema, unknown type "{raw_data_type}" on "{data}"') from exc
         return data_type
 
     def _parse_format(self, data: dict[str, Any]) -> models.Format | None:
@@ -193,8 +193,8 @@ class SchemaParser:
         if data_format:
             try:
                 return models.Format(data_format)
-            except Exception:
-                raise Exception(f'Unable to parse schema, unknown format "{data_format}"')
+            except Exception as exc:
+                raise Exception(f'Unable to parse schema, unknown format "{data_format}"') from exc
         return None
 
     def _get_description(self, data: dict[str, Any]) -> str | None:
@@ -214,8 +214,8 @@ class SchemaParser:
         property_name: str | None = raw_discriminator.get("propertyName")
         if not property_name:
             console.print_error(
-                title=f"Failed to generate a client",
-                msg=f"The discriminator must contain the \"propertyName\" field.",
+                title="Failed to generate a client",
+                msg="The discriminator must contain the \"propertyName\" field.",
                 invalid_data=data,
             )
             raise exceptions.Exit()
@@ -223,8 +223,8 @@ class SchemaParser:
         raw_mapping: dict[str, Any] | None = raw_discriminator.get("mapping")
         if not raw_mapping:
             console.print_error(
-                title=f"Failed to generate a client",
-                msg=f"The discriminator must contain the \"mapping\" field.",
+                title="Failed to generate a client",
+                msg="The discriminator must contain the \"mapping\" field.",
                 invalid_data=data,
             )
             raise exceptions.Exit()
@@ -264,8 +264,8 @@ class SchemaParser:
         if data_format:
             try:
                 data_format = models.Format(data_format)
-            except Exception:
-                raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"')
+            except Exception as exc:
+                raise Exception(f'Unable to parse schema "{id}", unknown format "{data_format}"') from exc
 
         properties = []
 

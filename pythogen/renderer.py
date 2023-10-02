@@ -185,7 +185,7 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
                     mapping.append((code, mapper))
                     continue
 
-                mapper = f'response.json()'
+                mapper = 'response.json()'
                 mapping.append((code, mapper))
                 continue
             continue
@@ -199,7 +199,7 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
             continue
 
         if response.schema.type == models.Type.integer:
-            mapping.append((code, f'int(response.text)'))
+            mapping.append((code, 'int(response.text)'))
             continue
 
         raise NotImplementedError(
@@ -219,7 +219,7 @@ def j2_responserepr(responses: models.ResponsesObject, document: models.Document
         else:
             types.append(j2_typerepr(response.schema, document))
 
-    types = sorted(list(set(types)))
+    types = sorted(set(types))
 
     if not types:
         return 'None'
@@ -290,14 +290,14 @@ def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Doc
 
 
 def varname(value: str) -> str:
-    clean_value = re.sub('\W|^(?=\d)', '_', value)  # remove special characters
+    clean_value = re.sub(r'\W|^(?=\d)', '_', value)  # remove special characters
     clean_value = re.sub('_{2,}', '_', clean_value)  # __ -> _
     clean_value = clean_value.replace(' ', '_')
     return inflection.underscore(clean_value)
 
 
 def classname(value: str) -> str:
-    clean_value = re.sub('\W|^(?=\d)', '_', value)  # remove special characters
+    clean_value = re.sub(r'\W|^(?=\d)', '_', value)  # remove special characters
     clean_value = re.sub('_{2,}', '_', clean_value)  # __ -> _
     return inflection.camelize(clean_value)
 
