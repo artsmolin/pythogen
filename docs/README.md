@@ -42,7 +42,7 @@ Generate a client using the installed library
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
-or via docker Docker
+or via Docker
 ```shell
 docker run \
 -v ./path/to/input:/opt/path/to/input \
@@ -175,12 +175,7 @@ client = Client(
 ```
 
 ### Discriminator
-Pythogen is able to generate a base class in which the logic of the discriminator is implemented by the value of the specified field. To do this, the desired field in the "description" parameter must contain a text
-```
-__discriminator__(BaseClassName.field)
-```
-- `BaseClassName` — desired name of the base class
-- `field` — discriminator field
+Generate [pydantic classes with discriminators](https://docs.pydantic.dev/latest/api/standard_library_types/#discriminated-unions-aka-tagged-unions) based on [OpenAPI discriminators](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/). The original OpenAPI specification must have the propertyName and mapping fields.
 
 ## Examples
 - [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
