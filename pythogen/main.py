@@ -1,8 +1,3 @@
-"""
-Точка входа. Запуск генератора клиента происходит отсюда.
-"""
-
-
 from importlib import metadata
 from typing import Optional
 
