@@ -3,6 +3,29 @@ info:
   title: test server
   version: 0.1.0
 paths:
+  /messages:
+    get:
+      tags:
+        - test
+      summary: Get message
+      operationId: getMessage
+      parameters:
+        - description: Auth token
+          in: header
+          name: X-Auth-Token
+          required: true
+          schema:
+            allOf:
+              - {$ref: '#/components/schemas/Token'}
+            title: Auth Token
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMessageResp'
+          
   /objects/no-ref-schema/{object_id}:
     get:
       tags:
@@ -477,6 +500,9 @@ paths:
                 $ref: '#/components/schemas/ListAnyOfResp'
 components:
   schemas:
+    Token:
+      title: Token
+      type: string
     AllOfResp:
       title: All Of Resp
       type: object
@@ -570,6 +596,16 @@ components:
         - {$ref: '#/components/schemas/Dog'}
         - {$ref: '#/components/schemas/Cat'}
         - type: integer
+    GetMessageResp:
+      title: GetMessageResp
+      type: object
+      properties:
+        title:
+          title: Title
+          type: string
+        text:
+          title: Text
+          type: string
     GetObjectResp:
       title: GetObjectResp
       type: object

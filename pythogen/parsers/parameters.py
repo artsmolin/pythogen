@@ -1,6 +1,8 @@
 import re
 from typing import Any
 
+from pythogen import console
+from pythogen import exceptions
 from pythogen import models
 from pythogen.parsers.references import RefResolver
 from pythogen.parsers.schemas import SchemaParser
@@ -38,6 +40,14 @@ class ParameterParser:
         description = schema_data.get('description', '')
         match = re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description)
         safety_key = match['safety_key'] if match else None
+
+        if len(schema.all_of) > 1:
+            console.print_error(
+                title="Failed to generate a client",
+                msg="\"allOf\" field in property can contains only one item.",
+                invalid_data=data,
+            )
+            raise exceptions.Exit()
 
         return models.ParameterObject(
             id=id_,
