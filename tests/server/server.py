@@ -131,6 +131,9 @@ async def get_list_of_anyof(request: web.Request) -> web.Response:
 async def get_discriminated_oneof(request: web.Request) -> web.Response:
     return web.json_response(data={'required_discriminated_animal': {'kind': 'dog', 'name': 'Puppy'}})
 
+async def get_message(request: web.Request) -> web.Response:
+    return web.json_response(data={'title': 'Hello', 'text': 'World'})
+
 
 app = web.Application()
 app.add_routes(
@@ -152,6 +155,7 @@ app.add_routes(
         web.put('/slow/objects/{object_id}', put_object_slow),
         web.get('/nested-any-of', get_list_of_anyof),
         web.get('/discriminated-oneof', get_discriminated_oneof),
+        web.get('/messages', get_message),
     ]
 )
 

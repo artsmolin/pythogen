@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.30
+#   Version:     0.2.31
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -211,6 +211,14 @@ class IntegerEnum(IntEnum):
 class EmptyBody(BaseModel):
     status_code: int
     text: str
+
+
+class GetMessageHeaders(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    x_auth_token: str = Field(alias="X-Auth-Token")
 
 
 class GetObjectNoRefSchemaPathParams(BaseModel):
@@ -703,6 +711,19 @@ class GetObjectResp(BaseModel):
     animal: AnimalObj | None = None
 
 
+class GetMessageResp(BaseModel):
+    """
+    GetMessageResp
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+    title: str | None = None
+    text: str | None = None
+
+
 class Dog(BaseModel):
     """
     Dog
@@ -811,6 +832,81 @@ class Client:
         self.metrics_integration = metrics_integration
         self.logs_integration = logs_integration
         self.client_name = client_name
+
+    def getMessage(
+        self,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        headers: GetMessageHeaders | dict[str, Any] | None = None,
+        meta: PythogenMetaBox | None = None,
+    ) -> GetMessageResp | None:
+        """
+        GET /messages
+        Operation ID: getMessage
+        Summary:      Get message
+        Description:  None
+        """
+
+        method = "get"
+
+        path = "/messages"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
+
+        headers_ = self.headers.copy()
+
+        if isinstance(headers, GetMessageHeaders):
+            headers_ = headers.model_dump(by_alias=True, exclude_none=True)
+        elif isinstance(headers, dict):
+            headers_ = headers
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+
+        try:
+            response = self.client.request(method, url, headers=headers_, params=params, content=content, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/messages"
+                else:
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
+
+            raise exc
+
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/messages"
+            else:
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method=method,
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
+        if meta:
+            meta.request = req
+            meta.response = resp
+
+        if response.status_code == 200:
+            return GetMessageResp.model_validate(response.json())
 
     def get_object_no_ref_schema(
         self,
@@ -2617,6 +2713,7 @@ PutObjectData.model_rebuild()
 PatchObjectData.model_rebuild()
 PostObjectData.model_rebuild()
 GetObjectResp.model_rebuild()
+GetMessageResp.model_rebuild()
 Dog.model_rebuild()
 DogWithKind.model_rebuild()
 CatWithKind.model_rebuild()

@@ -197,4 +197,9 @@ async def test_httpx_async_client():
     assert isinstance(response.required_discriminated_animal, async_client.DogWithKind)
     assert response.discriminated_animal is None
 
+    response = await httpx_async_client.getMessage(
+        headers=async_client.GetMessageHeaders(x_auth_token="qwerty12345!"),
+    )
+    assert isinstance(response, async_client.GetMessageResp)
+
     await httpx_async_client.close()

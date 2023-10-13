@@ -269,6 +269,9 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
     elif schema.discriminator:
         representation = " | ".join((j2_typerepr(item, document) for item in schema.discriminator.mapping.values()))
 
+    if schema.all_of and len(schema.all_of) == 1:
+        representation = j2_typerepr(schema.all_of[0], document)
+
     return representation
 
 
