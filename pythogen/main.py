@@ -45,7 +45,7 @@ def main(
     except exceptions.Exit:
         return None
 
-    pythogen_version: str = metadata.version('pythogen')
+    pythogen_version: str = metadata.version("pythogen")
 
     renderer.render_client(
         output_path=output,
@@ -62,5 +62,5 @@ def run() -> None:
     typer.run(main)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app()

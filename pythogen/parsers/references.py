@@ -25,12 +25,12 @@ class RefResolver:
         ref
             Путь до объекта. Пример: "#/components/schemas/PutObjectData"
         """
-        _, path = ref.split('#/')
-        segments = path.split('/')
+        _, path = ref.split("#/")
+        segments = path.split("/")
         target = self._openapi_data
         while segments:
             current = segments.pop(0)
             if current not in target:
                 raise Exception(f'Unable to resolve "{ref}", document section "{current}" not found')
             target = target[current]
-        return ResolvedRef(ref_data=target, ref_id=ref.split('/')[-1])
+        return ResolvedRef(ref_data=target, ref_id=ref.split("/")[-1])

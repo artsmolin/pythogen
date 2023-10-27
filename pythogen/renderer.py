@@ -19,7 +19,7 @@ from pythogen import models
 from pythogen import settings
 
 
-PathStr = TypeVar('PathStr', bound=str)
+PathStr = TypeVar("PathStr", bound=str)
 
 
 logger = logging.getLogger(__name__)
@@ -45,19 +45,19 @@ def render_client(
         Спаршенный в python-объекты OpenApi-файл
     """
     env = Environment(
-        loader=FileSystemLoader(settings.HTTP_CLIENT_TEMPLATES_DIR_PATH), extensions=['jinja2.ext.loopcontrols']
+        loader=FileSystemLoader(settings.HTTP_CLIENT_TEMPLATES_DIR_PATH), extensions=["jinja2.ext.loopcontrols"]
     )
     template = env.get_template(
         settings.CLIENT_TEMPLATE_NAME,
         globals={
-            'varname': varname,
-            'classname': classname,
-            'typerepr': j2_typerepr,
-            'responserepr': j2_responserepr,
-            'iterresponsemap': iterresponsemap,
-            'parameterfield': parameterfield,
-            'propertyfield': propertyfield,
-            'repranyof': j2_repr_any_of,
+            "varname": varname,
+            "classname": classname,
+            "typerepr": j2_typerepr,
+            "responserepr": j2_responserepr,
+            "iterresponsemap": iterresponsemap,
+            "parameterfield": parameterfield,
+            "propertyfield": propertyfield,
+            "repranyof": j2_repr_any_of,
         },
     )
 
@@ -94,7 +94,7 @@ def render_client(
         rendered_client,
         remove_all_unused_imports=True,
     )
-    with open(output_path, 'w') as output_file:
+    with open(output_path, "w") as output_file:
         output_file.write(rendered_client)
 
 
@@ -151,19 +151,19 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
 
     for code, response in responses.patterned.items():
         if response.schema is None:
-            mapper = 'EmptyBody(status_code=response.status_code, text=response.text)'
+            mapper = "EmptyBody(status_code=response.status_code, text=response.text)"
             mapping.append((code, mapper))
             continue
 
         if response.schema.type == models.Type.object:
-            mapper = f'{classname(response.schema.id)}.model_validate(response.json())'
+            mapper = f"{classname(response.schema.id)}.model_validate(response.json())"
             mapping.append((code, mapper))
             continue
 
         if response.schema.any_of:
             items_class_names = [classname(items.id) for items in response.schema.any_of]
-            items_class_names_str: str = '[' + ', '.join(items_class_names) + ']'
-            mapper = f'self._parse_any_of(response.json(), {items_class_names_str})'
+            items_class_names_str: str = "[" + ", ".join(items_class_names) + "]"
+            mapper = f"self._parse_any_of(response.json(), {items_class_names_str})"
             mapping.append((code, mapper))
             continue
 
@@ -175,35 +175,35 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
 
             for items in items_collection:
                 if items is None:
-                    mapper = 'EmptyBody(status_code=response.status_code, text=response.text)'
+                    mapper = "EmptyBody(status_code=response.status_code, text=response.text)"
                     mapping.append((code, mapper))
                     continue
 
                 if items.type is models.Type.object:
                     items_class_name = classname(items.id)
-                    mapper = f'[{items_class_name}.model_validate(item) for item in response.json()]'
+                    mapper = f"[{items_class_name}.model_validate(item) for item in response.json()]"
                     mapping.append((code, mapper))
                     continue
 
-                mapper = 'response.json()'
+                mapper = "response.json()"
                 mapping.append((code, mapper))
                 continue
             continue
 
         if response.schema.type == models.Type.string and response.schema.format is models.Format.binary:
-            mapping.append((code, 'response.content'))
+            mapping.append((code, "response.content"))
             continue
 
         if response.schema.type == models.Type.string:
-            mapping.append((code, 'response.text'))
+            mapping.append((code, "response.text"))
             continue
 
         if response.schema.type == models.Type.integer:
-            mapping.append((code, 'int(response.text)'))
+            mapping.append((code, "int(response.text)"))
             continue
 
         raise NotImplementedError(
-            f'Unable to create response mapping of {response.id} <response.schema.type={response.schema.type}>'
+            f"Unable to create response mapping of {response.id} <response.schema.type={response.schema.type}>"
         )
 
     return mapping
@@ -215,31 +215,31 @@ def j2_responserepr(responses: models.ResponsesObject, document: models.Document
 
     for response in responses.patterned.values():
         if not response.schema:
-            types.append('EmptyBody')
+            types.append("EmptyBody")
         else:
             types.append(j2_typerepr(response.schema, document))
 
     types = sorted(set(types))
 
     if not types:
-        return 'None'
+        return "None"
 
     elif len(types) == 1:
-        return f'{types[0]} | None'
+        return f"{types[0]} | None"
     else:
-        return ' | '.join(types)
+        return " | ".join(types)
 
 
 def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
     """Represent data type on j2 template"""
     schema = document.schemas.get(schema.id, schema)
 
-    representation = 'dict'
+    representation = "dict"
 
     if schema.type.is_primitive:
         if schema.enum:
-            if schema.id == '<inline+SchemaObject>':
-                representation = f'Literal{schema.enum}'
+            if schema.id == "<inline+SchemaObject>":
+                representation = f"Literal{schema.enum}"
             else:
                 representation = classname(schema.id)
         elif schema.format in FORMAT_MAPPING:
@@ -247,7 +247,7 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
         else:
             representation = PRIMITIVE_TYPE_MAPPING[schema.type]
 
-    elif schema.type == models.Type.object and schema.id != '<inline+SchemaObject>':
+    elif schema.type == models.Type.object and schema.id != "<inline+SchemaObject>":
         representation = classname(schema.id)
 
     elif schema.any_of:
@@ -260,11 +260,11 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
         and schema.items.any_of
     ):
         represented_items = " | ".join((j2_typerepr(anyof_item, document) for anyof_item in schema.items.any_of))
-        representation = f'list[{represented_items}]'
+        representation = f"list[{represented_items}]"
 
     elif schema.type == models.Type.array and schema.items:
         represented_item = j2_typerepr(schema.items, document)  # type: ignore
-        representation = f'list[{represented_item}]'
+        representation = f"list[{represented_item}]"
 
     elif schema.discriminator:
         representation = " | ".join((j2_typerepr(item, document) for item in schema.discriminator.mapping.values()))
@@ -279,7 +279,7 @@ def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Doc
     items = []
     for item in any_of_items:
         if item.additional_roperties:
-            items.append('dict[Any, Any]')
+            items.append("dict[Any, Any]")
         elif item.type is models.Type.array and item.items:
             repr = j2_typerepr(item, document)
             items.append(repr)
@@ -289,19 +289,19 @@ def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Doc
             items.append(classname(item.id))
         else:
             logger.error(f"j2_repr_any_of unsupported SchemaObject {item}")
-    return ' | '.join(items)
+    return " | ".join(items)
 
 
 def varname(value: str) -> str:
-    clean_value = re.sub(r'\W|^(?=\d)', '_', value)  # remove special characters
-    clean_value = re.sub('_{2,}', '_', clean_value)  # __ -> _
-    clean_value = clean_value.replace(' ', '_')
+    clean_value = re.sub(r"\W|^(?=\d)", "_", value)  # remove special characters
+    clean_value = re.sub("_{2,}", "_", clean_value)  # __ -> _
+    clean_value = clean_value.replace(" ", "_")
     return inflection.underscore(clean_value)
 
 
 def classname(value: str) -> str:
-    clean_value = re.sub(r'\W|^(?=\d)', '_', value)  # remove special characters
-    clean_value = re.sub('_{2,}', '_', clean_value)  # __ -> _
+    clean_value = re.sub(r"\W|^(?=\d)", "_", value)  # remove special characters
+    clean_value = re.sub("_{2,}", "_", clean_value)  # __ -> _
     return inflection.camelize(clean_value)
 
 
@@ -309,7 +309,7 @@ def parameterfield(parameter: models.ParameterObject) -> str:
     args: list[str] = []
 
     if not parameter.required:
-        args.append('None')
+        args.append("None")
 
     if parameter.safety_key != parameter.orig_key:
         args.append(f'alias="{parameter.orig_key}"')
@@ -320,16 +320,16 @@ def parameterfield(parameter: models.ParameterObject) -> str:
     if parameter.schema.discriminator:
         args.append(f'discriminator="{parameter.schema.discriminator.property_name}"')
 
-    return 'Field(' + ', '.join(args) + ')'
+    return "Field(" + ", ".join(args) + ")"
 
 
 def propertyfield(property: models.SchemaProperty, parent_schema: models.SchemaObject) -> str:
     args: list[str] = []
 
     if property.orig_key not in parent_schema.required:
-        args.append('None')
+        args.append("None")
     else:
-        args.append('...')
+        args.append("...")
 
     if property.safety_key and property.safety_key != property.orig_key:
         args.append(f'alias="{property.orig_key}"')
@@ -353,16 +353,16 @@ def propertyfield(property: models.SchemaProperty, parent_schema: models.SchemaO
 
 
 PRIMITIVE_TYPE_MAPPING = {
-    models.Type.integer: 'int',
-    models.Type.number: 'float',
-    models.Type.boolean: 'bool',
-    models.Type.string: 'str',
-    models.Type.null: 'None',
+    models.Type.integer: "int",
+    models.Type.number: "float",
+    models.Type.boolean: "bool",
+    models.Type.string: "str",
+    models.Type.null: "None",
 }
 
 FORMAT_MAPPING = {
-    models.Format.binary: 'bytes',
-    models.Format.uri: 'HttpUrl',
-    models.Format.date: 'datetime.date',
-    models.Format.datetime: 'datetime.datetime',
+    models.Format.binary: "bytes",
+    models.Format.uri: "HttpUrl",
+    models.Format.date: "datetime.date",
+    models.Format.datetime: "datetime.datetime",
 }

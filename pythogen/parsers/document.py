@@ -83,8 +83,8 @@ def parse_openapi_file(file_path: str) -> models.Document:
 
     document = models.Document(
         info=models.InfoObject(
-            title=openapi_data['info']['title'],
-            version=openapi_data['info']['version'],
+            title=openapi_data["info"]["title"],
+            version=openapi_data["info"]["version"],
         ),
         paths=paths,
         schemas=all_schemas,

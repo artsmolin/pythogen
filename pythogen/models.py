@@ -26,10 +26,10 @@ class SafetyKeyMixin:
         key = self.orig_key
 
         if not key.isidentifier():
-            key = re.sub('[-.]', '_', key)
+            key = re.sub("[-.]", "_", key)
             # stolen from https://stackoverflow.com/a/3303361
-            key = re.sub('[^0-9a-zA-Z_]', '', key)
-            key = re.sub('^[^a-zA-Z_]+', '', key)
+            key = re.sub("[^0-9a-zA-Z_]", "", key)
+            key = re.sub("^[^a-zA-Z_]+", "", key)
 
         if keyword.iskeyword(key):
             key += "_"
@@ -39,42 +39,42 @@ class SafetyKeyMixin:
 
 
 class HttpMethod(Enum):
-    get = 'get'
-    put = 'put'
-    post = 'post'
-    delete = 'delete'
-    options = 'options'
-    head = 'head'
-    patch = 'patch'
-    trace = 'trace'
+    get = "get"
+    put = "put"
+    post = "post"
+    delete = "delete"
+    options = "options"
+    head = "head"
+    patch = "patch"
+    trace = "trace"
 
 
 class ParameterLocation(Enum):
-    query = 'query'
-    header = 'header'
-    path = 'path'
-    cookie = 'cookie'
+    query = "query"
+    header = "header"
+    path = "path"
+    cookie = "cookie"
 
 
 class Format(Enum):
-    int32 = 'int32'
-    int64 = 'int64'
-    float = 'float'
-    double = 'double'
-    date = 'date'
-    byte = 'byte'
-    binary = 'binary'
-    datetime = 'date-time'
-    password = 'password'
-    uuid = 'uuid'
-    uri = 'uri'
-    hostname = 'hostname'
-    ipv4 = 'ipv4'
-    ipv6 = 'ipv6'
+    int32 = "int32"
+    int64 = "int64"
+    float = "float"
+    double = "double"
+    date = "date"
+    byte = "byte"
+    binary = "binary"
+    datetime = "date-time"
+    password = "password"
+    uuid = "uuid"
+    uri = "uri"
+    hostname = "hostname"
+    ipv4 = "ipv4"
+    ipv6 = "ipv6"
 
     @classmethod
     def _missing_(cls, value):
-        value = re.sub('[_-]*', '', value)
+        value = re.sub("[_-]*", "", value)
         for member in cls:
             if member.name.lower() == value:
                 return member
@@ -117,13 +117,13 @@ class InfoObject:
 
 
 class Type(Enum):
-    string = 'string'
-    number = 'number'
-    integer = 'integer'
-    boolean = 'boolean'
-    array = 'array'
-    object = 'object'
-    null = 'null'
+    string = "string"
+    number = "number"
+    integer = "integer"
+    boolean = "boolean"
+    array = "array"
+    object = "object"
+    null = "null"
 
     @property
     def is_primitive(self) -> bool:
@@ -140,7 +140,7 @@ class Type(Enum):
 class SchemaProperty(SafetyKeyMixin):
     orig_key: str
     safety_key: str | None
-    schema: 'SchemaObject'
+    schema: "SchemaObject"
 
 
 @dataclass
@@ -154,13 +154,13 @@ class SchemaObject:
     enum: list[str] | None
     type: Type
     format: Format | None
-    items: 'SchemaObject' | list['SchemaObject'] | None
+    items: "SchemaObject" | list["SchemaObject"] | None
     properties: list[SchemaProperty]
     description: str | None = None
     additional_roperties: bool = False
     required: list[str] = field(default_factory=list)
-    all_of: list['SchemaObject'] = field(default_factory=list)
-    any_of: list['SchemaObject'] = field(default_factory=list)
+    all_of: list["SchemaObject"] = field(default_factory=list)
+    any_of: list["SchemaObject"] = field(default_factory=list)
     discriminator: Discriminator | None = None
 
     # Технические поля
@@ -251,10 +251,10 @@ class OperationObject:
     @property
     def fn_name(self) -> str | None:
         if self.operation_id is not None:
-            return self.operation_id.replace('-', '_')
+            return self.operation_id.replace("-", "_")
 
-        name = self.path_str.removeprefix('/').replace('-', '_').replace('/', '_').replace('{', '').replace('}', '')
-        name = self.method.value + '_' + name
+        name = self.path_str.removeprefix("/").replace("-", "_").replace("/", "_").replace("{", "").replace("}", "")
+        name = self.method.value + "_" + name
         name = name.lower()
         return name
 

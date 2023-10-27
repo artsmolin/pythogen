@@ -1,9 +1,7 @@
 import io
 import logging
-import os
 
 import pytest
-
 from clients import async_client
 from clients import sync_client
 
@@ -59,13 +57,13 @@ def test_httpx_sync_client():
 
     # /objects patch
     response = httpx_sync_client.patch_object(
-        body=sync_client.PatchObjectData(id='id', data=1), 
+        body=sync_client.PatchObjectData(id='id', data=1),
         path_params=sync_client.PatchObjectPathParams(object_id='id'),
     )
     assert isinstance(response, sync_client.PatchObjectResp)
 
     response = httpx_sync_client.put_object(
-        body=sync_client.PutObjectData(id='id', data=1), 
+        body=sync_client.PutObjectData(id='id', data=1),
         path_params=sync_client.PutObjectPathParams(object_id='id'),
     )
     assert isinstance(response, sync_client.PutObjectResp)
@@ -143,13 +141,13 @@ async def test_httpx_async_client():
 
     # /objects patch
     response = await httpx_async_client.patch_object(
-        body=async_client.PatchObjectData(id='id', data=1), 
+        body=async_client.PatchObjectData(id='id', data=1),
         path_params=async_client.PatchObjectPathParams(object_id='id'),
     )
     assert isinstance(response, async_client.PatchObjectResp)
 
     response = await httpx_async_client.put_object(
-        body=async_client.PutObjectData(id='id', data=1), 
+        body=async_client.PutObjectData(id='id', data=1),
         path_params=async_client.PutObjectPathParams(object_id='id'),
     )
     assert isinstance(response, async_client.PutObjectResp)

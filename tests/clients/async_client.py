@@ -101,7 +101,7 @@ class DefaultLogsIntegration:
         return {"props": {"data": kwargs}}
 
     def log_error(self, req: RequestBox, resp: ResponseBox) -> None:
-        msg = f"request error"
+        msg = "request error"
         msg += f" | client={req.client_name}"
         msg += f" | method={req.method}"
         msg += f" | url={req.url}"
@@ -2657,7 +2657,7 @@ class Client:
         return {"extra": {"props": {"data": kwargs}}}
 
     def log_error(self, client_name: str, method, url: str, params, content, headers) -> None:
-        msg = f"request error"
+        msg = "request error"
         msg += f" | client={client_name}"
         msg += f" | method={method}"
         msg += f" | url={url}"

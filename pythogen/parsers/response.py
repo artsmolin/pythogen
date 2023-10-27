@@ -25,18 +25,18 @@ class ResponseParser:
         """Спарсить спецификацию ответа ручки"""
         schema = None
 
-        content = response_data.get('content')
+        content = response_data.get("content")
         if content:
             media_types = list(content.keys())
             if len(media_types) > 1:
                 logger.error(f'Unable to parse response "{response_id}", multiple media types not implemented yet')
             media_type = media_types[0]
             media_type_data = content[media_type]
-            schema_data = media_type_data.get('schema')
+            schema_data = media_type_data.get("schema")
 
             if schema_data:
-                if schema_data.get('$ref', None):
-                    resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
+                if schema_data.get("$ref", None):
+                    resolved_ref = self._ref_resolver.resolve(schema_data["$ref"])
                     schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 else:
                     schema = self._schema_parser.parse_item(response_id, schema_data)
@@ -44,6 +44,6 @@ class ResponseParser:
 
         return models.ResponseObject(
             id=response_id,
-            description=response_data['description'],
+            description=response_data["description"],
             schema=schema,
         )

@@ -1,5 +1,7 @@
 import pytest
-from tests.clients.async_client_with_headers import Client, RequiredHeaders
+
+from tests.clients.async_client_with_headers import Client
+from tests.clients.async_client_with_headers import RequiredHeaders
 
 
 def test_init_client_with_headers():
