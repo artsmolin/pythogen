@@ -3,7 +3,7 @@ from clients.sync_client import SafetyKeyForTesting
 
 def test_safety_key():
     item = SafetyKeyForTesting(for_="str value", with_dot_and_hyphens=1)
-    
+
     assert item.model_dump() == {
         'with_dot_and_hyphens': 1,
         'old_feature_priority': None,

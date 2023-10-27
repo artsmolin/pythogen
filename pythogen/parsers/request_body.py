@@ -24,8 +24,8 @@ class RequestBodyParser:
 
     def parse_item(self, request_body_data: dict[str, Any], operation_id: str) -> models.RequestBodyObject:
         """Спарсить спецификацию тела ручки"""
-        if request_body_data.get('$ref', None):
-            resolved_ref = self._ref_resolver.resolve(request_body_data['$ref'])
+        if request_body_data.get("$ref", None):
+            resolved_ref = self._ref_resolver.resolve(request_body_data["$ref"])
             data = resolved_ref.ref_data
             id_ = resolved_ref.ref_id
         else:
@@ -33,16 +33,16 @@ class RequestBodyParser:
             id_ = f"{operation_id}RequestBody"
 
         files_required = False
-        content = data.get('content')
+        content = data.get("content")
         if content:
             media_types = list(content.keys())
             if len(media_types) > 1:
                 logger.error(f'Unable to parse request body "{id_}", multiple media types not implemented yet')
             media_type = media_types[0]
             media_type_data = content[media_type]
-            schema_data = media_type_data['schema']
-            if schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
+            schema_data = media_type_data["schema"]
+            if schema_data.get("$ref", None):
+                resolved_ref = self._ref_resolver.resolve(schema_data["$ref"])
                 schema = self._schema_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
                 schema = self._schema_parser.parse_item(id_, schema_data)
@@ -53,13 +53,13 @@ class RequestBodyParser:
         else:
             raise Exception(f'Unable to parse request body "{id_}", field "content" must be specified')
 
-        type_schema_dict_keys = data.get('content', {}).keys()
-        type_schema = list(type_schema_dict_keys)[0] if len(type_schema_dict_keys) else ''
+        type_schema_dict_keys = data.get("content", {}).keys()
+        type_schema = list(type_schema_dict_keys)[0] if len(type_schema_dict_keys) else ""
         return models.RequestBodyObject(
             id=id_,
-            description=data.get('description'),
+            description=data.get("description"),
             schema=schema,
-            required=data.get('required', False),
+            required=data.get("required", False),
             is_form_data=type_schema == constants.FORM_DATA_TYPE,
             is_multipart_form_data=type_schema == constants.MULTIPART_FORM_DATA_TYPE,
             are_files_required=files_required,

@@ -1,9 +1,11 @@
+import subprocess
 from pathlib import Path
+
 import pytest
 from typer.testing import CliRunner
-import subprocess
 
 from pythogen import main
+
 
 runner = CliRunner()
 
@@ -16,7 +18,7 @@ ASYNC_CLIENT_PKG_PATH = f"{TMP_DIR_PATH}/async_client_pkg"
 
 @pytest.fixture
 def temp_files():
-    Path(TMP_DIR_PATH).mkdir(parents=True, exist_ok=True) 
+    Path(TMP_DIR_PATH).mkdir(parents=True, exist_ok=True)
     yield
     try:
         Path(ASYNC_CLIENT_PATH).unlink()
@@ -40,7 +42,7 @@ def test_entrypoint_gen_http_client_pkg() -> None:
 def test_entrypoint_gen_http_client_in_shell() -> None:
     process = subprocess.Popen(
         ['python', 'pythogen/main.py', OPENAPI_PATH, ASYNC_CLIENT_PATH],
-        stdout=subprocess.PIPE, 
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
     stdout, stderr = process.communicate()

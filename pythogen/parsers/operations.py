@@ -37,13 +37,13 @@ class OperationParser:
         responses: dict[str, models.ResponseObject] = {}
         operation_id: str = self.parse_operation_id(path_str, method, operation_data)
 
-        for status_code, response_data in operation_data['responses'].items():
-            if status_code == 'default':
+        for status_code, response_data in operation_data["responses"].items():
+            if status_code == "default":
                 logger.error('Unable to parse responses, "default" not implemented yet')
                 continue
 
-            if response_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(response_data['$ref'])
+            if response_data.get("$ref", None):
+                resolved_ref = self._ref_resolver.resolve(response_data["$ref"])
                 response_data = resolved_ref.ref_data
                 response_id = resolved_ref.ref_id
             else:
@@ -51,7 +51,7 @@ class OperationParser:
 
             responses[status_code] = self._response_parser.parse_item(response_id, response_data)
 
-        request_body_data = operation_data.get('requestBody')
+        request_body_data = operation_data.get("requestBody")
         if request_body_data:
             request_body = self._request_body_parser.parse_item(request_body_data, operation_id)
         else:
@@ -59,9 +59,9 @@ class OperationParser:
 
         return models.OperationObject(
             method=method,
-            summary=operation_data.get('summary'),
-            description=operation_data.get('description'),
-            operation_id=operation_data.get('operationId'),
+            summary=operation_data.get("summary"),
+            description=operation_data.get("description"),
+            operation_id=operation_data.get("operationId"),
             request_body=request_body,
             responses=models.ResponsesObject(patterned=responses),
             parameters=self.parse_parameters(operation_data),
@@ -74,28 +74,28 @@ class OperationParser:
         method: models.HttpMethod,
         operation_data: dict[str, Any],
     ) -> str:
-        operation_id: str = operation_data.get('operationId', '')
+        operation_id: str = operation_data.get("operationId", "")
 
         if not operation_id:
             operation_id = (
-                path_str.removeprefix('/').replace('-', '_').replace('/', '_').replace('{', '').replace('}', '')
+                path_str.removeprefix("/").replace("-", "_").replace("/", "_").replace("{", "").replace("}", "")
             )
-            operation_id = method.value + '_' + operation_id
+            operation_id = method.value + "_" + operation_id
             operation_id = operation_id.lower()
             return operation_id
 
-        operation_id = operation_id.replace('_', ' ').title().replace(' ', '')
+        operation_id = operation_id.replace("_", " ").title().replace(" ", "")
         return operation_id
 
     def parse_parameters(self, operation_data: dict[str, Any]) -> list[models.ParameterObject]:
         parameters: list[models.ParameterObject] = []
-        for parameter_data in operation_data.get('parameters', []):
-            if parameter_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(parameter_data['$ref'])
+        for parameter_data in operation_data.get("parameters", []):
+            if parameter_data.get("$ref", None):
+                resolved_ref = self._ref_resolver.resolve(parameter_data["$ref"])
                 parameter = self._parameters_parser.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
                 parameters.append(parameter)
             else:
-                parameter_id = f'<inline+{models.ParameterObject.__name__}>'
+                parameter_id = f"<inline+{models.ParameterObject.__name__}>"
                 parameter = self._parameters_parser.parse_item(parameter_id, parameter_data)
                 parameters.append(parameter)
         return parameters

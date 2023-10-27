@@ -51,10 +51,10 @@ class SchemaParser:
         self._schemas: dict[str, models.SchemaObject] = {}
 
     def parse_collection(self) -> dict[str, models.SchemaObject]:
-        schemas_data = self._openapi_data.get('components', {}).get('schemas', {})
+        schemas_data = self._openapi_data.get("components", {}).get("schemas", {})
         for schema_id, schema_data in schemas_data.items():
-            if schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(schema_data['$ref'])
+            if schema_data.get("$ref", None):
+                resolved_ref = self._ref_resolver.resolve(schema_data["$ref"])
                 schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data)
             else:
                 schema = self.parse_item(schema_id, schema_data)
@@ -100,9 +100,9 @@ class SchemaParser:
             """
             return models.SchemaObject(
                 id=schema_id,
-                title=schema_data.get('title'),
-                required=schema_data.get('required', []),
-                enum=schema_data.get('enum'),
+                title=schema_data.get("title"),
+                required=schema_data.get("required", []),
+                enum=schema_data.get("enum"),
                 type=schema_type,
                 format=self._parse_format(schema_data),
                 items=[],
@@ -121,9 +121,9 @@ class SchemaParser:
 
         return models.SchemaObject(
             id=schema_id,
-            title=schema_data.get('title'),
-            required=schema_data.get('required', []),
-            enum=schema_data.get('enum'),
+            title=schema_data.get("title"),
+            required=schema_data.get("required", []),
+            enum=schema_data.get("enum"),
             type=schema_type,
             format=self._parse_format(schema_data),
             items=self._parse_items(schema_id, schema_data),
@@ -138,7 +138,7 @@ class SchemaParser:
     def _parse_all_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
         result: list[models.SchemaObject] = []
         for i, all_of_item in enumerate(parent_data.get("allOf", [])):
-            if ref := all_of_item.get('$ref'):
+            if ref := all_of_item.get("$ref"):
                 resolved_ref = self._ref_resolver.resolve(ref)
                 all_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 result.append(all_of_item_schema)
@@ -155,7 +155,7 @@ class SchemaParser:
     def _parse_any_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:
         result: list[models.SchemaObject] = []
         for i, any_of_item in enumerate(parent_data.get("anyOf", [])):
-            if ref := any_of_item.get('$ref'):
+            if ref := any_of_item.get("$ref"):
                 resolved_ref = self._ref_resolver.resolve(ref)
                 any_of_item_schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 result.append(any_of_item_schema)
@@ -174,14 +174,14 @@ class SchemaParser:
             #   schema:
             #     {}
             data_type = models.Type.object
-        elif 'allOf' in data:
+        elif "allOf" in data:
             data_type = models.Type.object
-        elif 'anyOf' in data:
+        elif "anyOf" in data:
             data_type = models.Type.object
-        elif 'type' not in data:
+        elif "type" not in data:
             data_type = models.Type.object
         else:
-            raw_data_type: str | None = data.get('type')
+            raw_data_type: str | None = data.get("type")
             try:
                 data_type = models.Type(raw_data_type)
             except ValueError as exc:
@@ -189,7 +189,7 @@ class SchemaParser:
         return data_type
 
     def _parse_format(self, data: dict[str, Any]) -> models.Format | None:
-        data_format = data.get('format')
+        data_format = data.get("format")
         if data_format:
             try:
                 return models.Format(data_format)
@@ -215,7 +215,7 @@ class SchemaParser:
         if not property_name:
             console.print_error(
                 title="Failed to generate a client",
-                msg="The discriminator must contain the \"propertyName\" field.",
+                msg='The discriminator must contain the "propertyName" field.',
                 invalid_data=data,
             )
             raise exceptions.Exit()
@@ -224,7 +224,7 @@ class SchemaParser:
         if not raw_mapping:
             console.print_error(
                 title="Failed to generate a client",
-                msg="The discriminator must contain the \"mapping\" field.",
+                msg='The discriminator must contain the "mapping" field.',
                 invalid_data=data,
             )
             raise exceptions.Exit()
@@ -260,7 +260,7 @@ class SchemaParser:
         schema_type: models.Type,
         data: dict[str, Any],
     ) -> list[models.SchemaProperty]:
-        data_format = data.get('format')
+        data_format = data.get("format")
         if data_format:
             try:
                 data_format = models.Format(data_format)
@@ -269,43 +269,43 @@ class SchemaParser:
 
         properties = []
 
-        properties_map = data.get('properties')
+        properties_map = data.get("properties")
         if properties_map:
             for key, property_schema_data in properties_map.items():
-                if property_schema_data.get('$ref', None):
-                    resolved_ref = self._ref_resolver.resolve(property_schema_data['$ref'])
+                if property_schema_data.get("$ref", None):
+                    resolved_ref = self._ref_resolver.resolve(property_schema_data["$ref"])
                     property_schema_data = resolved_ref.ref_data
                     property_schema_id = resolved_ref.ref_id
                     schema = self.parse_item(property_schema_id, property_schema_data, from_depth_level=True)
                 else:
                     if (
-                        property_schema_data.get('type') == models.Type.object.value
-                        and 'properties' in property_schema_data
+                        property_schema_data.get("type") == models.Type.object.value
+                        and "properties" in property_schema_data
                     ):
                         # extract inline object definition to schema
                         property_schema_id = key + "_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)
                         self._inline_schema_aggregator.add(property_schema_id, schema)
-                    elif 'allOf' in property_schema_data:
+                    elif "allOf" in property_schema_data:
                         property_schema_id = key + "_ref_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)
                         self._inline_schema_aggregator.add(property_schema_id, schema)
-                    elif property_schema_data.get('type') == models.Type.array.value:
+                    elif property_schema_data.get("type") == models.Type.array.value:
                         # specify inline array name
                         property_schema_id = key + "_list"
                         schema = self.parse_item(property_schema_id, property_schema_data)
-                    elif 'anyOf' in property_schema_data:
+                    elif "anyOf" in property_schema_data:
                         # extract inline object definition to schema
                         property_schema_id = key + "_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)
                         self._inline_schema_aggregator.add(property_schema_id, schema)
                     else:
-                        property_schema_id = f'<inline+{models.SchemaObject.__name__}>'
+                        property_schema_id = f"<inline+{models.SchemaObject.__name__}>"
                         schema = self.parse_item(property_schema_id, property_schema_data)
 
                 description = property_schema_data.get("description", "")
                 match = re.search(r"(__safety_key__)\((?P<safety_key>.+)\)", description)
-                safety_key = match['safety_key'] if match else None
+                safety_key = match["safety_key"] if match else None
 
                 properties.append(
                     models.SchemaProperty(
@@ -318,10 +318,10 @@ class SchemaParser:
             if schema_type == models.Type.string and not data_format:
                 properties.append(
                     models.SchemaProperty(
-                        orig_key='text',
+                        orig_key="text",
                         safety_key=None,
                         schema=models.SchemaObject(
-                            id='',
+                            id="",
                             type=models.Type.string,
                             enum=None,
                             properties=[],
@@ -335,10 +335,10 @@ class SchemaParser:
             if schema_type == models.Type.string and data_format == models.Format.binary:
                 properties.append(
                     models.SchemaProperty(
-                        orig_key='content',
+                        orig_key="content",
                         safety_key=None,
                         schema=models.SchemaObject(
-                            id='',
+                            id="",
                             type=models.Type.string,
                             enum=None,
                             properties=[],
@@ -353,10 +353,10 @@ class SchemaParser:
             if schema_type == models.Type.integer:
                 properties.append(
                     models.SchemaProperty(
-                        orig_key='text',
+                        orig_key="text",
                         safety_key=None,
                         schema=models.SchemaObject(
-                            id='',
+                            id="",
                             type=models.Type.integer,
                             enum=None,
                             properties=[],
@@ -375,20 +375,20 @@ class SchemaParser:
         parent_schema_id: str,
         data: dict[str, Any],
     ) -> models.SchemaObject | list[models.SchemaObject] | None:
-        items_schema_data = data.get('items')
+        items_schema_data = data.get("items")
         if items_schema_data:
-            if items_schema_data.get('$ref', None):
-                resolved_ref = self._ref_resolver.resolve(items_schema_data['$ref'])
+            if items_schema_data.get("$ref", None):
+                resolved_ref = self._ref_resolver.resolve(items_schema_data["$ref"])
                 schema = self.parse_item(resolved_ref.ref_id, resolved_ref.ref_data, from_depth_level=True)
                 return schema
             else:
-                parent_raw_type = data.get('type')
-                if parent_raw_type == 'array':
-                    items_schema_id = f'{parent_schema_id}Item'
+                parent_raw_type = data.get("type")
+                if parent_raw_type == "array":
+                    items_schema_id = f"{parent_schema_id}Item"
                 else:
-                    items_schema_id = f'<inline+{models.SchemaObject.__name__}>'
+                    items_schema_id = f"<inline+{models.SchemaObject.__name__}>"
                 schema = self.parse_item(items_schema_id, items_schema_data)
-                items_schema_data_type = items_schema_data.get('type')
+                items_schema_data_type = items_schema_data.get("type")
 
                 if items_schema_data_type and not models.Type(items_schema_data_type).is_primitive:
                     self._inline_schema_aggregator.add(items_schema_id, schema)
