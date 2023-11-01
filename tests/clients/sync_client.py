@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.31
+#   Version:     0.2.32
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -803,6 +803,7 @@ class Client:
 
     def getMessage(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetMessageHeaders | dict[str, Any] | None = None,
@@ -878,6 +879,7 @@ class Client:
 
     def get_object_no_ref_schema(
         self,
+        *,
         path_params: GetObjectNoRefSchemaPathParams | dict[str, Any],
         query_params: GetObjectNoRefSchemaQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
@@ -955,6 +957,7 @@ class Client:
 
     def get_object(
         self,
+        *,
         path_params: GetObjectPathParams | dict[str, Any],
         query_params: GetObjectQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
@@ -1043,6 +1046,7 @@ class Client:
 
     def get_object_with_array_response(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1112,6 +1116,7 @@ class Client:
 
     def get_object_with_inline_array(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1181,6 +1186,7 @@ class Client:
 
     def get_list_objects(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1250,6 +1256,7 @@ class Client:
 
     def get_text(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1319,6 +1326,7 @@ class Client:
 
     def get_text_as_integer(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1388,6 +1396,7 @@ class Client:
 
     def get_empty(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetEmptyHeaders | dict[str, Any] | None = None,
@@ -1463,6 +1472,7 @@ class Client:
 
     def get_no_operation_id(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         headers: GetNoOperationIdHeaders | dict[str, Any] | None = None,
@@ -1538,6 +1548,7 @@ class Client:
 
     def get_binary(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1607,6 +1618,7 @@ class Client:
 
     def get_allof(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1676,6 +1688,7 @@ class Client:
 
     def get_discriminated_oneof(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1745,6 +1758,7 @@ class Client:
 
     def get_object_slow(
         self,
+        *,
         path_params: GetObjectSlowPathParams | dict[str, Any],
         query_params: GetObjectSlowQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
@@ -1833,6 +1847,7 @@ class Client:
 
     def response_body_list_of_anyof(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1902,6 +1917,7 @@ class Client:
 
     def post_object_without_body(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1971,6 +1987,7 @@ class Client:
 
     def post_object(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
@@ -2050,6 +2067,7 @@ class Client:
 
     def post_form_object(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
@@ -2130,6 +2148,7 @@ class Client:
 
     def post_multipart_form_data(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
@@ -2214,6 +2233,7 @@ class Client:
 
     def request_body_anyof(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
@@ -2293,6 +2313,7 @@ class Client:
 
     def patch_object(
         self,
+        *,
         path_params: PatchObjectPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -2376,6 +2397,7 @@ class Client:
 
     def put_object(
         self,
+        *,
         path_params: PutObjectPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -2459,6 +2481,7 @@ class Client:
 
     def put_object_slow(
         self,
+        *,
         path_params: PutObjectSlowPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -2542,6 +2565,7 @@ class Client:
 
     def delete_object(
         self,
+        *,
         path_params: DeleteObjectPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,

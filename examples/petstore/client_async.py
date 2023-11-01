@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.31
+#   Version:     0.2.32
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -502,6 +502,7 @@ class Client:
 
     async def findPetsByStatus(
         self,
+        *,
         query_params: FindPetsByStatusQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -588,6 +589,7 @@ class Client:
 
     async def findPetsByTags(
         self,
+        *,
         query_params: FindPetsByTagsQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -674,6 +676,7 @@ class Client:
 
     async def getPetById(
         self,
+        *,
         path_params: GetPetByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -771,6 +774,7 @@ class Client:
 
     async def getInventory(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -842,6 +846,7 @@ class Client:
 
     async def getOrderById(
         self,
+        *,
         path_params: GetOrderByIdPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -939,6 +944,7 @@ class Client:
 
     async def loginUser(
         self,
+        *,
         query_params: LoginUserQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -1025,6 +1031,7 @@ class Client:
 
     async def logoutUser(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
@@ -1093,6 +1100,7 @@ class Client:
 
     async def getUserByName(
         self,
+        *,
         path_params: GetUserByNamePathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -1190,6 +1198,7 @@ class Client:
 
     async def addPet(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
@@ -1280,6 +1289,7 @@ class Client:
 
     async def addPetOrTag(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: AddpetortagRequestBody | dict[str, Any] | None = None,
@@ -1370,6 +1380,7 @@ class Client:
 
     async def updatePetWithForm(
         self,
+        *,
         path_params: UpdatePetWithFormPathParams | dict[str, Any],
         query_params: UpdatePetWithFormQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
@@ -1457,6 +1468,7 @@ class Client:
 
     async def uploadFile(
         self,
+        *,
         path_params: UploadFilePathParams | dict[str, Any],
         query_params: UploadFileQueryParams | dict[str, Any],
         auth: BasicAuth | None = None,
@@ -1544,6 +1556,7 @@ class Client:
 
     async def placeOrder(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Order | dict[str, Any] | None = None,
@@ -1634,6 +1647,7 @@ class Client:
 
     async def createUser(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
@@ -1710,6 +1724,7 @@ class Client:
 
     async def createUsersWithListInput(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: list[User] | dict[str, Any] | None = None,
@@ -1789,6 +1804,7 @@ class Client:
 
     async def updatePet(
         self,
+        *,
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
@@ -1901,6 +1917,7 @@ class Client:
 
     async def updateUser(
         self,
+        *,
         path_params: UpdateUserPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -1981,6 +1998,7 @@ class Client:
 
     async def deletePet(
         self,
+        *,
         path_params: DeletePetPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -2070,6 +2088,7 @@ class Client:
 
     async def deleteOrder(
         self,
+        *,
         path_params: DeleteOrderPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
@@ -2164,6 +2183,7 @@ class Client:
 
     async def deleteUser(
         self,
+        *,
         path_params: DeleteUserPathParams | dict[str, Any],
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
