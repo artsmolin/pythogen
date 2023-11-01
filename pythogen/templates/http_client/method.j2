@@ -5,6 +5,7 @@
     async def {{ operation.fn_name }}(
     {%- endif %}
         self,
+        *,
         {#- path params -#}
         {% if operation.path_params %}
         path_params: {{ classname(operation.fn_name) }}PathParams | dict[str, Any],

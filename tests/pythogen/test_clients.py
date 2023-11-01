@@ -22,6 +22,14 @@ def _get_httpx_async_client():
 
 def test_httpx_sync_client():
     httpx_sync_client = _get_httpx_sync_client()
+    
+    # check error for not named args
+    with pytest.raises(TypeError):
+        httpx_sync_client.get_object(
+            sync_client.GetObjectPathParams(object_id='123'),
+            sync_client.GetObjectQueryParams(return_error='', from_=''),
+        )
+
     response = httpx_sync_client.get_object(
         path_params=sync_client.GetObjectPathParams(object_id='123'),
         query_params=sync_client.GetObjectQueryParams(
@@ -109,6 +117,14 @@ def test_httpx_sync_client():
 @pytest.mark.asyncio
 async def test_httpx_async_client():
     httpx_async_client = _get_httpx_async_client()
+
+    # check error for not named args
+    with pytest.raises(TypeError):
+        await httpx_async_client.get_object(
+            sync_client.GetObjectPathParams(object_id='123'),
+            sync_client.GetObjectQueryParams(return_error='', from_=''),
+        )
+
     response = await httpx_async_client.get_object(
         path_params=async_client.GetObjectPathParams(object_id='123'),
         query_params=async_client.GetObjectQueryParams(
