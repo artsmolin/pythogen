@@ -10,6 +10,7 @@ from pythogen import main
 runner = CliRunner()
 
 
+OPENAPI_TOO_MUCH_ALLOF_PATH = "tests/docs/openapi-with-too-much-allof.yaml"
 OPENAPI_PATH = "tests/docs/openapi.yaml"
 TMP_DIR_PATH = "tests/pythogen/tmp"
 ASYNC_CLIENT_PATH = f"{TMP_DIR_PATH}/async_client.py"
@@ -48,3 +49,16 @@ def test_entrypoint_gen_http_client_in_shell() -> None:
     stdout, stderr = process.communicate()
     assert stdout == b''
     assert stderr == b''
+
+
+@pytest.mark.usefixtures("temp_files")
+def test_entrypoint_gen_http_client_in_shell_with_too_much_allof() -> None:
+    process = subprocess.Popen(
+        ['python', 'pythogen/main.py', OPENAPI_TOO_MUCH_ALLOF_PATH, ASYNC_CLIENT_PATH],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = process.communicate()
+    assert stdout == b''
+    assert b"Failed to generate a client" in stderr
+    assert b"\"allOf\" field in property can contains only one item" in stderr
