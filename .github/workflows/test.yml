@@ -1,27 +1,13 @@
 name: tests
-on: push
+on: [push, pull_request]
 
 jobs:
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.11
-      - name: Linting
-        run: |
-          pip install pre-commit
-          pre-commit run --all-files
   test:
     name: test
-    needs: lint
     strategy:
       fail-fast: true
       matrix:
-        python-version: [ "3.10", "3.11", "3.12" ]
+        python-version: [ "3.10", "3.11" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master

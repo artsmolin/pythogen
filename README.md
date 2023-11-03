@@ -1,6 +1,7 @@
 <h2 align="center">Awesome python HTTP-clients from  OpenAPI</h2>
 
-[![Build Status](https://github.com/artsmolin/pythogen/actions/workflows/main.yml/badge.svg)](https://github.com/artsmolin/pythogen/actions)
+[![test](https://github.com/artsmolin/pythogen/actions/workflows/test.yml/badge.svg)](https://github.com/artsmolin/pythogen/actions)
+[![lint](https://github.com/artsmolin/pythogen/actions/workflows/lint.yml/badge.svg)](https://github.com/artsmolin/pythogen/actions)
 [![codecov](https://codecov.io/gh/artsmolin/pythogen/branch/main/graph/badge.svg?token=6JR6NB8Y9Z)](https://codecov.io/gh/artsmolin/pythogen)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
