@@ -223,6 +223,7 @@ class GetObjectQueryParams(BaseModel):
     from_: str = Field(alias="from", description="__safety_key__(from_)")
 
     return_error: str | None = Field(None, alias="return_error")
+    ref_string_parameter: str | None = Field(None, alias="ref_string_parameter")
 
 
 class GetEmptyHeaders(BaseModel):

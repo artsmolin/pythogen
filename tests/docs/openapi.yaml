@@ -97,6 +97,11 @@ paths:
           schema: { title: From, type: string, description: __safety_key__(from_) }
           name: from
           in: query
+        - required: false
+          schema:
+            $ref: '#/components/schemas/GetObjectRefStringParameter'
+          name: ref_string_parameter
+          in: query
       responses:
         '200':
           description: Successful Response
@@ -606,6 +611,9 @@ components:
         text:
           title: Text
           type: string
+    GetObjectRefStringParameter:
+      title: GetObjectRefStringParameter
+      type: string
     GetObjectResp:
       title: GetObjectResp
       type: object
