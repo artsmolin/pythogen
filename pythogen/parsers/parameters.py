@@ -16,18 +16,10 @@ class ParameterParser:
 
     def parse_collections(self) -> dict[str, models.ParameterObject]:
         parameters = self._openapi_data.get("components", {}).get("parameters", {})
-        result = {}
-        for parameter_id, parameter_data in parameters.items():
-            if parameter_data.get("$ref", None):
-                parameter = self.parse_item_from_ref(parameter_id, parameter_data["$ref"])
-            else:
-                parameter = self.parse_item(parameter_id, parameter_data)
-            result[parameter_id] = parameter
-        return result
-
-    def parse_item_from_ref(self, id_: str, ref: str) -> models.ParameterObject:
-        resolved_ref = self._ref_resolver.resolve(ref)
-        return self.parse_item(id_, resolved_ref.ref_data)
+        return {
+            parameter_id: self.parse_item(parameter_id, parameter_data)
+            for parameter_id, parameter_data in parameters.items()
+        }
 
     def parse_item(self, id_: str, data: dict[str, Any]) -> models.ParameterObject:
         schema_data = data["schema"]
