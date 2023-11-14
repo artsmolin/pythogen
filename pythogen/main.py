@@ -58,6 +58,8 @@ def main(
     )
 
 
+# pragma: no cover
+# Used in pytroject.toml -> [tool.poetry.scripts]
 def run() -> None:
     typer.run(main)
 
