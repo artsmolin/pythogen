@@ -58,10 +58,9 @@ def main(
     )
 
 
-# pragma: no cover
 # Used in pytroject.toml -> [tool.poetry.scripts]
 def run() -> None:
-    typer.run(main)
+    typer.run(main)  # pragma: no cover
 
 
 if __name__ == "__main__":
