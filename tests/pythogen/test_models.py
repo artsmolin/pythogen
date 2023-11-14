@@ -1,4 +1,5 @@
 from clients.sync_client import SafetyKeyForTesting
+from pythogen import models
 
 
 def test_safety_key():
@@ -37,3 +38,8 @@ def test_safety_key():
         '33with.dot-and-hyphens&*': 1,
         'for': 'str value',
     }
+
+
+def test_format_missing():
+    assert models.Format("date-time") is models.Format.datetime
+    assert models.Format("datetime") is models.Format.datetime
