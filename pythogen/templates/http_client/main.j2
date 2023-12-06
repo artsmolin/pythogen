@@ -232,6 +232,7 @@ class {{ schema.name }}(BaseModel):
 {%- for model in models %}
 
 {%- if model.type.value == "null"  %}
+{%- elif model.is_empty_object  %}
 {%- elif model.any_of  %}
 class {{ classname(model.id) }}(RootModel):
     """
@@ -421,7 +422,7 @@ class {{ name }}:
 
 
 {% for model in models %}
-{%- if model.type.value not in ("any_of", "null") %}
+{%- if model.type.value not in ("any_of", "null") and not model.is_empty_object %}
 {{ classname(model.id) }}.model_rebuild()
 {%- else %}
 {%- endif -%}

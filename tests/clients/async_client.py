@@ -386,6 +386,7 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     integer_data: int | None = None
     array_data: list[str] | None = None
     boolean_data: bool | None = None
+    array_of_dicts_data: list[dict[Any, Any]] | None = None
 
 
 class IntEnumOrNullObj(RootModel):

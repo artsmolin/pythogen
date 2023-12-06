@@ -190,6 +190,21 @@ class SchemaObject:
     def named_allof_models(self) -> list[SchemaObject]:
         return [item for item in self.all_of if not item.is_inline]
 
+    @property
+    def is_empty_object(self) -> bool:
+        return all(
+            (
+                self.type is Type.object,
+                not self.enum,
+                not self.items,
+                not self.properties,
+                not self.required,
+                not self.all_of,
+                not self.any_of,
+                not self.discriminator,
+            )
+        )
+
 
 @dataclass
 class ParameterObject(SafetyKeyMixin):

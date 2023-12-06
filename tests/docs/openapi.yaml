@@ -73,6 +73,11 @@ paths:
                   boolean_data:
                     title: Boolean Data
                     type: boolean
+                  array_of_dicts_data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
                 additionalProperties: false
   /objects/{object_id}:
     get:
