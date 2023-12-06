@@ -281,17 +281,6 @@ class CreateuserswithlistinputRequestBody(BaseModel):
     )
 
 
-class GetinventoryResponse200(BaseModel):
-    """
-    None
-
-    """
-
-    model_config = ConfigDict(
-        populate_by_name=True,  # Addressing by field name, even if there is an alias.
-    )
-
-
 class FindpetsbytagsResponse200(BaseModel):
     """
     None
@@ -772,7 +761,7 @@ class Client:
         auth: BasicAuth | None = None,
         content: str | bytes | None = None,
         meta: PythogenMetaBox | None = None,
-    ) -> GetinventoryResponse200 | None:
+    ) -> dict[Any, Any] | None:
         """
         GET /store/inventory
         Operation ID: getInventory
@@ -2292,7 +2281,6 @@ class Client:
 
 
 CreateuserswithlistinputRequestBody.model_rebuild()
-GetinventoryResponse200.model_rebuild()
 FindpetsbytagsResponse200.model_rebuild()
 FindpetsbystatusResponse200.model_rebuild()
 AddpetortagRequestBody.model_rebuild()
