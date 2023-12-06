@@ -2,3 +2,4 @@ title:        pythogen
 tagline:      Awesome python HTTP-clients from OpenAPI
 
 remote_theme: sighingnow/jekyll-gitbook
+syntax_highlighter_style: colorful
