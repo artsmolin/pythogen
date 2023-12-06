@@ -2,3 +2,8 @@ title:        pythogen
 tagline:      Awesome python HTTP-clients from OpenAPI
 
 remote_theme: alexander-heimbuch/millidocs
+
+markdown: kramdown
+kramdown:
+  syntax_highlighter_opts:
+    disable : true
