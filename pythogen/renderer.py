@@ -248,7 +248,10 @@ def j2_typerepr(schema: models.SchemaObject, document: models.Document) -> str:
             representation = PRIMITIVE_TYPE_MAPPING[schema.type]
 
     elif schema.type == models.Type.object and schema.id != "<inline+SchemaObject>":
-        representation = classname(schema.id)
+        if schema.is_empty_object:
+            representation = "dict[Any, Any]"
+        else:
+            representation = classname(schema.id)
 
     elif schema.any_of:
         representation = classname(schema.id)
