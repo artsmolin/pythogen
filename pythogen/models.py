@@ -195,6 +195,7 @@ class SchemaObject:
         return all(
             (
                 self.type is Type.object,
+                not self.is_fake,
                 not self.enum,
                 not self.items,
                 not self.properties,

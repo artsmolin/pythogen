@@ -288,6 +288,8 @@ def j2_repr_any_of(any_of_items: list[models.SchemaObject], document: models.Doc
             items.append(repr)
         elif item.type.is_primitive:
             items.append(PRIMITIVE_TYPE_MAPPING[item.type])
+        elif item.is_empty_object:
+            items.append("dict[Any, Any]")
         elif item.id:
             items.append(classname(item.id))
         else:

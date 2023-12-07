@@ -668,6 +668,15 @@ components:
           anyOf:
             - {$ref: '#/components/schemas/Cat'}
             - {$ref: '#/components/schemas/Dog'}
+        dictOdArrayOfDicts:
+          description: ''
+          anyOf:
+            - type: array
+              items:
+                 type: object
+                 additionalProperties: true
+            - type: object
+              additionalProperties: true
       additionalProperties: false
     PostObjectData:
       title: PostObjectData
