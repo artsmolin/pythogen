@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.32
+#   Version:     0.2.34
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -407,6 +407,26 @@ class OptionalAnyofStringDataObj(RootModel):
     root: str | None
 
 
+class DictOdArrayOfDictsObj(RootModel):
+    """
+    None
+
+    """
+
+    root: list[dict[Any, Any]] | dict[Any, Any]
+
+
+class DictOdArrayOfDictsObjItem0(BaseModel):
+    """
+    None
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+
 class AnimalObj(RootModel):
     """
     None
@@ -679,6 +699,7 @@ class GetObjectResp(BaseModel):
     child: GetObjectResp | None = None
     childs: list[GetObjectResp] | None = None
     animal: AnimalObj | None = None
+    dictOdArrayOfDicts: DictOdArrayOfDictsObj | None = Field(None, alias="dictOdArrayOfDicts")
 
 
 class GetMessageResp(BaseModel):
@@ -2721,6 +2742,8 @@ GetObjectWithArrayResponseResponse200Item.model_rebuild()
 GetObjectNoRefSchemaResponse200.model_rebuild()
 IntEnumOrNullObj.model_rebuild()
 OptionalAnyofStringDataObj.model_rebuild()
+DictOdArrayOfDictsObj.model_rebuild()
+DictOdArrayOfDictsObjItem0.model_rebuild()
 AnimalObj.model_rebuild()
 AnyOfChildObj.model_rebuild()
 TierObj.model_rebuild()
