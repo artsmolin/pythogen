@@ -32,7 +32,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.10"
 typer = "^0.9.0"
-pyyaml = "^6.0"
+pyyaml = "^6.0.1"
 jinja2 = "^3.1.1"
 inflection = "^0.5.1"
 black = "^23.3.0"
@@ -40,8 +40,8 @@ autoflake = "^2.2.0"
 isort = "^5.12.0"
 pydantic = "^2.0.2"
 pytest-cov = "^4.1.0"
-openapi-spec-validator = "^0.6.0"
 rich = "^13.6.0"
+openapi-spec-validator = "^0.7.1"
 
 [tool.poetry.scripts]
 pythogen = 'pythogen.main:run'
