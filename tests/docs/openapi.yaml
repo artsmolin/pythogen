@@ -848,6 +848,9 @@ components:
           title: With dot, hyphens and garbage
           type: integer
           description: __safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"
+        schema:
+          type: string
+          description: Field named "schema"
     ListAnyOfResp:
       title: PostObjectResp
       type: object

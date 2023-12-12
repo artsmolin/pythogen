@@ -10,6 +10,7 @@ def test_safety_key():
         'old_feature_priority': None,
         'class_': None,
         'for_': 'str value',
+        'schema_': None,
     }
 
     assert item.model_dump(by_alias=True) == {
@@ -17,6 +18,7 @@ def test_safety_key():
         '34with.dot-and-hyphens&*': None,
         'class': None,
         'for': 'str value',
+        'schema': None,
     }
 
     assert item.model_dump(exclude_none=True) == {

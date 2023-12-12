@@ -556,6 +556,7 @@ class SafetyKeyForTesting(BaseModel):
         alias="34with.dot-and-hyphens&*",
         description='__safety_key__(old_feature_priority) invalid identifier, expecting "old_feature_priority"',
     )
+    schema_: str | None = Field(None, alias="schema", description='Field named "schema"')
 
 
 class UnknownError(BaseModel):
