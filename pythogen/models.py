@@ -12,6 +12,8 @@ from enum import Enum
 
 
 class SafetyKeyMixin:
+    pydantic_reserved_properties = ("schema",)
+
     @property
     def key(self):
         return self._safe_key()
@@ -20,7 +22,13 @@ class SafetyKeyMixin:
         if self.safety_key:
             return self.safety_key
 
-        if self.orig_key.isidentifier() and not keyword.iskeyword(self.orig_key):
+        if all(
+            (
+                self.orig_key.isidentifier(),
+                not keyword.iskeyword(self.orig_key),
+                self.orig_key not in self.pydantic_reserved_properties,
+            )
+        ):
             return self.orig_key
 
         key = self.orig_key
@@ -32,6 +40,9 @@ class SafetyKeyMixin:
             key = re.sub("^[^a-zA-Z_]+", "", key)
 
         if keyword.iskeyword(key):
+            key += "_"
+
+        if key in self.pydantic_reserved_properties:
             key += "_"
 
         self.safety_key = key
