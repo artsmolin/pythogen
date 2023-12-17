@@ -26,6 +26,7 @@ Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i
 
 **Examples**: [sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
 
+---
 
 ## Installation
 You can install the library
