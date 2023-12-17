@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./docs/img/logo.png" style="width: 100%; max-width: 500px" alt="pythogen">
+<img src="./docs/img/logo.png" style="width: 100%; max-width: 300px" alt="pythogen">
 <br />
 Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i> and <i>pydantic</i>
 </p>
