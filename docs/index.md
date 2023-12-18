@@ -1,3 +1,9 @@
+---
+hide:
+  - navigation
+---
+
+
 <p align="center">
 <img src="https://github.com/artsmolin/pythogen/raw/main/docs/img/logo.png" style="width: 100%; max-width: 500px" alt="pythogen">
 <br />
@@ -22,7 +28,7 @@ Generator of python HTTP-clients from OpenApi specification based on <a href="ht
 
 # Overview
 ## Installation
-### with pip <small>recommended</small>
+### with pip
 ```shell
 pip install pythogen
 ```

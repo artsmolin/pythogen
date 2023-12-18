@@ -8,6 +8,7 @@ theme:
   features:
     # - navigation.tabs
     - navigation.sections
+    - navigation.tabs
     - search.suggest
   palette:
     - media: "(prefers-color-scheme)"
