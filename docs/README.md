@@ -1,13 +1,22 @@
-Generator of python HTTP-clients from OpenApi specification based on [httpx](https://github.com/projectdiscovery/httpx) and [pydantic](https://github.com/pydantic/pydantic).
+<p align="center">
+Generator of python HTTP-clients from OpenApi specification based on <a href="https://github.com/projectdiscovery/httpx">httpx</a> and <a href="https://github.com/pydantic/pydantic">pydantic</a>.
+</p>
 
 
-[![codecov](https://codecov.io/gh/artsmolin/pythogen/branch/main/graph/badge.svg?token=6JR6NB8Y9Z)](https://codecov.io/gh/artsmolin/pythogen)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
-![downloads](https://img.shields.io/pypi/dm/pythogen)
-[![python](https://img.shields.io/pypi/pyversions/pythogen.svg)](https://pypi.python.org/pypi/pythogen/)
-[![pypi](https://img.shields.io/pypi/v/pythogen.svg)](https://pypi.org/project/pythogen/)
-[![license](https://img.shields.io/github/license/artsmolin/pythogen.svg)](https://github.com/artsmolin/pythogen/blob/master/LICENSE)
+<p align="center">
+<a href="https://github.com/artsmolin/pythogen/actions" target="_blank">
+    <img src="https://github.com/artsmolin/pythogen/actions/workflows/test.yml/badge.svg" alt="tests">
+</a>
+<a href="https://codecov.io/gh/artsmolin/pythogen" target="_blank">
+    <img src="https://codecov.io/gh/artsmolin/pythogen/branch/main/graph/badge.svg?token=6JR6NB8Y9Z" alt="coverage">
+</a>
+<a href="https://pypi.org/project/pythogen/" target="_blank">
+    <img src="https://img.shields.io/pypi/v/pythogen.svg?color=%2334D058" alt="pypi">
+</a>
+<a href="https://pypi.python.org/pypi/pythogen/" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/pythogen.svg?color=%2334D058" alt="python">
+</a>
+</p>
 
 - [Overview](#overview)
   - [Installation](#installation)
