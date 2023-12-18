@@ -20,18 +20,18 @@ Generator of python HTTP-clients from OpenApi specification based on <a href="ht
 </a>
 </p>
 
-## Overview
-### Installation
-You can install the library
+# Overview
+## Installation
+### with pip <small>recommended</small>
 ```shell
 pip install pythogen
 ```
-or use Docker
+### with docker
 ```shell
 docker pull artsmolin/pythogen
 ```
 
-### Generation
+## Generation
 - `path/to/input` — path to the directory with openapi.yaml;
 - `path/to/output` — the path to the directory where the generated client will be saved;
 
@@ -49,7 +49,7 @@ path/to/input/openapi.yaml \
 path/to/output/client.py
 ```
 
-### Usage
+## Usage
 Use the generated [client](/examples/petstore/client_async.py). Below is an example of using a client generated for [Petstore OpenAPI](/examples/petstore/openapi.yaml).
 ```python
 from petstore.client_async import Client
