@@ -1,8 +1,9 @@
 <p align="center">
-<img src="./docs/img/logo.png" style="width: 100%; max-width: 500px" alt="pythogen">
+<img src="https://github.com/artsmolin/pythogen/raw/main/docs/img/logo.png" style="width: 100%; max-width: 500px" alt="pythogen">
 <br />
-Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i> and <i>pydantic</i>
+Generator of python HTTP-clients from OpenApi specification based on <a href="https://github.com/projectdiscovery/httpx">httpx</a> and <a href="https://github.com/pydantic/pydantic">pydantic</a>.
 </p>
+
 
 <p align="center">
 <a href="https://github.com/artsmolin/pythogen/actions" target="_blank">
@@ -19,16 +20,8 @@ Generator of python HTTP-clients from OpenApi specification based on <i>httpx</i
 </a>
 </p>
 
----
-**Documentation**: <a href="https://artsmolin.github.io/pythogen" target="_blank">https://artsmolin.github.io/pythogen</a>
-
-**Source Code**: <a href="https://github.com/artsmolin/pythogen" target="_blank">https://github.com/artsmolin/pythogen</a>
-
-**Examples**: [sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
-
----
-
-## Installation
+## Overview
+### Installation
 You can install the library
 ```shell
 pip install pythogen
@@ -38,7 +31,7 @@ or use Docker
 docker pull artsmolin/pythogen
 ```
 
-## Generation
+### Generation
 - `path/to/input` — path to the directory with openapi.yaml;
 - `path/to/output` — the path to the directory where the generated client will be saved;
 
@@ -46,7 +39,6 @@ Generate a client using the installed library
 ```shell
 pythogen path/to/input/openapi.yaml path/to/output/client.py
 ```
-
 or via Docker
 ```shell
 docker run \
@@ -57,15 +49,18 @@ path/to/input/openapi.yaml \
 path/to/output/client.py
 ```
 
-## Usage
+### Usage
+Use the generated [client](/examples/petstore/client_async.py). Below is an example of using a client generated for [Petstore OpenAPI](/examples/petstore/openapi.yaml).
 ```python
 from petstore.client_async import Client
 from petstore.client_async import Pet
 from petstore.client_async import EmptyBody
 from petstore.client_async import FindPetsByStatusQueryParams
 
-client = Client(base_url="http://your.base.url")
 pets: list[Pet] | EmptyBody = await client.findPetsByStatus(
   query_params=FindPetsByStatusQueryParams(status="available"),
 )
 ```
+
+## Examples
+- [Sync](/examples/petstore/client_sync.py) and [async](/examples/petstore/client_async.py) clients for [Petstore OpenAPI](/examples/petstore/openapi.yaml)
