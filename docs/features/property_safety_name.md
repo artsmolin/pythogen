@@ -1,5 +1,5 @@
 # Property safety name
-Promerty names are automatically converted to secure python names. However, you can explicitly specify the name with which the property will be generated for the data schema. To do this, specify the desired name in the property description in the format `__safety_key__(your_name)`.
+Property names are automatically converted to secure python names. However, you can explicitly specify the name with which the property will be generated for the data schema. To do this, specify the desired name in the property description in the format `__safety_key__(your_name)`.
 
 ## Auto converted names
 For OpenAPI schema with not safety property names `for`, `class`, `33with.dot-and-hyphens&*`
