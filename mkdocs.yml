@@ -10,6 +10,7 @@ theme:
     - navigation.sections
     - navigation.tabs
     - search.suggest
+    - navigation.expand
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
