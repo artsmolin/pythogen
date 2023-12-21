@@ -9,6 +9,7 @@ theme:
     # - navigation.tabs
     - navigation.sections
     - navigation.tabs
+    - navigation.path
     - search.suggest
   palette:
     - media: "(prefers-color-scheme)"
