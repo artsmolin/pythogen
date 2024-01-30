@@ -60,6 +60,11 @@ except AttributeError:
     DEFAULT_AUTH = None
 
 
+class RequestBodySerializer(Protocol):
+    def __call__(self, v: Any) -> Any:
+        ...
+
+
 class MetricsIntegration(Protocol):
     def on_request_error(self, client_name: str, error: Exception, http_method: str, http_target: str,) -> None:
         ...

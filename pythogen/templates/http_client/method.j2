@@ -36,6 +36,10 @@
         {% endif %}
 
         meta: PythogenMetaBox | None = None,
+
+        {%- if operation.request_body %}
+        request_body_serializer: RequestBodySerializer | None = None,
+        {%- endif %}
     ) -> {{ responserepr(operation.responses, document) }}:
         """
         {{ operation.method.value|upper }} {{ operation.path_str }}
@@ -82,7 +86,9 @@
             auth_ = (auth.username, auth.password)
 
         {% if operation.request_body %}
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, {{typerepr(operation.request_body.schema, document)}}):
             json = body.model_dump(by_alias=True)

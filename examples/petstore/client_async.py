@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.31
+#   Version:     0.2.37
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -37,6 +37,11 @@ try:
     DEFAULT_AUTH = httpx.USE_CLIENT_DEFAULT
 except AttributeError:
     DEFAULT_AUTH = None
+
+
+class RequestBodySerializer(Protocol):
+    def __call__(self, v: Any) -> Any:
+        ...
 
 
 class MetricsIntegration(Protocol):
@@ -1192,6 +1197,7 @@ class Client:
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> EmptyBody | Pet:
         """
         POST /pet
@@ -1217,7 +1223,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, Pet):
             json = body.model_dump(by_alias=True)
@@ -1283,6 +1291,7 @@ class Client:
         content: str | bytes | None = None,
         body: AddpetortagRequestBody | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> AddpetortagResponse200 | EmptyBody:
         """
         POST /pet_or_tag
@@ -1308,7 +1317,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, AddpetortagRequestBody):
             json = body.model_dump(by_alias=True)
@@ -1464,6 +1475,7 @@ class Client:
         content: str | bytes | None = None,
         body: bytes | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> ApiResponse | None:
         """
         POST /pet/{petId}/uploadImage
@@ -1495,7 +1507,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, bytes):
             json = body.model_dump(by_alias=True)
@@ -1550,6 +1564,7 @@ class Client:
         content: str | bytes | None = None,
         body: Order | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> EmptyBody | Order:
         """
         POST /store/order
@@ -1575,7 +1590,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, Order):
             json = body.model_dump(by_alias=True)
@@ -1641,6 +1658,7 @@ class Client:
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> None:
         """
         POST /user
@@ -1666,7 +1684,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, User):
             json = body.model_dump(by_alias=True)
@@ -1718,6 +1738,7 @@ class Client:
         content: str | bytes | None = None,
         body: list[User] | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> User | None:
         """
         POST /user/createWithList
@@ -1743,7 +1764,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, list[User]):
             json = body.model_dump(by_alias=True)
@@ -1798,6 +1821,7 @@ class Client:
         content: str | bytes | None = None,
         body: Pet | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> EmptyBody | Pet:
         """
         PUT /pet
@@ -1823,7 +1847,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, Pet):
             json = body.model_dump(by_alias=True)
@@ -1912,6 +1938,7 @@ class Client:
         content: str | bytes | None = None,
         body: User | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> None:
         """
         PUT /user/{username}
@@ -1940,7 +1967,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, User):
             json = body.model_dump(by_alias=True)

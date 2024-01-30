@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.31
+#   Version:     0.2.37
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -45,6 +45,11 @@ try:
     DEFAULT_AUTH = httpx.USE_CLIENT_DEFAULT
 except AttributeError:
     DEFAULT_AUTH = None
+
+
+class RequestBodySerializer(Protocol):
+    def __call__(self, v: Any) -> Any:
+        ...
 
 
 class MetricsIntegration(Protocol):
@@ -2016,6 +2021,7 @@ class Client:
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PostObjectResp | None:
         """
         POST /objects
@@ -2041,7 +2047,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
             json = body.model_dump(by_alias=True)
@@ -2096,6 +2104,7 @@ class Client:
         content: str | bytes | None = None,
         body: PostObjectData | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PostObjectResp | None:
         """
         POST /objects-form-data
@@ -2121,7 +2130,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, PostObjectData):
             json = body.model_dump(by_alias=True)
@@ -2178,6 +2189,7 @@ class Client:
         files: Mapping[str, FileTypes] | Sequence[tuple[str, FileTypes]] | None = None,
         body: PostFile | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PostObjectResp | None:
         """
         POST /multipart-form-data
@@ -2203,7 +2215,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, PostFile):
             json = body.model_dump(by_alias=True)
@@ -2262,6 +2276,7 @@ class Client:
         content: str | bytes | None = None,
         body: RequestBodyAnyofRequestBody | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PostObjectResp | None:
         """
         POST /request-body-anyof
@@ -2287,7 +2302,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, RequestBodyAnyofRequestBody):
             json = body.model_dump(by_alias=True)
@@ -2343,6 +2360,7 @@ class Client:
         content: str | bytes | None = None,
         body: PatchObjectData | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PatchObjectResp | None:
         """
         PATCH /objects/{object_id}
@@ -2371,7 +2389,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, PatchObjectData):
             json = body.model_dump(by_alias=True)
@@ -2427,6 +2447,7 @@ class Client:
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PutObjectResp | None:
         """
         PUT /objects/{object_id}
@@ -2455,7 +2476,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
             json = body.model_dump(by_alias=True)
@@ -2511,6 +2534,7 @@ class Client:
         content: str | bytes | None = None,
         body: PutObjectData | dict[str, Any] | None = None,
         meta: PythogenMetaBox | None = None,
+        request_body_serializer: RequestBodySerializer | None = None,
     ) -> PutObjectResp | None:
         """
         PUT /slow/objects/{object_id}
@@ -2539,7 +2563,9 @@ class Client:
         else:
             auth_ = (auth.username, auth.password)
 
-        if isinstance(body, dict):
+        if request_body_serializer:
+            json = request_body_serializer(body)
+        elif isinstance(body, dict):
             json = body
         elif isinstance(body, PutObjectData):
             json = body.model_dump(by_alias=True)
