@@ -155,6 +155,11 @@ def iterresponsemap(responses: models.ResponsesObject) -> list[tuple[str, str]]:
             mapping.append((code, mapper))
             continue
 
+        if response.schema.type == models.Type.object and response.schema.is_empty_object:
+            mapper = "response.json()"
+            mapping.append((code, mapper))
+            continue
+
         if response.schema.type == models.Type.object:
             mapper = f"{classname(response.schema.id)}.model_validate(response.json())"
             mapping.append((code, mapper))

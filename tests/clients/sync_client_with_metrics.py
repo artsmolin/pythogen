@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.37
+#   Version:     0.2.38
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -1015,6 +1015,76 @@ class Client:
 
         if response.status_code == 200:
             return GetObjectNoRefSchemaResponse200.model_validate(response.json())
+
+    def get_empty_object(
+        self,
+        *,
+        auth: BasicAuth | None = None,
+        content: str | bytes | None = None,
+        meta: PythogenMetaBox | None = None,
+    ) -> dict[Any, Any] | None:
+        """
+        GET /get-empty-object
+        Operation ID: get_empty_object
+        Summary:      Get Empty Object
+        Description:  None
+        """
+
+        method = "get"
+
+        path = "/get-empty-object"
+
+        url = f"{self.base_url}{path}"
+
+        params = None
+
+        headers_ = self.headers.copy()
+
+        if auth is None:
+            auth_ = DEFAULT_AUTH
+        elif isinstance(auth, httpx.Auth):
+            auth_ = auth
+        else:
+            auth_ = (auth.username, auth.password)
+
+        try:
+            response = self.client.request(method, url, headers=headers_, params=params, content=content, auth=auth_)
+        except Exception as exc:
+            if self.metrics_integration:
+                if self.metrics_integration.shadow_path():
+                    metrics_path = "/get-empty-object"
+                else:
+                    metrics_path = path
+                self.metrics_integration.on_request_error(self.client_name, exc, method, metrics_path)
+
+            raise exc
+
+        if self.metrics_integration:
+            if self.metrics_integration.shadow_path():
+                metrics_path = "/get-empty-object"
+            else:
+                metrics_path = path
+            self.metrics_integration.on_request_success(self.client_name, response, method, metrics_path)
+
+        req = RequestBox(
+            client_name=self.client_name,
+            method=method,
+            url=url,
+            params=params,
+            headers=headers_,
+            content=content,
+        )
+
+        resp = ResponseBox(
+            status_code=response.status_code,
+        )
+
+        if meta:
+            meta.request = req
+            meta.response = resp
+
+        if response.status_code == 200:
+            return response.json()
 
     def get_object(
         self,

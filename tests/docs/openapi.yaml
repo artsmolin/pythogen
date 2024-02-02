@@ -79,6 +79,19 @@ paths:
                       type: object
                       additionalProperties: true
                 additionalProperties: false
+  /get-empty-object:
+    get:
+      tags:
+        - test
+      summary: Get Empty Object
+      operationId: get_empty_object
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
   /objects/{object_id}:
     get:
       tags:
@@ -510,6 +523,11 @@ paths:
                 $ref: '#/components/schemas/ListAnyOfResp'
 components:
   schemas:
+    EmptyResponse:
+      additionalProperties: false
+      properties: {}
+      title: EmptyResponse
+      type: object
     Token:
       title: Token
       type: string

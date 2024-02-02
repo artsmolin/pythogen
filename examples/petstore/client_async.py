@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.37
+#   Version:     0.2.38
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -836,7 +836,7 @@ class Client:
             meta.response = resp
 
         if response.status_code == 200:
-            return GetinventoryResponse200.model_validate(response.json())
+            return response.json()
 
     async def getOrderById(
         self,
