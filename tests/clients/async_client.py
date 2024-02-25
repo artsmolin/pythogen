@@ -34,9 +34,9 @@ from httpx import Timeout
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import FieldValidationInfo
 from pydantic import HttpUrl
 from pydantic import RootModel
+from pydantic import ValidationInfo
 from pydantic import field_validator
 
 
@@ -299,7 +299,7 @@ class BaseObjectResp(BaseModel):
     string_data: str
 
     @field_validator("string_data", mode="before")
-    def check(cls, v: str, info: FieldValidationInfo) -> str:
+    def check(cls, v: str, info: ValidationInfo) -> str:
         type_hints = get_type_hints(cls)
         string_data_values: tuple[str] = type_hints["string_data"].__dict__["__args__"]
 

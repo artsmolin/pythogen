@@ -29,7 +29,7 @@ STYLE_UNDERLINE = "\033[4m"
 
 def print_error(title: str, msg: str, invalid_data: Any) -> None:
     print(f"{FMT}{STYLE_BOLD}{BG_RED}{FG_WHITE} {title} {RESET}", file=sys.stderr)
-    print(f"\n{msg}")
+    print(f"\n{msg}", file=sys.stderr)
     if invalid_data:
-        print(f"\n{FMT}{STYLE_UNDERLINE}Invalid data:{RESET}")
-        print(invalid_data)
+        print(f"\n{FMT}{STYLE_UNDERLINE}Invalid data:{RESET}", file=sys.stderr)
+        print(invalid_data, file=sys.stderr)

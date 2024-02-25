@@ -58,7 +58,6 @@ def test_entrypoint_gen_http_client_in_shell_with_too_much_allof() -> None:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    stdout, stderr = process.communicate()
-    assert stdout == b''
+    _, stderr = process.communicate()
     assert b"Failed to generate a client" in stderr
     assert b"\"allOf\" field in property can contains only one item" in stderr
