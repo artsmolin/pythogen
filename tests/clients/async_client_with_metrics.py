@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.38
+#   Version:     0.2.39
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -36,9 +36,9 @@ from prometheus_client import Histogram
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import FieldValidationInfo
 from pydantic import HttpUrl
 from pydantic import RootModel
+from pydantic import ValidationInfo
 from pydantic import field_validator
 
 
@@ -331,7 +331,7 @@ class BaseObjectResp(BaseModel):
     string_data: str
 
     @field_validator("string_data", mode="before")
-    def check(cls, v: str, info: FieldValidationInfo) -> str:
+    def check(cls, v: str, info: ValidationInfo) -> str:
         type_hints = get_type_hints(cls)
         string_data_values: tuple[str] = type_hints["string_data"].__dict__["__args__"]
 

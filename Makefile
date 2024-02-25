@@ -31,6 +31,9 @@ clients:
 	@python pythogen/main.py examples/petstore/openapi.yaml examples/petstore/client_async.py
 	@python pythogen/main.py examples/petstore/openapi.yaml examples/petstore/client_sync.py --sync
 
+broken-clients:
+	@python pythogen/main.py tests/docs/openapi-with-too-much-allof.yaml tests/clients/broken_async_client.py
+
 requirements:
 	pip install --upgrade pip
 	poetry install --remove-untracked
