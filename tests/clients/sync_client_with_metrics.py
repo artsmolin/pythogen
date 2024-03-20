@@ -7,7 +7,7 @@
 #
 # Generator info:
 #   GitHub Page: https://github.com/artsmolin/pythogen
-#   Version:     0.2.39
+#   Version:     0.2.40
 # ==============================================================================
 
 # jinja2: lstrip_blocks: "True"
@@ -421,6 +421,8 @@ class GetObjectNoRefSchemaResponse200(BaseModel):
     )
     string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
     integer_data: int | None = None
+    integer_data_all_params: int | None = Field(None, gt=1, lt=20)
+    integer_data_min_max: int | None = Field(None, ge=1, le=20)
     array_data: list[str] | None = None
     boolean_data: bool | None = None
     array_of_dicts_data: list[dict[Any, Any]] | None = None
@@ -727,6 +729,7 @@ class GetObjectResp(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Addressing by field name, even if there is an alias.
     )
+    integer_data_all_params: int = Field(..., gt=1, lt=20)
     string_data: str | None = Field(None, description="String Data. [__discriminator__(BaseObjectResp.string_data)]")
     integer_data: int | None = None
     array_data: list[str] | None = None
@@ -738,6 +741,7 @@ class GetObjectResp(BaseModel):
     childs: list[GetObjectResp] | None = None
     animal: AnimalObj | None = None
     dictOdArrayOfDicts: DictOdArrayOfDictsObj | None = Field(None, alias="dictOdArrayOfDicts")
+    integer_data_min_max: int | None = Field(None, ge=1, le=20)
 
 
 class GetMessageResp(BaseModel):

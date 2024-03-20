@@ -113,6 +113,10 @@ class SchemaParser:
                 any_of=any_of,
                 is_inline=is_inline,
                 discriminator=self._parse_discriminator(schema_data),
+                minimum=schema_data.get("minimum"),
+                maximum=schema_data.get("maximum"),
+                exclusive_minimum=schema_data.get("exclusiveMinimum", False),
+                exclusive_maximum=schema_data.get("exclusiveMaximum", False),
             )
 
         discr_schema = self._get_discriminator_base_class_schema(schema_data)
@@ -133,6 +137,10 @@ class SchemaParser:
             any_of=any_of,
             is_inline=is_inline,
             discriminator=self._parse_discriminator(schema_data),
+            minimum=schema_data.get("minimum"),
+            maximum=schema_data.get("maximum"),
+            exclusive_minimum=schema_data.get("exclusiveMinimum", False),
+            exclusive_maximum=schema_data.get("exclusiveMaximum", False),
         )
 
     def _parse_all_of(self, parent_id: str, parent_data: dict[str, Any]) -> list[models.SchemaObject]:

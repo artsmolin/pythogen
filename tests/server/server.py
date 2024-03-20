@@ -10,7 +10,13 @@ async def get_object(request: web.Request) -> web.json_response:
     if return_error == 'true':
         return web.json_response(data={'code': 'unknown_error'}, status=500)
     return web.json_response(
-        data={'string_data': object_id, 'integer_data': 1, 'array_data': ['1', '2', '3'], 'boolean_data': True}
+        data={
+            'string_data': object_id, 
+            'integer_data': 1, 
+            'array_data': ['1', '2', '3'], 
+            'boolean_data': True,
+            'integer_data_all_params': 2,
+        },
     )
 
 
@@ -91,8 +97,8 @@ async def delete_object(request: web.Request) -> web.json_response:
 async def get_list_objects(request: web.Request) -> web.json_response:
     return web.json_response(
         data=[
-            {'string_data': '1', 'integer_data': 1, 'array_data': ['1', '2', '3'], 'boolean_data': True},
-            {'string_data': '1', 'integer_data': 1, 'array_data': ['1', '2', '3'], 'boolean_data': True},
+            {'string_data': '1', 'integer_data': 1, 'array_data': ['1', '2', '3'], 'boolean_data': True, 'integer_data_all_params': 2},
+            {'string_data': '1', 'integer_data': 1, 'array_data': ['1', '2', '3'], 'boolean_data': True, 'integer_data_all_params': 3},
         ]
     )
 

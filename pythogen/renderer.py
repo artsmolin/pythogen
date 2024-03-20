@@ -341,6 +341,18 @@ def propertyfield(property: models.SchemaProperty, parent_schema: models.SchemaO
     else:
         args.append("...")
 
+    if property.schema.minimum is not None:
+        if property.schema.exclusive_minimum:
+            args.append(f"gt={property.schema.minimum}")
+        else:
+            args.append(f"ge={property.schema.minimum}")
+
+    if property.schema.maximum is not None:
+        if property.schema.exclusive_maximum:
+            args.append(f"lt={property.schema.maximum}")
+        else:
+            args.append(f"le={property.schema.maximum}")
+
     if property.safety_key and property.safety_key != property.orig_key:
         args.append(f'alias="{property.orig_key}"')
 
