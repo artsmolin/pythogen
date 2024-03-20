@@ -174,6 +174,12 @@ class SchemaObject:
     any_of: list["SchemaObject"] = field(default_factory=list)
     discriminator: Discriminator | None = None
 
+    # numbers
+    minimum: int | None = None
+    maximum: int | None = None
+    exclusive_minimum: bool = False
+    exclusive_maximum: bool = False
+
     # Технические поля
     discriminator_base_class_schema: DiscriminatorBaseClassSchema | None = None
     is_fake: bool = False

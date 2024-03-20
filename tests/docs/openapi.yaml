@@ -65,6 +65,18 @@ paths:
                   integer_data:
                     title: Integer Data
                     type: integer
+                  integer_data_all_params:
+                    title: Integer Data With Params
+                    type: integer
+                    minimum: 1
+                    maximum: 20
+                    exclusiveMinimum: true
+                    exclusiveMaximum: true
+                  integer_data_min_max:
+                    title: Integer Data With Params
+                    type: integer
+                    minimum: 1
+                    maximum: 20
                   array_data:
                     title: Array Data
                     type: array
@@ -640,6 +652,7 @@ components:
     GetObjectResp:
       title: GetObjectResp
       type: object
+      required: [integer_data_all_params]
       properties:
         string_data:
           title: String Data
@@ -695,6 +708,18 @@ components:
                  additionalProperties: true
             - type: object
               additionalProperties: true
+        integer_data_all_params:
+          title: Integer Data With Params
+          type: integer
+          minimum: 1
+          maximum: 20
+          exclusiveMinimum: true
+          exclusiveMaximum: true
+        integer_data_min_max:
+          title: Integer Data With Params
+          type: integer
+          minimum: 1
+          maximum: 20
       additionalProperties: false
     PostObjectData:
       title: PostObjectData

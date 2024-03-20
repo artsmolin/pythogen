@@ -9,8 +9,8 @@ from pythogen.parsers.operations import OperationParser
 
 
 if TYPE_CHECKING:
-    from parsers import SchemaParser
-    from references import RefResolver
+    from pythogen.parsers.references import RefResolver
+    from pythogen.parsers.schemas import SchemaParser
 
 
 logger = logging.getLogger(__name__)
