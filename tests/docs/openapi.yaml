@@ -25,7 +25,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetMessageResp'
-          
+
   /objects/no-ref-schema/{object_id}:
     get:
       tags:
@@ -720,7 +720,19 @@ components:
           type: integer
           minimum: 1
           maximum: 20
+        propertyAllOfSimpleStringRef:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/ExpiredAt'
       additionalProperties: false
+
+    ExpiredAt:
+      type: string
+      example: '16:21:48'
+      description: Время отмены заказа
+      nullable: true
+
+
     PostObjectData:
       title: PostObjectData
       required:
@@ -762,9 +774,9 @@ components:
         url:
           type: string
           format: uri
-        int_enum: 
+        int_enum:
           $ref: '#/components/schemas/IntegerEnum'
-        str_enum: 
+        str_enum:
           $ref: '#/components/schemas/StringEnum'
         int_enum_or_null:
           anyOf:

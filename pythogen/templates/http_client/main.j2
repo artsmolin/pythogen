@@ -428,7 +428,8 @@ class {{ name }}:
 
 {% for model in models %}
 {%- if model.type.value not in ("any_of", "null") and not model.is_empty_object %}
-{{ classname(model.id) }}.model_rebuild()
+if hasattr({{ classname(model.id) }}, "model_rebuild"):
+    {{ classname(model.id) }}.model_rebuild()
 {%- else %}
-{%- endif -%}
+{%- endif %}
 {% endfor %}

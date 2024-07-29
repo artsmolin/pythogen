@@ -2309,16 +2309,42 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-CreateuserswithlistinputRequestBody.model_rebuild()
-FindpetsbytagsResponse200.model_rebuild()
-FindpetsbystatusResponse200.model_rebuild()
-AddpetortagRequestBody.model_rebuild()
-AddpetortagResponse200.model_rebuild()
-ApiResponse.model_rebuild()
-Tag.model_rebuild()
-Category.model_rebuild()
-Pet.model_rebuild()
-User.model_rebuild()
-Address.model_rebuild()
-Customer.model_rebuild()
-Order.model_rebuild()
+if hasattr(CreateuserswithlistinputRequestBody, "model_rebuild"):
+    CreateuserswithlistinputRequestBody.model_rebuild()
+
+
+if hasattr(FindpetsbytagsResponse200, "model_rebuild"):
+    FindpetsbytagsResponse200.model_rebuild()
+
+if hasattr(FindpetsbystatusResponse200, "model_rebuild"):
+    FindpetsbystatusResponse200.model_rebuild()
+
+if hasattr(AddpetortagRequestBody, "model_rebuild"):
+    AddpetortagRequestBody.model_rebuild()
+
+if hasattr(AddpetortagResponse200, "model_rebuild"):
+    AddpetortagResponse200.model_rebuild()
+
+if hasattr(ApiResponse, "model_rebuild"):
+    ApiResponse.model_rebuild()
+
+if hasattr(Tag, "model_rebuild"):
+    Tag.model_rebuild()
+
+if hasattr(Category, "model_rebuild"):
+    Category.model_rebuild()
+
+if hasattr(Pet, "model_rebuild"):
+    Pet.model_rebuild()
+
+if hasattr(User, "model_rebuild"):
+    User.model_rebuild()
+
+if hasattr(Address, "model_rebuild"):
+    Address.model_rebuild()
+
+if hasattr(Customer, "model_rebuild"):
+    Customer.model_rebuild()
+
+if hasattr(Order, "model_rebuild"):
+    Order.model_rebuild()

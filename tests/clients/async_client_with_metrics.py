@@ -446,6 +446,21 @@ class OptionalAnyofStringDataObj(RootModel):
     root: str | None
 
 
+class PropertyAllOfSimpleStringRefRefObj(
+    str,
+):
+    """
+    None
+
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Addressing by field name, even if there is an alias.
+    )
+
+    ...
+
+
 class DictOdArrayOfDictsObj(RootModel):
     """
     None
@@ -742,6 +757,7 @@ class GetObjectResp(BaseModel):
     animal: AnimalObj | None = None
     dictOdArrayOfDicts: DictOdArrayOfDictsObj | None = Field(None, alias="dictOdArrayOfDicts")
     integer_data_min_max: int | None = Field(None, ge=1, le=20)
+    propertyAllOfSimpleStringRef: str | None = Field(None, alias="propertyAllOfSimpleStringRef")
 
 
 class GetMessageResp(BaseModel):
@@ -2868,40 +2884,119 @@ class Client:
         raise Exception('Can\'t parse "{item}"')
 
 
-RequestBodyAnyofRequestBody.model_rebuild()
-GetListObjectsResponse200.model_rebuild()
-RewardsListItem.model_rebuild()
-GetObjectWithInlineArrayResponse200.model_rebuild()
-GetObjectWithArrayResponseResponse200.model_rebuild()
-GetObjectWithArrayResponseResponse200Item.model_rebuild()
-GetObjectNoRefSchemaResponse200.model_rebuild()
-IntEnumOrNullObj.model_rebuild()
-OptionalAnyofStringDataObj.model_rebuild()
-DictOdArrayOfDictsObj.model_rebuild()
-DictOdArrayOfDictsObjItem0.model_rebuild()
-AnimalObj.model_rebuild()
-AnyOfChildObj.model_rebuild()
-TierObj.model_rebuild()
-AllOfRefObjItem2.model_rebuild()
-Cat.model_rebuild()
-Data.model_rebuild()
-AllOfRefObj.model_rebuild()
-AnyOfChildItem.model_rebuild()
-ListAnyOfResp.model_rebuild()
-SafetyKeyForTesting.model_rebuild()
-UnknownError.model_rebuild()
-DeleteObjectResp.model_rebuild()
-PutObjectResp.model_rebuild()
-PatchObjectResp.model_rebuild()
-PostObjectResp.model_rebuild()
-PostFile.model_rebuild()
-PutObjectData.model_rebuild()
-PatchObjectData.model_rebuild()
-PostObjectData.model_rebuild()
-GetObjectResp.model_rebuild()
-GetMessageResp.model_rebuild()
-Dog.model_rebuild()
-DogWithKind.model_rebuild()
-CatWithKind.model_rebuild()
-DiscriminatedOneOfResp.model_rebuild()
-AllOfResp.model_rebuild()
+if hasattr(RequestBodyAnyofRequestBody, "model_rebuild"):
+    RequestBodyAnyofRequestBody.model_rebuild()
+
+if hasattr(GetListObjectsResponse200, "model_rebuild"):
+    GetListObjectsResponse200.model_rebuild()
+
+if hasattr(RewardsListItem, "model_rebuild"):
+    RewardsListItem.model_rebuild()
+
+if hasattr(GetObjectWithInlineArrayResponse200, "model_rebuild"):
+    GetObjectWithInlineArrayResponse200.model_rebuild()
+
+if hasattr(GetObjectWithArrayResponseResponse200, "model_rebuild"):
+    GetObjectWithArrayResponseResponse200.model_rebuild()
+
+if hasattr(GetObjectWithArrayResponseResponse200Item, "model_rebuild"):
+    GetObjectWithArrayResponseResponse200Item.model_rebuild()
+
+
+if hasattr(GetObjectNoRefSchemaResponse200, "model_rebuild"):
+    GetObjectNoRefSchemaResponse200.model_rebuild()
+
+if hasattr(IntEnumOrNullObj, "model_rebuild"):
+    IntEnumOrNullObj.model_rebuild()
+
+if hasattr(OptionalAnyofStringDataObj, "model_rebuild"):
+    OptionalAnyofStringDataObj.model_rebuild()
+
+if hasattr(PropertyAllOfSimpleStringRefRefObj, "model_rebuild"):
+    PropertyAllOfSimpleStringRefRefObj.model_rebuild()
+
+if hasattr(DictOdArrayOfDictsObj, "model_rebuild"):
+    DictOdArrayOfDictsObj.model_rebuild()
+
+
+if hasattr(DictOdArrayOfDictsObjItem0, "model_rebuild"):
+    DictOdArrayOfDictsObjItem0.model_rebuild()
+
+
+if hasattr(AnimalObj, "model_rebuild"):
+    AnimalObj.model_rebuild()
+
+if hasattr(AnyOfChildObj, "model_rebuild"):
+    AnyOfChildObj.model_rebuild()
+
+if hasattr(TierObj, "model_rebuild"):
+    TierObj.model_rebuild()
+
+if hasattr(AllOfRefObjItem2, "model_rebuild"):
+    AllOfRefObjItem2.model_rebuild()
+
+if hasattr(Cat, "model_rebuild"):
+    Cat.model_rebuild()
+
+if hasattr(Data, "model_rebuild"):
+    Data.model_rebuild()
+
+if hasattr(AllOfRefObj, "model_rebuild"):
+    AllOfRefObj.model_rebuild()
+
+if hasattr(AnyOfChildItem, "model_rebuild"):
+    AnyOfChildItem.model_rebuild()
+
+if hasattr(ListAnyOfResp, "model_rebuild"):
+    ListAnyOfResp.model_rebuild()
+
+if hasattr(SafetyKeyForTesting, "model_rebuild"):
+    SafetyKeyForTesting.model_rebuild()
+
+if hasattr(UnknownError, "model_rebuild"):
+    UnknownError.model_rebuild()
+
+if hasattr(DeleteObjectResp, "model_rebuild"):
+    DeleteObjectResp.model_rebuild()
+
+if hasattr(PutObjectResp, "model_rebuild"):
+    PutObjectResp.model_rebuild()
+
+if hasattr(PatchObjectResp, "model_rebuild"):
+    PatchObjectResp.model_rebuild()
+
+if hasattr(PostObjectResp, "model_rebuild"):
+    PostObjectResp.model_rebuild()
+
+if hasattr(PostFile, "model_rebuild"):
+    PostFile.model_rebuild()
+
+if hasattr(PutObjectData, "model_rebuild"):
+    PutObjectData.model_rebuild()
+
+if hasattr(PatchObjectData, "model_rebuild"):
+    PatchObjectData.model_rebuild()
+
+if hasattr(PostObjectData, "model_rebuild"):
+    PostObjectData.model_rebuild()
+
+if hasattr(GetObjectResp, "model_rebuild"):
+    GetObjectResp.model_rebuild()
+
+if hasattr(GetMessageResp, "model_rebuild"):
+    GetMessageResp.model_rebuild()
+
+if hasattr(Dog, "model_rebuild"):
+    Dog.model_rebuild()
+
+if hasattr(DogWithKind, "model_rebuild"):
+    DogWithKind.model_rebuild()
+
+if hasattr(CatWithKind, "model_rebuild"):
+    CatWithKind.model_rebuild()
+
+if hasattr(DiscriminatedOneOfResp, "model_rebuild"):
+    DiscriminatedOneOfResp.model_rebuild()
+
+if hasattr(AllOfResp, "model_rebuild"):
+    AllOfResp.model_rebuild()
