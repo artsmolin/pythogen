@@ -131,7 +131,7 @@ class SchemaParser:
             type=schema_type,
             format=self._parse_format(schema_data),
             items=self._parse_items(schema_id, schema_data),
-            properties=self._parse_properties(schema_type, schema_data),
+            properties=self._parse_properties(schema_id, schema_type, schema_data),
             description=self._get_description(schema_data),
             all_of=all_of,
             any_of=any_of,
@@ -265,6 +265,7 @@ class SchemaParser:
 
     def _parse_properties(
         self,
+        parent_schema_id: str,
         schema_type: models.Type,
         data: dict[str, Any],
     ) -> list[models.SchemaProperty]:
@@ -304,7 +305,7 @@ class SchemaParser:
                         schema = self.parse_item(property_schema_id, property_schema_data)
                     elif "anyOf" in property_schema_data:
                         # extract inline object definition to schema
-                        property_schema_id = key + "_obj"
+                        property_schema_id = parent_schema_id + "_" + key + "_obj"
                         schema = self.parse_item(property_schema_id, property_schema_data)
                         self._inline_schema_aggregator.add(property_schema_id, schema)
                     else:
